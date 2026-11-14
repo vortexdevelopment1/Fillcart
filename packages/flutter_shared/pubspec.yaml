@@ -1,0 +1,5 @@
+name: fillcart_shared
+description: Shared Flutter widgets, themes, networking utilities, and common components for the Fillcart mobile ecosystem.
+version: 0.0.1
+homepage: https://github.com/vortexdevelopment1/Fillcart
+publish_to: "none"
