@@ -13,12 +13,12 @@ interface MonthBarData {
 }
 
 const monthlyData: MonthBarData[] = [
-  { month: 'Jan', totalHeight: 55, hatchedRatio: 38, open: 340, closed: 850, total: 1190 },
-  { month: 'Feb', totalHeight: 40, hatchedRatio: 36, open: 220, closed: 420, total: 640 },
-  { month: 'Mar', totalHeight: 70, hatchedRatio: 32, open: 410, closed: 980, total: 1390 },
-  { month: 'Apr', totalHeight: 62, hatchedRatio: 30, open: 390, closed: 870, total: 1260 },
-  { month: 'May', totalHeight: 85, hatchedRatio: 26, open: 480, closed: 1140, total: 1620 },
-  { month: 'Jun', totalHeight: 75, hatchedRatio: 30, open: 510, closed: 1280, total: 1790 },
+  { month: 'Jan', totalHeight: 65, hatchedRatio: 36, open: 340, closed: 850, total: 1190 },
+  { month: 'Feb', totalHeight: 48, hatchedRatio: 38, open: 220, closed: 420, total: 640 },
+  { month: 'Mar', totalHeight: 78, hatchedRatio: 32, open: 410, closed: 980, total: 1390 },
+  { month: 'Apr', totalHeight: 68, hatchedRatio: 30, open: 390, closed: 870, total: 1260 },
+  { month: 'May', totalHeight: 88, hatchedRatio: 26, open: 480, closed: 1140, total: 1620 },
+  { month: 'Jun', totalHeight: 60, hatchedRatio: 34, open: 510, closed: 1280, total: 1790 },
   {
     month: 'Jul',
     totalHeight: 100,
@@ -28,11 +28,11 @@ const monthlyData: MonthBarData[] = [
     total: 1234,
     isHighlighted: true,
   },
-  { month: 'Aug', totalHeight: 58, hatchedRatio: 35, open: 380, closed: 890, total: 1270 },
-  { month: 'Sep', totalHeight: 48, hatchedRatio: 32, open: 290, closed: 780, total: 1070 },
-  { month: 'Oct', totalHeight: 66, hatchedRatio: 28, open: 440, closed: 1020, total: 1460 },
-  { month: 'Nov', totalHeight: 95, hatchedRatio: 25, open: 520, closed: 1310, total: 1830 },
-  { month: 'Dec', totalHeight: 72, hatchedRatio: 30, open: 460, closed: 1180, total: 1640 },
+  { month: 'Aug', totalHeight: 74, hatchedRatio: 32, open: 380, closed: 890, total: 1270 },
+  { month: 'Sep', totalHeight: 56, hatchedRatio: 30, open: 290, closed: 780, total: 1070 },
+  { month: 'Oct', totalHeight: 64, hatchedRatio: 28, open: 440, closed: 1020, total: 1460 },
+  { month: 'Nov', totalHeight: 94, hatchedRatio: 24, open: 520, closed: 1310, total: 1830 },
+  { month: 'Dec', totalHeight: 76, hatchedRatio: 28, open: 460, closed: 1180, total: 1640 },
 ];
 
 export const PlatformActivityCard: React.FC = () => {
@@ -69,7 +69,7 @@ export const PlatformActivityCard: React.FC = () => {
       className="h-full flex-1 min-h-[220px] flex flex-col justify-between"
     >
       {/* Chart Canvas */}
-      <div className="flex-1 min-h-0 w-full pt-10 pb-0 flex flex-col justify-end">
+      <div className="flex-1 min-h-0 w-full pt-12 pb-0 flex flex-col justify-end">
         {/* 12 Columns aligned to bottom axis */}
         <div className="flex-1 min-h-0 w-full grid grid-cols-12 gap-1 md:gap-2 items-end">
           {monthlyData.map((item) => {
@@ -84,7 +84,7 @@ export const PlatformActivityCard: React.FC = () => {
               >
                 {/* Floating Dark Tooltip above Jul (BLACK #000000, white text) */}
                 {isSelected && (
-                  <div className="absolute -top-[48px] left-1/2 -translate-x-1/2 z-30 bg-black text-white text-[11px] font-sans py-1.5 px-3 rounded-[12px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none">
+                  <div className="absolute -top-[52px] left-1/2 -translate-x-1/2 z-30 bg-black text-white text-[11px] font-sans py-1.5 px-3 rounded-[10px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none">
                     <div className="font-medium text-[11px] leading-tight text-white mb-0.5 font-sans">
                       {item.total.toLocaleString()} Total
                     </div>
@@ -104,37 +104,39 @@ export const PlatformActivityCard: React.FC = () => {
                   </div>
                 )}
 
-                {/* Stacked Bar Container: max-w-[36px], centered */}
+                {/* Stacked Bar Container: max-w-[34px], centered, 4px gap */}
                 <div
-                  className="w-full max-w-[36px] flex flex-col justify-end transition-all duration-300"
+                  className="w-full max-w-[34px] flex flex-col justify-end transition-all duration-300"
                   style={{
                     height: `${item.totalHeight}%`,
-                    gap: '6px', // 6px gap
+                    gap: '4px', // 4px gap matching reference
                   }}
                 >
                   {/* TOP BLOCK:
+                      Reference: rectangular box with slightly rounded corners (rounded-[6px]), NOT pill/oval
                       Normal month: PRIMARY #F5B800 lines over SECONDARY #FCE8A3
                       Highlighted month: PRIMARY #F5B800 lines over WHITE #FFFFFF
                   */}
                   <div
-                    className="w-full rounded-[14px] flex-shrink-0 transition-all duration-300"
+                    className="w-full rounded-[6px] flex-shrink-0 transition-all duration-300"
                     style={{
-                      height: `calc(${hatchedHeightPercent}% - 3px)`,
-                      minHeight: '12px',
+                      height: `calc(${hatchedHeightPercent}% - 2px)`,
+                      minHeight: '14px',
                       backgroundColor: isSelected ? '#FFFFFF' : '#FCE8A3',
-                      backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.5px, transparent 1.5px, transparent 5px)',
-                      border: isSelected ? '1px solid rgba(0, 0, 0, 0.08)' : 'none',
+                      backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.2px, transparent 1.2px, transparent 5px)',
+                      border: isSelected ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
                     }}
                   />
 
                   {/* BOTTOM BLOCK:
+                      Reference: rounded rectangle with rounded-[8px]
                       Normal month: solid SECONDARY #FCE8A3
                       Highlighted month: solid PRIMARY #F5B800
                   */}
                   <div
-                    className="w-full rounded-[14px] flex-1 transition-all duration-300"
+                    className="w-full rounded-[8px] flex-1 transition-all duration-300"
                     style={{
-                      minHeight: '16px',
+                      minHeight: '18px',
                       backgroundColor: isSelected ? '#F5B800' : '#FCE8A3',
                     }}
                   />

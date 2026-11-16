@@ -67,28 +67,28 @@ export const TopOrdersCard: React.FC = () => {
       className="h-[210px] flex flex-col justify-between"
     >
       <div className="flex items-center gap-4 my-auto h-full pt-1 pb-1">
-        {/* Left: Stacked Bar (width 36px, same total height as 4 rows, 6px gap) */}
+        {/* Left: Stacked Bar (width 36px, same total height as 4 rows, 4px gap) */}
         <div
           className="w-[36px] h-full flex flex-col flex-shrink-0 select-none"
-          style={{ gap: '6px' }}
+          style={{ gap: '4px' }}
         >
-          {/* Block 1: SECONDARY #FCE8A3, radius 10px */}
+          {/* Block 1: SECONDARY #FCE8A3, radius 7px */}
           <div
-            className="w-full rounded-[10px] bg-secondary transition-all"
+            className="w-full rounded-[7px] bg-secondary transition-all"
             style={{ height: '28%' }}
             title="Block 1 (Sarah Mitchell)"
           />
 
-          {/* Block 2: PRIMARY #F5B800, radius 8px */}
+          {/* Block 2: PRIMARY #F5B800, radius 6px */}
           <div
-            className="w-full rounded-[8px] bg-primary transition-all"
+            className="w-full rounded-[6px] bg-primary transition-all"
             style={{ height: '11%' }}
             title="Block 2 (David Kim)"
           />
 
-          {/* Block 3: PRIMARY at 55% opacity, radius 8px */}
+          {/* Block 3: PRIMARY at 55% opacity, radius 6px */}
           <div
-            className="w-full rounded-[8px] transition-all"
+            className="w-full rounded-[6px] transition-all"
             style={{
               height: '9%',
               backgroundColor: 'rgba(245, 184, 0, 0.55)',
@@ -96,12 +96,12 @@ export const TopOrdersCard: React.FC = () => {
             title="Block 3 (Priya Patel)"
           />
 
-          {/* Block 4: Hatched pattern (PRIMARY lines on white), radius 10px */}
+          {/* Block 4: Hatched pattern (PRIMARY lines on white), radius 7px */}
           <div
-            className="w-full flex-1 rounded-[10px] border border-black/[0.08] transition-all"
+            className="w-full flex-1 rounded-[7px] border border-black/[0.08] transition-all"
             style={{
               backgroundColor: '#FFFFFF',
-              backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.5px, transparent 1.5px, transparent 5px)',
+              backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.2px, transparent 1.2px, transparent 5px)',
             }}
             title="Block 4 (Others)"
           />
