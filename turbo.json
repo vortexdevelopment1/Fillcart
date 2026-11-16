@@ -2,12 +2,42 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "tasks": {
+    "generate": {
+      "inputs": ["$TURBO_DEFAULT$", "../openapi/v1/openapi.yaml"],
+      "outputs": ["src/generated/**"],
+      "cache": true
+    },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/config/typescript/**"
+      ],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "@fillcart/api-contracts#build": {
+      "dependsOn": ["generate"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/config/typescript/**"
+      ],
+      "outputs": ["dist/**"]
     },
     "type-check": {
-      "dependsOn": ["^type-check"]
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/config/typescript/**"
+      ],
+      "outputs": []
+    },
+    "@fillcart/api-contracts#type-check": {
+      "dependsOn": ["generate"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/config/typescript/**"
+      ],
+      "outputs": []
     },
     "lint": {
       "dependsOn": []

@@ -2,9 +2,29 @@
   "name": "@fillcart/api-contracts",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "echo \"[@fillcart/api-contracts] build pending Phase 2.2.3\"",
+    "generate": "openapi-typescript ../openapi/v1/openapi.yaml -o src/generated/api-schema.ts",
+    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"const fs = require('node:fs'); fs.rmSync('dist', { recursive: true, force: true }); fs.rmSync('src/generated', { recursive: true, force: true });\"",
     "lint": "echo \"[@fillcart/api-contracts] lint pending Phase 2.2.3\"",
-    "type-check": "echo \"[@fillcart/api-contracts] type-check pending Phase 2.2.3\""
+    "test": "echo \"[@fillcart/api-contracts] test pending Phase 2.2.3\"",
+    "type-check": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@fillcart/config": "*",
+    "openapi-typescript": "7.13.0"
   }
 }

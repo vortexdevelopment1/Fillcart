@@ -1,0 +1,6 @@
+openapi: "3.1.0"
+info:
+  title: "Fillcart Platform API"
+  version: "1.0.0"
+  description: "Fillcart Multi-Vendor Commerce Platform API Specification Baseline"
+paths: {}
