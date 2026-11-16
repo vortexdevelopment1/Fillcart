@@ -48,11 +48,11 @@ export const PlatformActivityCard: React.FC = () => {
           </h3>
           <div className="flex items-center gap-3 text-xs text-black/55">
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full border border-black/55" />
+              <span className="w-2 h-2 rounded-full border-[1.5px] border-primary bg-white inline-block" />
               <span className="text-[11px] text-black/55">Open conversations</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-primary" />
+              <span className="w-2 h-2 rounded-full bg-primary inline-block" />
               <span className="text-[11px] text-black/55">Closed</span>
             </div>
           </div>
@@ -112,19 +112,19 @@ export const PlatformActivityCard: React.FC = () => {
                     gap: '4px', // 4px gap matching reference
                   }}
                 >
-                  {/* TOP BLOCK:
-                      Reference: rectangular box with slightly rounded corners (rounded-[6px]), NOT pill/oval
-                      Normal month: PRIMARY #F5B800 lines over SECONDARY #FCE8A3
-                      Highlighted month: PRIMARY #F5B800 lines over WHITE #FFFFFF
+                  {/* TOP BLOCK (Open conversations):
+                      Reference: clean white background (#FFFFFF) with crisp PRIMARY (#F5B800) diagonal lines
+                      Selected month: 1.5px solid #F5B800 border
+                      Unselected month: 1px solid rgba(0, 0, 0, 0.08)
                   */}
                   <div
                     className="w-full rounded-[6px] flex-shrink-0 transition-all duration-300"
                     style={{
                       height: `calc(${hatchedHeightPercent}% - 2px)`,
                       minHeight: '14px',
-                      backgroundColor: isSelected ? '#FFFFFF' : '#FCE8A3',
-                      backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.2px, transparent 1.2px, transparent 5px)',
-                      border: isSelected ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
+                      backgroundColor: '#FFFFFF',
+                      backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.5px, transparent 1.5px, transparent 5.5px)',
+                      border: isSelected ? '1.5px solid #F5B800' : '1px solid rgba(0, 0, 0, 0.08)',
                     }}
                   />
 

@@ -101,7 +101,7 @@ export const TopOrdersCard: React.FC = () => {
             className="w-full flex-1 rounded-[7px] border border-black/[0.08] transition-all"
             style={{
               backgroundColor: '#FFFFFF',
-              backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.2px, transparent 1.2px, transparent 5px)',
+              backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.5px, transparent 1.5px, transparent 5.5px)',
             }}
             title="Block 4 (Others)"
           />
