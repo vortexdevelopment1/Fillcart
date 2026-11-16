@@ -2,9 +2,27 @@
   "name": "@fillcart/shared-types",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "echo \"[@fillcart/shared-types] build pending Phase 2.2.3\"",
+    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"const fs = require('node:fs'); fs.rmSync('dist', { recursive: true, force: true });\"",
     "lint": "echo \"[@fillcart/shared-types] lint pending Phase 2.2.3\"",
-    "type-check": "echo \"[@fillcart/shared-types] type-check pending Phase 2.2.3\""
+    "test": "echo \"[@fillcart/shared-types] test pending Phase 2.2.3\"",
+    "type-check": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@fillcart/config": "*"
   }
 }
