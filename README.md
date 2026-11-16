@@ -41,38 +41,45 @@ fillcart/
 
 ## 2. Technology Stack
 
-| Layer | Technology |
-|---|---|
-| **Monorepo Engine** | Turborepo |
-| **Package Manager** | npm |
-| **Mobile Applications** | Flutter + Dart (Feature-First Architecture) |
-| **Website & Admin** | Next.js + TypeScript (Feature-Based Structure) |
-| **Central Backend** | Express.js + TypeScript (Modular Domain Architecture) |
-| **Database** | PostgreSQL |
-| **ORM** | Prisma |
-| **API Architecture** | REST API |
-| **Real-time Engine** | WebSockets (Planned) |
+| Layer                   | Technology                                            |
+| ----------------------- | ----------------------------------------------------- |
+| **Runtime**             | Node.js v26.13.1 LTS                                  |
+| **Monorepo Engine**     | Turborepo (npm-compatible)                            |
+| **Package Manager**     | npm Workspaces (v11.20.0)                             |
+| **Mobile Applications** | Flutter (v3.44.4 stable) + Dart (v3.12.2)             |
+| **Website & Admin**     | Next.js + TypeScript (Feature-Based Structure)        |
+| **Central Backend**     | Express.js + TypeScript (Modular Domain Architecture) |
+| **Database**            | PostgreSQL                                            |
+| **ORM**                 | Prisma 7                                              |
+| **API Architecture**    | REST API (OpenAPI 3.1 authoritative contract)         |
+| **Real-time Engine**    | WebSockets (Planned)                                  |
 
 ---
 
 ## 3. Applications Breakdown
 
 ### A. Customer Mobile App (`apps/customer-app`)
+
 Built with **Flutter & Dart** using feature-first architecture. Handles customer discovery, product browsing, cart management, checkout, order tracking, addresses, payment gateway integration, and customer profile.
 
 ### B. Vendor Mobile App (`apps/vendor-app`)
+
 Built with **Flutter & Dart**. Empowers store owners and merchants to manage catalogs, real-time inventories, incoming orders, preparation workflows, promotional offers, store earnings, and analytics.
 
 ### C. Rider Mobile App (`apps/rider-app`)
+
 Built with **Flutter & Dart**. Equips delivery partners with shift availability toggling, dispatch delivery requests, pickup confirmations, route navigation, live delivery tracking, earnings summaries, and delivery history.
 
 ### D. Public Website (`apps/website`)
+
 Built with **Next.js & TypeScript**. Serves as the high-performance, SEO-optimized public portal showcasing platform offerings, onboarding funnels for vendors/riders, corporate information, careers, and support.
 
 ### E. Admin Dashboard (`apps/admin-dashboard`)
+
 Built with **Next.js & TypeScript**. The mission-control dashboard for Fillcart operations, platform governance, inventory auditing, vendor KYC, rider verification, dispute resolution, financial reports, analytics, and global system configurations.
 
 ### F. Central Backend API (`apps/backend`)
+
 Built with **Express.js & TypeScript** following clean modular architecture. Organizes business domains independently into 25 dedicated modules (auth, users, vendors, catalog, orders, payments, delivery, refunds, analytics, etc.), each containing its own controllers, services, repositories, models, DTOs, validators, routes, interfaces, and test suites.
 
 ---

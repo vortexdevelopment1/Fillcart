@@ -1,0 +1,14 @@
+node_modules/
+package-lock.json
+dist/
+build/
+.next/
+out/
+coverage/
+.turbo/
+.dart_tool/
+apps/backend/src/generated/
+apps/customer-app/
+apps/vendor-app/
+apps/rider-app/
+packages/flutter_shared/

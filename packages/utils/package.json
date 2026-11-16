@@ -1,0 +1,10 @@
+{
+  "name": "@fillcart/utils",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "echo \"[@fillcart/utils] build pending Phase 2.2.3\"",
+    "lint": "echo \"[@fillcart/utils] lint pending Phase 2.2.3\"",
+    "type-check": "echo \"[@fillcart/utils] type-check pending Phase 2.2.3\""
+  }
+}

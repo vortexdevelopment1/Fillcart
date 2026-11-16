@@ -1,0 +1,10 @@
+{
+  "name": "@fillcart/shared-types",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "echo \"[@fillcart/shared-types] build pending Phase 2.2.3\"",
+    "lint": "echo \"[@fillcart/shared-types] lint pending Phase 2.2.3\"",
+    "type-check": "echo \"[@fillcart/shared-types] type-check pending Phase 2.2.3\""
+  }
+}

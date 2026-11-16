@@ -1,0 +1,37 @@
+{
+  "name": "fillcart",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "npm@11.20.0",
+  "engines": {
+    "node": ">=26.13.1",
+    "npm": ">=11.20.0"
+  },
+  "workspaces": [
+    "apps/backend",
+    "apps/website",
+    "apps/admin-dashboard",
+    "packages/config",
+    "packages/design-tokens",
+    "packages/shared-types",
+    "packages/validations",
+    "packages/constants",
+    "packages/utils",
+    "packages/ui-web",
+    "packages/api-contracts/typescript"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "type-check": "turbo run type-check",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md,yaml,yml}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,md,yaml,yml}\" --ignore-path .prettierignore"
+  },
+  "devDependencies": {
+    "prettier": "3.5.2",
+    "turbo": "2.11.11",
+    "typescript": "5.8.2"
+  }
+}
