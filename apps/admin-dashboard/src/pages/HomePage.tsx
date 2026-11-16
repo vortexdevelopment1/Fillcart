@@ -10,7 +10,7 @@ import { PlatformActivityCard } from '../components/charts/PlatformActivityCard'
 
 export const HomePage: React.FC = () => {
   return (
-    <div className="w-full h-full min-h-0 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_clamp(240px,24%,330px)] gap-4">
+    <div className="w-full h-full min-h-0 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_clamp(260px,24%,330px)] gap-4">
       {/* ──────────────── LEFT COLUMN ────────────────
           Nested grid: 2 equal columns, 3 rows (auto, auto, 1fr)
           Row 3 (Platform Activity) takes all remaining vertical space */}
