@@ -1,0 +1,12 @@
+{
+  "name": "@fillcart/backend",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo \"[@fillcart/backend] build pending Phase 2.2.4\"",
+    "lint": "echo \"[@fillcart/backend] lint pending Phase 2.2.4\"",
+    "test": "echo \"[@fillcart/backend] test pending Phase 2.2.4\"",
+    "type-check": "echo \"[@fillcart/backend] type-check pending Phase 2.2.4\""
+  }
+}

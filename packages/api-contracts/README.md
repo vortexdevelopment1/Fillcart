@@ -35,11 +35,11 @@ packages/api-contracts/
 graph TD
     A["OpenAPI Specification (packages/api-contracts/openapi/)"] -->|"Generates TypeScript Types"| B["TypeScript Contracts (packages/api-contracts/typescript/)"]
     A -->|"Generates Dart Models & Clients"| C["Dart Contracts (packages/api-contracts/dart/)"]
-    
+
     B --> D["apps/backend (Express.js)"]
     B --> E["apps/website (Next.js)"]
     B --> F["apps/admin-dashboard (Next.js)"]
-    
+
     C --> G["apps/customer-app (Flutter)"]
     C --> H["apps/vendor-app (Flutter)"]
     C --> I["apps/rider-app (Flutter)"]

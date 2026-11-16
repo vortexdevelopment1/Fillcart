@@ -1,0 +1,10 @@
+{
+  "name": "@fillcart/api-contracts",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "echo \"[@fillcart/api-contracts] build pending Phase 2.2.3\"",
+    "lint": "echo \"[@fillcart/api-contracts] lint pending Phase 2.2.3\"",
+    "type-check": "echo \"[@fillcart/api-contracts] type-check pending Phase 2.2.3\""
+  }
+}

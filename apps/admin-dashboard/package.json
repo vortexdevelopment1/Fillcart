@@ -1,0 +1,11 @@
+{
+  "name": "@fillcart/admin-dashboard",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "echo \"[@fillcart/admin-dashboard] build pending Phase 2.2.6\"",
+    "lint": "echo \"[@fillcart/admin-dashboard] lint pending Phase 2.2.6\"",
+    "test": "echo \"[@fillcart/admin-dashboard] test pending Phase 2.2.6\"",
+    "type-check": "echo \"[@fillcart/admin-dashboard] type-check pending Phase 2.2.6\""
+  }
+}
