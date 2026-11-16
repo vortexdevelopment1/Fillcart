@@ -1,0 +1,8 @@
+apis:
+  fillcart-v1:
+    root: packages/api-contracts/openapi/v1/openapi.yaml
+extends:
+  - recommended
+rules:
+  no-empty-servers: warn
+  info-license: off

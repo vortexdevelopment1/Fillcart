@@ -18,8 +18,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "node -e \"const fs = require('node:fs'); fs.rmSync('dist', { recursive: true, force: true });\"",
-    "lint": "echo \"[@fillcart/design-tokens] lint pending Phase 2.2.3\"",
-    "test": "echo \"[@fillcart/design-tokens] test pending Phase 2.2.3\"",
+    "lint": "eslint src",
+    "test": "vitest run",
     "type-check": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

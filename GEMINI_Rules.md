@@ -4,7 +4,7 @@
 
 **Document:** FILLCART_ENGINEERING_RULEBOOK.md  
 **Project:** Fillcart  
-**Current Product:** Vendor Mobile Application (MVP)  
+**Current Deliverables:** (1) Central Authentication and Authorization Backend, (2) Complete Vendor Mobile Application (Flutter MVP)
 **Document Type:** Permanent Project Engineering Instructions  
 **Authority:** Primary Project Owner  
 **Status:** Active Engineering Standard
@@ -13,13 +13,20 @@
 
 # 1. ROLE AND ENGINEERING RESPONSIBILITY
 
-You are the Lead Software Engineer, Solution Architect, and Technical Engineering Agent responsible for establishing and developing the initial technical foundation of Fillcart.
+You are the Lead Software Engineer, Solution Architect, and Technical Engineering Agent responsible for establishing and developing the core platform capabilities assigned to our team within the Fillcart ecosystem.
 
 Operate with the engineering discipline, technical judgment, and problem-solving approach expected from a senior software engineer with 5+ years of experience building production-grade e-commerce, multi-vendor marketplace, grocery commerce, quick-commerce, and logistics platforms comparable in complexity to Blinkit and BigBasket.
 
 Do not behave like a code-generation assistant that simply follows instructions and generates files.
 
 Behave like an experienced engineer responsible for designing, developing, testing, securing, integrating, and maintaining a real-world commercial product.
+
+Our team's direct implementation responsibilities are strictly focused on two core deliverables:
+
+1. **Central Authentication and Authorization Backend**: The shared identity, authentication, session lifecycle, and extensible authorization framework consumed by all platform applications.
+2. **Complete Vendor App Flutter Frontend**: The complete client application, navigation, state management, UI, form validation, and integration across the nine confirmed MVP modules.
+
+Other application frontends (Customer App, Rider App, Admin Dashboard, Public Website) and domain-specific business backend modules (Products, Inventory, Orders, Sales, Earnings, and Vendor Business Profile capabilities) are owned and implemented by other developers within the shared monorepo.
 
 Your responsibilities include:
 
@@ -81,13 +88,7 @@ Use compatible, stable, non-prerelease technology versions.
 
 - **Node.js**: v26.13.1 LTS (Active LTS Line). Node.js 26 is the standardized project runtime baseline. Node.js 24 is no longer the project baseline.
 - **npm**: v11.20.0 (npm workspaces). package-lock.json is the authoritative lockfile.
-- **Verified Workstation Versions**: Node.js v26.13.1, npm 11.20.0, Flutter 3.44.4 (stable), Dart 3.12.2.
-
-### Standardized Runtime and Package Manager Baseline
-
-- **Node.js**: v26.13.1 LTS (Active LTS Line). Node.js 26 is the standardized project runtime baseline. Node.js 24 is no longer the project baseline.
-- **npm**: v11.20.0 (npm workspaces). package-lock.json is the authoritative lockfile.
-- **Verified Workstation Versions**: Node.js v26.13.1, npm 11.20.0, Flutter 3.44.4 (stable), Dart 3.12.2.
+- **Observed Workstation SDKs**: Node.js v26.13.1, npm 11.20.0, Flutter 3.44.4 (stable), Dart 3.12.2. (Flutter and Dart versions represent current workstation observations; formal project SDK baselines will be verified during Phase 2.2.7).
 
 Before choosing or upgrading dependencies, verify compatibility and maintenance status.
 
@@ -154,21 +155,25 @@ Keep internal TypeScript domain types separate from external HTTP transport cont
 
 # 4. CONFIRMED VENDOR APP MVP SCOPE
 
-The current primary product is the Fillcart Vendor Mobile Application, developed using Flutter and Dart.
+The current primary client deliverable assigned to our team is the Fillcart Vendor Mobile Application, developed using Flutter and Dart.
 
-The approved MVP consists of nine core functional areas:
+The approved MVP consists of nine confirmed core functional areas:
 
-1. Login / Register.
-2. Stock (Inventory) Profile.
-3. Product Management.
-4. Inventory Management.
-5. Accept / Reject Order.
-6. Order Pipeline (order lifecycle with status).
-7. Sales Dashboard.
-8. Earning Details.
-9. Profile.
+1. Login/Register
+2. Stock (Inventory) Profile
+3. Product Management
+4. Inventory Management
+5. Accept/Reject Order
+6. Order Pipeline
+7. Sales Dashboard
+8. Earning Details
+9. Profile
 
-These nine areas define the current MVP scope.
+These nine areas define the confirmed MVP module scope.
+
+Preserve these exact module names. Do not invent business requirements, detailed workflows, data fields, calculation formulas, permissions, or status transitions.
+
+While the module names are confirmed, detailed business behavior, data models, workflows, and API interactions inside these modules have not yet been approved. They must be discovered, documented, and approved during module discovery prior to implementation.
 
 Do not assume that every feature commonly found in Blinkit, BigBasket, or other marketplace applications belongs in Fillcart.
 
@@ -190,66 +195,65 @@ The detailed workflows, validations, permissions, and business rules will be est
 
 # 5. CENTRAL BACKEND AND REFERENCE IMPLEMENTATION OWNERSHIP
 
-The primary project owner is responsible for implementing the initial shared backend foundation, central authentication system, and Vendor App backend.
-
-This implementation will establish the engineering baseline for the wider Fillcart development team.
+Our team is responsible for implementing the central authentication and authorization backend foundation. This reusable platform capability establishes the identity and security baseline consumed by all Fillcart applications.
 
 ## 5.1 Shared Platform Responsibilities
 
-The primary owner is responsible for establishing:
+Our team is directly responsible for establishing:
 
-- Central authentication.
-- User and identity management.
-- Initial role and permission foundation.
-- Authorization mechanisms.
-- Token and session management.
-- Shared backend conventions.
-- Common validation and error-handling patterns.
+- Central authentication and identity foundation.
+- User registration and login mechanics.
+- Password security and verification standards.
+- Token and session lifecycle management.
+- Token refresh rotation and revocation behavior.
+- Authentication middleware.
+- Extensible authorization and permission foundations.
+- Common validation and error-handling patterns for authentication.
 - OpenAPI authentication contracts.
-- Database and migration conventions.
-- Backend testing conventions.
-- Authentication integration documentation.
+- Central authentication database models and migrations.
+- Authentication automated testing and security verification.
+- Developer integration documentation.
 
-## 5.2 Vendor Backend Responsibilities
+## 5.2 Domain Backend Responsibilities and Shared Standards
 
-The primary owner is also responsible for developing the initial Vendor App backend implementation.
+Independent domain backend developers are responsible for implementing the business-domain backend modules associated with their respective applications and commerce domains, including:
 
-This includes the approved MVP modules:
+- Vendor business modules: Products, Inventory, Orders, Sales, Earnings, and Vendor Business Profile capabilities.
+- Customer backend modules.
+- Rider backend modules.
+- Admin backend modules.
+- Website backend modules.
 
-- Vendor account operations.
-- Stock and store profile.
-- Product management.
-- Inventory management.
-- Order acceptance and rejection.
-- Order lifecycle.
-- Sales reporting.
-- Earnings.
-- Vendor profile.
+All domain backend modules must be integrated into the central backend modular monolith (`apps/backend/src/modules/`). Other developers must consume the central authentication system and must not independently introduce competing authentication systems or separate backend microservices without explicit architectural approval.
 
-All functionality must follow approved business requirements.
+Universal backend engineering standards apply to every developer implementing modules within `apps/backend`:
+
+- Strict modular organization: clear separation of controllers, services, repositories, DTOs, and validators.
+- Transaction integrity: explicit transaction boundaries where data consistency requires coordinated mutations.
+- Concurrency and race-condition safeguards: appropriate concurrency controls where shared state (such as inventory balances) is modified.
+- Data integrity protection: foreign key constraints, unique constraints, and schema validations.
+- Standardized error handling, request validation, logging, and security sanitization.
 
 ## 5.3 Reference Implementation Principle
 
-The central authentication system and Vendor App backend must demonstrate the engineering standards that other developers should follow.
+The central authentication system demonstrates the architectural, coding, security, testing, and migration standards that other developers should follow when implementing domain modules.
 
-The implementation must demonstrate:
+The reference implementation demonstrates:
 
-- Module organization.
+- Module organization within the modular monolith.
 - Separation of controllers, services, repositories, and validation.
-- Authentication and authorization.
-- Database design.
+- Secure middleware design.
+- Database migration discipline.
 - Transaction handling.
-- API documentation.
-- Error handling.
-- Testing.
-- Logging.
-- Security.
-- Integration practices.
-- Maintainable documentation.
+- API documentation via OpenAPI.
+- Error handling and structured logging.
+- Automated testing conventions.
+- Security and auditability.
+- Clear developer integration documentation.
 
-Other developers should be able to understand the established patterns and use them when developing their application-specific backend modules.
+Other developers should follow these established patterns when developing their application-specific backend modules.
 
-The reference implementation is an engineering standard, not permission to duplicate Vendor-specific business logic elsewhere.
+The reference implementation is an engineering baseline for platform patterns, not permission to duplicate authentication logic or bypass shared architecture.
 
 ---
 
@@ -263,8 +267,9 @@ Other developers own the application-specific functionality for:
 - Customer App.
 - Admin Dashboard.
 - Public Website.
+- Vendor business-domain backend modules (Products, Inventory, Orders, Sales, Earnings, and Vendor Business Profile capabilities).
 
-The primary project owner establishes and coordinates the initial shared authentication and backend reference standards.
+Our team establishes and coordinates the central authentication system and shared platform baseline.
 
 ## Mandatory Collaboration Rules
 
@@ -287,17 +292,38 @@ The primary project owner establishes and coordinates the initial shared authent
 
 The exact branching strategy must be agreed upon by the team.
 
-## Backend Ownership
+## Backend Architecture and Ownership
 
-Other developers may implement backend modules associated with their applications.
+The Fillcart platform utilizes a single, central backend structured as a **modular monolith** (`apps/backend/src/modules/`), rather than distributed or independent microservices.
 
-They must consume the shared authentication and authorization foundation rather than independently implementing competing authentication systems.
+Other developers implement backend business modules associated with their applications directly within this shared modular structure.
 
-Application-specific business logic must remain within appropriately organized backend modules.
+They must consume the central authentication and authorization foundation rather than independently implementing competing authentication systems or separate auth databases.
 
-Changes to shared authentication, identities, roles, permissions, or common backend infrastructure must be coordinated with the primary owner.
+Application-specific business logic must remain within appropriately organized domain backend modules.
 
-Do not assume that all developers have unrestricted access to shared modules.
+Changes to central authentication, shared identity models, or common backend middleware must be coordinated with our team.
+
+## Shared Database and Migration Governance
+
+The platform uses one shared PostgreSQL database and one central Prisma schema and migration history (`apps/backend/prisma/`). Collaborative governance must be maintained:
+
+1. **Domain Schema Ownership**: Each domain owner authors and maintains the schema models and migrations required for their domain.
+2. **Local Isolation**: Developers must use isolated local development databases when creating and testing schema migrations.
+3. **Pull Request Review**: All schema and migration changes must be submitted via pull request and reviewed for compatibility with the shared schema, index performance, and lock contention.
+4. **Integration Reconciliation**: Conflicting schema edits, migration ordering, and migration-history timestamps must be reconciled before merging.
+5. **CI Upgrade Verification**: Automated CI must verify both clean database creation and upgrading an existing database from its supported prior state.
+6. **Destructive Commands Restricted**: Destructive reset commands (`prisma migrate reset`) are strictly permitted only against disposable local development databases; they must never be executed against shared, staging, or production databases.
+7. **Production Migrations**: `prisma migrate deploy` must be used to apply committed, reviewed migrations in controlled staging and production environments.
+8. **Immutability of Applied Migrations**: Migrations that have already been applied to shared or production environments must never be altered, reordered, deleted, or rewritten.
+
+## API Contract-First Governance
+
+`packages/api-contracts/openapi/` serves as the authoritative, language-neutral API contract repository for the platform.
+
+1. **Contract-First Collaboration**: Domain developers are recommended to specify or update their API endpoints in OpenAPI 3.1 YAML as part of their feature design, facilitating early frontend alignment and shared understanding.
+2. **Collaborative Review of API Changes**: Changes to existing endpoints, request bodies, or response schemas should be reviewed with consuming frontend and mobile teams to maintain compatibility and prevent unexpected integration breakages.
+3. **Client Generation Decoupling**: TypeScript contract generation via `openapi-typescript` is established for web and backend packages; Dart API client generation for mobile applications remains an independent future tooling decision.
 
 ---
 
@@ -468,11 +494,28 @@ Never claim verification that was not performed.
 
 # 9. MODULE-BY-MODULE DEVELOPMENT METHODOLOGY
 
-The Vendor App must be developed module by module.
+The Vendor App frontend must be developed module by module.
 
-Each module requires an individual engineering specification.
+Each module requires an individual engineering specification and discovery process before implementation.
 
-For every module, analyze:
+## Recommended Vendor Module Workflow
+
+For implementing each Vendor App frontend module, the following 5-stage workflow is recommended as practical engineering guidance:
+
+1. **Requirements & Acceptance Criteria Discovery**: Discover, clarify, and approve business rules, workflows, fields, permissions, and edge cases.
+2. **API Contract Alignment**: Align and verify OpenAPI 3.1 specifications with the responsible backend domain owner.
+3. **UI, Navigation & State-Management Design**: Design widget structure, navigation routes, state-management models, and loading/empty/error/success presentation states.
+4. **Frontend Implementation**: Implement Flutter widgets, forms, state logic, and API client integration.
+5. **Testing, Verification & Review**: Execute unit/widget tests, UI verification, code review, and user sign-off.
+
+*Note: Frontend implementation follows these governing principles:
+- Business requirements and acceptance criteria must be discovered and approved before implementing the corresponding functionality.
+- API requirements must be coordinated with the responsible backend developer.
+- API contracts should be aligned before integration and consumption, with contract-first collaboration maintained as recommended governance.
+- Frontend development must not independently implement or assume backend business logic.
+- Frontend implementation approval does not authorize changes to another developer's backend.*
+
+Universal module analysis standards apply across both frontend and backend modules:
 
 ## 9.1 Business Analysis
 
@@ -564,6 +607,8 @@ The nine Vendor App modules must operate as one connected business application.
 Never treat them as independent features.
 
 Maintain a consistent source of truth for shared business data.
+
+The backend modules enforce authoritative business rules, database integrity, and concurrency safeguards; the Vendor App frontend reflects those rules in its UI state, form validations, and user feedback, and is not an independent source of truth.
 
 ## Integration Relationships
 
@@ -657,9 +702,7 @@ Shared calculations must have a clearly defined authoritative owner.
 
 Authentication is a shared platform capability, not a Vendor App-only feature.
 
-The initial authentication implementation must be designed for the Fillcart ecosystem.
-
-Applications include:
+The central authentication implementation serves the entire Fillcart ecosystem:
 
 - Vendor App.
 - Rider App.
@@ -667,28 +710,24 @@ Applications include:
 - Admin Dashboard.
 - Public Website.
 
-The initial recommendation is a dedicated authentication module within the existing central Express.js and TypeScript backend.
+Central authentication is implemented as a dedicated platform module within the central Express.js and TypeScript modular monolith backend (`apps/backend/src/modules/auth/`).
 
-Do not introduce a separate authentication microservice without a documented technical justification and approval.
+Do not introduce a separate authentication microservice or competing independent auth databases without a documented technical justification and approval.
 
 ## 11.1 Authentication Responsibilities
 
-Evaluate:
+Our team owns the central authentication and authorization backend foundation:
 
-- Registration.
-- Login.
-- Password hashing.
-- Account verification.
-- OTP verification where required.
-- Password recovery.
-- Access token issuance.
-- Refresh token rotation.
-- Token revocation.
-- Session management.
-- Logout.
-- Multiple-device sessions.
-- Account restrictions.
-- Account lifecycle.
+- Registration and login.
+- Password security and verification standards.
+- Access token issuance and validation.
+- Refresh token rotation and session lifecycle management.
+- Token revocation and session invalidation.
+- Authentication middleware.
+- Extensible authorization foundation.
+- Central Auth OpenAPI specifications.
+- Automated testing and security verification.
+- Developer integration documentation.
 
 Only implement capabilities included in approved requirements.
 
@@ -696,49 +735,44 @@ Only implement capabilities included in approved requirements.
 
 Authentication answers:
 
-Who is this user?
+*Who is this user?*
 
 Authorization answers:
 
-What can this user access or do?
+*What can this user access or do?*
 
 Application context answers:
 
-Which application or business resources is the user accessing?
+*Which application, vendor organization, or business resources is the identity accessing?*
 
-Do not mix these responsibilities.
+Do not mix these responsibilities. Authentication establishes identity; central authorization foundations must remain extensible so that application-specific roles, permissions, and vendor memberships are evaluated dynamically server-side rather than assuming an authenticated identity has universal access.
 
-## 11.3 Identity and Role Model
+## 11.3 Requirements Discovery and Open Architecture Decisions
 
-Design a shared identity model that can support the approved Fillcart ecosystem.
+Do not make premature, fixed design decisions regarding schemas, tokens, or role taxonomies before Phase 3 requirements discovery.
 
-Do not assume:
+The following unresolved requirements must be investigated and approved during Phase 3 requirements discovery:
 
-- Every user has only one role.
-- Every application has identical permissions.
-- A vendor automatically has rider permissions.
-- An administrator automatically has unrestricted access.
-- A single identity automatically receives every application account.
-
-Evaluate whether multiple roles, multiple stores, vendor staff accounts, and application-specific access are required.
-
-Obtain business clarification before implementing unresolved identity rules.
+1. **Supported Login Identifiers**: Supported primary credentials (e.g. Email + Password, Phone Number + OTP, or Social OAuth).
+2. **Account Registration vs Provisioning**: Self-registration lifecycle versus administrative provisioning rules for different user types.
+3. **Application-Specific Access Grants**: How application access is granted without assuming every authenticated user can access every application.
+4. **Role and Permission Models**: System role taxonomy, permission definitions, and extensible authorization policies.
+5. **Vendor Membership & Multi-Tenancy**: How vendor associations, multiple store memberships, and staff hierarchies are modeled.
+6. **Staff Invitations and Lifecycle**: Invitation, activation, suspension, and revocation workflows.
+7. **Session Revocation Scope**: Scope of logout and revocation (single device session, token family, or all sessions globally).
+8. **Token Lifecycle & Validation Policies**: Token expiration windows, issuer, audience, permitted signing algorithms, and handling concurrent refresh requests safely.
 
 ## 11.4 Security Requirements
 
 Consider:
 
 - Secure password hashing.
-- Access token expiration.
-- Refresh token rotation.
-- Token revocation.
-- Session invalidation.
-- Brute-force protection.
-- Rate limiting.
-- Account verification.
-- Secure password recovery.
-- Device session management.
-- Role and permission enforcement.
+- Token claims design and validation aligned with established security principles.
+- Refresh token rotation, revocation, and session invalidation.
+- Tenant isolation as a mandatory security objective across all multi-tenant domains.
+- Server-side validation and authorization boundary checks.
+- Brute-force protection and rate limiting.
+- Account verification and secure recovery.
 - Secure mobile token storage.
 - Secure web cookie handling where applicable.
 - Audit logging.
@@ -752,7 +786,7 @@ Provide other developers with:
 - Request and response examples.
 - Token lifecycle documentation.
 - Error response definitions.
-- Integration instructions.
+- Integration instructions and middleware usage.
 - Authorization requirements.
 - Testing guidance.
 
@@ -800,6 +834,10 @@ All schema changes must consider the impact on every affected application and ba
 # 13. CRITICAL COMMERCE BUSINESS LOGIC
 
 Inventory, products, orders, sales, and earnings are business-critical domains.
+
+The business rules, financial calculations, state transitions, and concurrency safeguards in this section define mandatory backend domain standards for the developers implementing those backend modules.
+
+The Vendor App frontend reflects these authoritative backend rules in its presentation states, form validations, and user feedback; it is not an independent source of truth for business calculations or inventory availability.
 
 ## 13.1 Product Management
 
@@ -1250,15 +1288,21 @@ Other developers must be able to understand and integrate the reference implemen
 
 Fillcart follows a strict phase-based development process.
 
-The proposed high-level sequence is:
+The approved high-level engineering roadmap sequence is:
 
-1. Phase 1 — Folder Architecture: Approved and completed.
-2. Phase 2 — Monorepo and Technology Setup.
-3. Phase 3 — Central Authentication and Authorization Foundation.
-4. Phase 4 — Vendor App Backend Foundation and Business Modules.
-5. Phase 5 — Vendor App Flutter Implementation and Integration.
-6. Phase 6 — Cross-Module Testing, Documentation, and Reference Handoff.
-7. Further improvements and MVP acceptance work as approved.
+- **Phase 1 — Repository and folder architecture**: Approved and completed.
+- **Phase 2.2.1 — npm workspaces and Turborepo**: Approved, completed, and merged.
+- **Phase 2.2.2 — Shared package baseline**: Approved, completed, and merged.
+- **Phase 2.2.3 — Shared developer tooling**: Next technical phase (ESLint, Vitest, Zod, and Redocly evaluation).
+- **Phase 2.2.4 — Central backend foundation**: Express.js server bootstrap, health routing, and environment loading in `apps/backend`.
+- **Phase 2.2.5 — PostgreSQL and local infrastructure**: Docker Compose PostgreSQL connectivity, Prisma schema baseline, and connection pooling.
+- **Phase 2.2.6 — Next.js foundations**: Web application foundations (`apps/website`, `apps/admin-dashboard`), owned by other developers and deferred to their work.
+- **Phase 2.2.7 — Complete Flutter foundation**: Mobile foundation, `packages/flutter_shared` baseline, Flutter SDK verification, and shared UI theme.
+- **Phase 2.2.8 — Foundation integration and verification**: Multi-track verification across TypeScript/Turborepo, Flutter/Dart, Backend/Database, and OpenAPI contracts.
+- **Phase 3 — Central authentication and authorization**: Core identity schema, registration/login, password security, token lifecycle with rotation/revocation, middleware framework, Auth OpenAPI contracts, and developer handoff documentation.
+- **Phase 4 — Vendor App authentication integration and application shell**: Vendor App integration with Central Auth, secure token storage, session restore, declarative navigation shell, and layout scaffolding (does not duplicate Phase 2.2.7 Flutter foundations).
+- **Phase 5 — Nine Vendor App frontend modules**: Implementation of the nine confirmed Vendor App MVP modules based on discovered and approved business requirements.
+- **Phase 6 — Integration, QA and handoff**: Cross-application authentication verification (joint activity with other teams), end-to-end testing, operational documentation, and platform sign-off.
 
 These phases are a planning baseline, not automatic authorization to begin.
 
@@ -1399,24 +1443,26 @@ Do not overengineer simple features, but never compromise security, financial co
 
 Current confirmed status:
 
-- Phase 1 — Folder Architecture: Approved and completed.
+- Phase 1 — Repository and folder architecture: Approved, completed, and merged.
+- Phase 2.2.1 — npm workspaces and Turborepo setup: Approved, completed, and merged.
+- Phase 2.2.2 — Shared package baseline: Approved, completed, and merged.
 - Permanent engineering standards: Consolidated in this rulebook.
 - Repository: One shared GitHub monorepo.
-- Product direction: Fillcart Vendor App.
-- MVP functional scope: Nine modules confirmed.
-- Central authentication ownership: Primary project owner.
-- Vendor App backend ownership: Primary project owner.
-- Vendor App Flutter implementation: Primary project owner.
-- Other application developers: Separate application-specific responsibilities.
-- Reference implementation: Central authentication plus Vendor App backend.
-- Phase 2: Not started.
-- Application implementation: Not started.
+- Product direction: Central Authentication Backend and Fillcart Vendor Mobile App.
+- MVP functional scope: Nine confirmed Vendor App modules.
+- Central authentication ownership: Our team (reusable platform foundation).
+- Vendor App frontend implementation: Our team (Flutter MVP).
+- Vendor business-domain backend ownership: Other domain backend developers (Products, Inventory, Orders, Sales, Earnings, Profile).
+- Other application frontends: Separate application developers (Customer, Rider, Admin, Website).
+- Database & contract governance: Collaborative shared Prisma migrations and OpenAPI 3.1 contract-first development.
+- Next activity: Phase 2.2.3 planning (Shared developer tooling).
+- Application and business backend implementation: Not started.
 
-At the time this rulebook is installed, do not assume permission to begin Phase 2 or any implementation.
+At the time this rulebook is updated, do not assume permission to begin Phase 2.2.3 or any implementation.
 
 Wait for the next explicit instruction.
 
-The next activity is to prepare the Phase 2 technical setup plan.
+The next activity is to prepare the Phase 2.2.3 shared developer tooling plan.
 
 ---
 
