@@ -1,8 +1,53 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../common/Card';
-import { topOrdersVendors } from '../../data/mockDashboardData';
 import { ChevronDown } from 'lucide-react';
+
+interface ContactRow {
+  id: string;
+  name: string;
+  email: string;
+  share: number;
+  orders: string;
+  color: string;
+  isOthers?: boolean;
+}
+
+const contactsData: ContactRow[] = [
+  {
+    id: 'c1',
+    name: 'Sarah Mitchell',
+    email: 'sarah@brights...',
+    share: 12,
+    orders: '1,240',
+    color: '#F5B800',
+  },
+  {
+    id: 'c2',
+    name: 'David Kim',
+    email: 'david.kim@email...',
+    share: 8,
+    orders: '850',
+    color: '#FCE8A3',
+  },
+  {
+    id: 'c3',
+    name: 'Priya Patel',
+    email: 'priya@oakrealty.c...',
+    share: 4,
+    orders: '425',
+    color: '#8A6500',
+  },
+  {
+    id: 'c4',
+    name: 'Others',
+    email: '',
+    share: 76,
+    orders: '7,011',
+    color: '#ECECF0',
+    isOthers: true,
+  },
+];
 
 export const TopOrdersCard: React.FC = () => {
   const navigate = useNavigate();
@@ -11,74 +56,78 @@ export const TopOrdersCard: React.FC = () => {
   return (
     <Card
       onClick={() => navigate('/orders')}
-      title="Orders by Store"
+      title="Top Contacts"
       action={
         <div
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1 text-xs text-[#8A8A93] bg-[#F6F6F8] px-3 py-1 rounded-full cursor-pointer hover:text-[#222026] border border-[#ECECF0]"
+          className="flex items-center gap-1 text-[11px] text-[#8A8A93] bg-[#F6F6F8] px-2.5 py-0.5 rounded-full cursor-pointer hover:text-[#222026] border border-[#ECECF0]"
         >
           <span>{filter}</span>
           <ChevronDown className="w-3 h-3 text-[#8A8A93]" />
         </div>
       }
-      className="flex flex-col justify-between"
+      className="h-[210px] flex flex-col justify-between"
     >
-      <div className="flex items-center gap-6 mt-1">
-        {/* Left: Stacked Vertical Pill Bar with Hatched segment */}
-        <div className="w-7 h-44 rounded-full bg-[#F6F6F8] p-1 flex flex-col justify-between overflow-hidden border border-[#ECECF0] shadow-inner flex-shrink-0">
-          {/* Segment 1: Primary Yellow */}
+      <div className="flex items-stretch gap-4 my-auto">
+        {/* Left: Stacked Vertical Pill Bar matching exact height of 4 list rows */}
+        <div className="w-[22px] rounded-full bg-[#F6F6F8] p-[2px] flex flex-col justify-between overflow-hidden border border-[#ECECF0] flex-shrink-0">
+          {/* Segment 1: Solid Primary Yellow */}
           <div
             className="w-full bg-[#F5B800] rounded-t-full transition-all duration-300"
-            style={{ height: '18%' }}
-            title="Fresh Mart Hub (12%)"
+            style={{ height: '22%' }}
+            title="Sarah Mitchell (12%)"
           />
           {/* Segment 2: Light Yellow */}
           <div
-            className="w-full bg-[#FCE8A3] my-1 rounded-sm transition-all duration-300"
-            style={{ height: '14%' }}
-            title="Royal Kirana (8%)"
+            className="w-full bg-[#FCE8A3] my-[2px] rounded-xs transition-all duration-300"
+            style={{ height: '16%' }}
+            title="David Kim (8%)"
           />
-          {/* Segment 3: Amber dark */}
+          {/* Segment 3: Amber Dark */}
           <div
-            className="w-full bg-[#D49E00] my-1 rounded-sm transition-all duration-300"
-            style={{ height: '10%' }}
-            title="Priya Dairy (4%)"
+            className="w-full bg-[#8A6500] my-[2px] rounded-xs transition-all duration-300"
+            style={{ height: '12%' }}
+            title="Priya Patel (4%)"
           />
-          {/* Segment 4: Hatched Bottom Segment */}
+          {/* Segment 4: Hatched Pattern */}
           <div
             className="w-full hatched-pattern-yellow rounded-b-full transition-all duration-300 border border-[#FCE8A3]"
-            style={{ height: '54%' }}
+            style={{ height: '50%' }}
             title="Others (76%)"
           />
         </div>
 
-        {/* Right: Vendor Rows with colored bullets, percentages & counts */}
-        <div className="flex-1 flex flex-col justify-between gap-3 text-xs">
-          {topOrdersVendors.map((vendor, idx) => (
-            <div key={vendor.id} className="flex items-center justify-between gap-2 group">
-              <div className="flex items-center gap-2.5 min-w-0">
-                {/* Dot */}
-                {idx === 3 ? (
-                  <div className="w-2.5 h-2.5 rounded-full border border-[#8A8A93] flex-shrink-0" />
+        {/* Right: 4 List Rows */}
+        <div className="flex-1 flex flex-col justify-between gap-1.5 min-w-0">
+          {contactsData.map((contact) => (
+            <div key={contact.id} className="flex items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2 min-w-0">
+                {/* Bullet */}
+                {contact.isOthers ? (
+                  <div className="w-2 h-2 rounded-full border border-[#8A8A93] flex-shrink-0" />
                 ) : (
                   <div
-                    className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: vendor.color }}
+                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: contact.color }}
                   />
                 )}
-                <div className="truncate">
-                  <span className="font-semibold text-[#222026] group-hover:text-[#F5B800] transition-colors">
-                    {vendor.name}
+                <span className="font-semibold text-[#222026] truncate text-[12px]">
+                  {contact.name}
+                </span>
+                {contact.email && (
+                  <span className="text-[#8A8A93] text-[11px] truncate hidden sm:inline">
+                    {contact.email}
                   </span>
-                  <span className="text-[#8A8A93] ml-1 text-[11px] hidden sm:inline truncate">
-                    {vendor.email}
-                  </span>
-                </div>
+                )}
               </div>
 
-              <div className="flex items-center gap-3 text-right flex-shrink-0">
-                <span className="text-[#8A8A93] font-medium">{vendor.share}%</span>
-                <span className="font-semibold text-[#222026] min-w-[40px]">{vendor.orders}</span>
+              <div className="flex items-center gap-3 text-right flex-shrink-0 font-sans">
+                <span className="text-[#8A8A93] text-[11px] font-medium w-7 text-right">
+                  {contact.share}%
+                </span>
+                <span className="font-semibold text-[#222026] text-[12px] tabular-nums min-w-[36px] text-right">
+                  {contact.orders}
+                </span>
               </div>
             </div>
           ))}

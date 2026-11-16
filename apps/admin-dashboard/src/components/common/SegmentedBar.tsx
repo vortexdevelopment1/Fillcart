@@ -7,22 +7,27 @@ interface SegmentedBarProps {
   color?: string;
   unfilledColor?: string;
   height?: number;
+  gap?: number;
   className?: string;
 }
 
 export const SegmentedBar: React.FC<SegmentedBarProps> = ({
-  totalTicks = 48,
+  totalTicks = 40,
   filledRatio = 0.8,
   filledCount,
   color = '#F5B800',
   unfilledColor = '#ECECF0',
-  height = 24,
+  height = 22,
+  gap = 3,
   className = '',
 }) => {
   const activeCount = filledCount !== undefined ? filledCount : Math.round(totalTicks * filledRatio);
 
   return (
-    <div className={`flex items-center gap-[2.5px] w-full select-none ${className}`}>
+    <div
+      className={`flex items-center w-full select-none ${className}`}
+      style={{ gap: `${gap}px` }}
+    >
       {Array.from({ length: totalTicks }).map((_, idx) => {
         const isFilled = idx < activeCount;
         return (

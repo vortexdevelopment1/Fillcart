@@ -1,7 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp } from 'lucide-react';
-import { ridersTallStats } from '../../data/mockDashboardData';
+
+interface RiderMonthBar {
+  label: string;
+  heightPercent: number; // relative to ~45% container
+  isHatched?: boolean;
+}
+
+const riderBars: RiderMonthBar[] = [
+  { label: 'J', heightPercent: 88, isHatched: false },
+  { label: 'F', heightPercent: 52, isHatched: false },
+  { label: 'M', heightPercent: 74, isHatched: false },
+  { label: 'A', heightPercent: 38, isHatched: false },
+  { label: 'M', heightPercent: 50, isHatched: false },
+  { label: 'J', heightPercent: 78, isHatched: false },
+  { label: 'J', heightPercent: 62, isHatched: true }, // last bar hatched
+];
 
 export const RidersTallCard: React.FC = () => {
   const navigate = useNavigate();
@@ -10,11 +25,10 @@ export const RidersTallCard: React.FC = () => {
     <div
       onClick={() => navigate('/riders')}
       className="
-        rounded-[26px] p-6 text-white relative cursor-pointer
+        rounded-[24px] p-5 text-white relative cursor-pointer
         shadow-card hover:shadow-card-hover transition-all duration-300
         flex flex-col justify-between overflow-hidden
-        bg-gradient-to-br from-[#E5A500] via-[#F5B800] to-[#E09E00]
-        border border-white/20
+        border border-white/20 flex-[1.4] min-h-[220px]
       "
       style={{
         backgroundImage: 'linear-gradient(135deg, #DE9E00 0%, #F5B800 45%, #F0B300 85%, #E29E00 100%)',
@@ -28,8 +42,8 @@ export const RidersTallCard: React.FC = () => {
       </div>
 
       {/* 6-dot drag handle in top right */}
-      <div className="absolute top-5 right-5 text-white/50 p-1">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+      <div className="absolute top-4 right-4 text-white/50 p-1">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
           <circle cx="3" cy="2" r="1.2" />
           <circle cx="3" cy="6" r="1.2" />
           <circle cx="3" cy="10" r="1.2" />
@@ -40,44 +54,42 @@ export const RidersTallCard: React.FC = () => {
       </div>
 
       {/* Top Header & Stats */}
-      <div className="relative z-10 mb-6">
-        <h3 className="text-sm font-medium text-white/90">Riders</h3>
-        <div className="text-3xl font-semibold tracking-tight text-white mt-1 mb-2">
-          {ridersTallStats.count}
+      <div className="relative z-10">
+        <h3 className="text-[15px] font-semibold text-white/90">Contacts</h3>
+        <div className="text-3xl font-semibold tracking-tight text-white mt-0.5 mb-1.5 leading-none">
+          3,241
         </div>
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-xs font-medium text-white border border-white/10">
-          <span>{ridersTallStats.badge}</span>
+        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-[11px] font-medium text-white border border-white/10">
+          <span>192 New in July</span>
           <TrendingUp className="w-3 h-3 text-white inline" />
-          <span>{ridersTallStats.change}</span>
+          <span>12%</span>
         </div>
       </div>
 
-      {/* 7 Pill Bars (J F M A M J J) */}
-      <div className="relative z-10 pt-4">
-        <div className="h-44 flex items-end justify-between gap-2.5 px-2">
-          {ridersTallStats.bars.map((bar, idx) => {
-            return (
-              <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end">
-                {/* Pill bar */}
+      {/* 7 Pill Bars: Max height ~45% of card, 26px wide, labels directly under */}
+      <div className="relative z-10 h-[45%] min-h-[90px] flex flex-col justify-end mt-auto">
+        <div className="flex-1 flex items-end justify-between gap-1 sm:gap-2 px-1">
+          {riderBars.map((bar, idx) => (
+            <div key={idx} className="flex-1 flex flex-col items-center h-full min-h-0">
+              {/* Bar Area */}
+              <div className="w-full flex-1 flex items-end justify-center min-h-0">
                 <div
-                  className={`w-full rounded-full transition-all duration-300 ${
-                    bar.isHatched ? 'hatched-pattern-white border border-white/40' : 'bg-white shadow-sm'
+                  className={`w-full max-w-[26px] rounded-full transition-all duration-300 ${
+                    bar.isHatched
+                      ? 'hatched-pattern-white border border-white/40'
+                      : 'bg-white shadow-xs'
                   }`}
                   style={{
-                    height: `${bar.value}%`,
+                    height: `${bar.heightPercent}%`,
                   }}
                 />
               </div>
-            );
-          })}
-        </div>
 
-        {/* Month Labels */}
-        <div className="flex justify-between gap-2.5 px-2 mt-3 text-center text-xs font-medium text-white/80">
-          {ridersTallStats.bars.map((bar, idx) => (
-            <span key={idx} className="flex-1 text-center">
-              {bar.label}
-            </span>
+              {/* Month Label */}
+              <span className="text-[11px] font-medium text-white/90 mt-1.5 block leading-none">
+                {bar.label}
+              </span>
+            </div>
           ))}
         </div>
       </div>

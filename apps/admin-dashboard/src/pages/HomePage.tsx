@@ -7,50 +7,45 @@ import { ProductsDonutCard } from '../components/charts/ProductsDonutCard';
 import { PaymentsCreditsCard } from '../components/charts/PaymentsCreditsCard';
 import { BasicReportsDarkCard } from '../components/charts/BasicReportsDarkCard';
 import { PlatformActivityCard } from '../components/charts/PlatformActivityCard';
-import { StaffCard, AuditLogsCard } from '../components/charts/StaffAndAuditCards';
 
 export const HomePage: React.FC = () => {
   return (
-    <div className="space-y-6">
-      {/* Upper Grid Section: Matching Reference 3-Column Asymmetric Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left 8 Columns (Row 1 & Row 2 left content) */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          {/* Row 1: Pending Verifications + Vendors */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <PendingVerificationsCard />
-            <VendorsCard />
-          </div>
+    <div className="w-full h-full min-h-0 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_clamp(240px,24%,330px)] gap-4">
+      {/* ──────────────── LEFT COLUMN ────────────────
+          Nested grid: 2 equal columns, 3 rows (auto, auto, 1fr)
+          Row 3 (Platform Activity) takes all remaining vertical space */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 grid-rows-[auto_auto_1fr] gap-4 h-full min-h-0">
+        {/* Row 1, Col 1: Pending Verifications (Delivery Rate) */}
+        <PendingVerificationsCard />
 
-          {/* Row 2: Orders + Products Donut */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <TopOrdersCard />
-            <ProductsDonutCard />
-          </div>
-        </div>
+        {/* Row 1, Col 2: Vendors (Campaigns) */}
+        <VendorsCard />
 
-        {/* Right 4 Columns (Tall Riders Card + Payments + Basic Reports) */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          {/* Riders Tall Gradient Card (Contacts replica) */}
-          <RidersTallCard />
+        {/* Row 2, Col 1: Top Contacts (Orders by Store) */}
+        <TopOrdersCard />
 
-          {/* Payments & Statements (Credits replica) */}
-          <PaymentsCreditsCard />
+        {/* Row 2, Col 2: Products & Categories Donut */}
+        <ProductsDonutCard />
 
-          {/* Basic Reports (Texts Sent replica) */}
-          <BasicReportsDarkCard />
+        {/* Row 3, Col-Span 2: Platform Activity bar chart (ONLY under the left 2 columns) */}
+        <div className="col-span-1 sm:col-span-2 h-full min-h-[240px] xl:min-h-0 flex flex-col">
+          <PlatformActivityCard />
         </div>
       </div>
 
-      {/* Row 3: Full Width Platform Activity Bar Chart (Messages By Month replica) */}
-      <div className="w-full">
-        <PlatformActivityCard />
-      </div>
+      {/* ──────────────── RIGHT COLUMN ────────────────
+          Desktop (>=1280px): Flex column, height 100%, gap 16px.
+          Tablet (768-1279px): 3-card horizontal grid row.
+          Mobile (<768px): Stacks in one column. */}
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:flex xl:flex-col gap-4 h-full min-h-0">
+        {/* Riders gradient card: flex 1.4 */}
+        <RidersTallCard />
 
-      {/* Row 4: Operational Governance Cards (Staff & Audit Logs) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <StaffCard />
-        <AuditLogsCard />
+        {/* Payments & Statements card: compact ~110px */}
+        <PaymentsCreditsCard />
+
+        {/* Basic Reports dark card: flex 1 */}
+        <BasicReportsDarkCard />
       </div>
     </div>
   );

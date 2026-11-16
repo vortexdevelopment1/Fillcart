@@ -16,12 +16,12 @@ export const PendingVerificationsCard: React.FC = () => {
   return (
     <Card
       onClick={() => navigate('/document-verification')}
-      title="Pending Verifications"
-      className="flex flex-col justify-between"
+      title="Delivery Rate"
+      className="h-[135px] flex flex-col justify-between"
     >
-      <div className="flex items-baseline justify-between mt-2 mb-4">
-        <div className="flex items-baseline gap-2.5">
-          <span className="text-3xl font-semibold text-[#222026] tracking-tight">
+      <div className="flex items-baseline justify-between mt-1 mb-2">
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-semibold text-[#222026] tracking-tight leading-none">
             {verifiedRate}%
           </span>
           <Badge variant="soft-amber" icon="up">
@@ -29,17 +29,18 @@ export const PendingVerificationsCard: React.FC = () => {
           </Badge>
         </div>
         <span className="text-xs text-[#8A8A93] font-medium">
-          {pendingPercentage}% pending ({stats.pending} awaiting)
+          {pendingPercentage}% pending
         </span>
       </div>
 
-      <div className="mt-2">
+      <div className="mt-auto">
         <SegmentedBar
-          totalTicks={46}
+          totalTicks={40}
           filledRatio={stats.approved / total || 0.78}
           color="#F5B800"
           unfilledColor="#ECECF0"
           height={22}
+          gap={3}
         />
       </div>
     </Card>

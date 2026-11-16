@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { SegmentedBar } from '../common/SegmentedBar';
-import { vendorsStats } from '../../data/mockDashboardData';
 
 export const VendorsCard: React.FC = () => {
   const navigate = useNavigate();
@@ -11,27 +10,28 @@ export const VendorsCard: React.FC = () => {
   return (
     <Card
       onClick={() => navigate('/vendors')}
-      title="Vendors"
-      className="flex flex-col justify-between"
+      title="Campaigns"
+      className="h-[135px] flex flex-col justify-between"
     >
-      <div className="flex items-baseline justify-between mt-2 mb-4">
-        <div className="flex items-baseline gap-2.5">
-          <span className="text-3xl font-semibold text-[#222026] tracking-tight">
-            {vendorsStats.count}
+      <div className="flex items-baseline justify-between mt-1 mb-2">
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-semibold text-[#222026] tracking-tight leading-none">
+            25
           </span>
           <Badge variant="soft-amber">
-            {vendorsStats.badge}
+            4 active
           </Badge>
         </div>
       </div>
 
-      <div className="mt-2">
+      <div className="mt-auto">
         <SegmentedBar
-          totalTicks={46}
-          filledRatio={0.35}
+          totalTicks={40}
+          filledRatio={0.25}
           color="#F5B800"
           unfilledColor="#ECECF0"
           height={22}
+          gap={3}
         />
       </div>
     </Card>
