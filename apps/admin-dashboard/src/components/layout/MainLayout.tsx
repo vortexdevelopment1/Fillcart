@@ -12,8 +12,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       {/* Fixed/Floating Sidebar */}
       <Sidebar />
 
-      {/* Main Screen Area */}
-      <main className="flex-1 md:pl-[88px] h-screen flex flex-col pt-5 pb-4 px-4 lg:px-6 w-full max-w-[1600px] mx-auto overflow-hidden bg-white">
+      {/* Main Screen Area - pl-4 on mobile, md:pl-[88px] on desktop so content never hides behind 56px floating sidebar */}
+      <main className="flex-1 h-screen flex flex-col pt-4 pb-4 pl-4 md:pl-[88px] pr-4 md:pr-6 w-full overflow-hidden bg-white">
         {/* Global Header */}
         <Header />
 
