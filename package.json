@@ -1,0 +1,14 @@
+{
+  "name": "fillkart-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --prefix apps/admin-dashboard",
+    "build": "npm run build --prefix apps/admin-dashboard",
+    "install:admin": "npm install --prefix apps/admin-dashboard"
+  }
+}
