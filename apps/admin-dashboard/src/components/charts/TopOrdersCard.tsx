@@ -64,85 +64,112 @@ export const TopOrdersCard: React.FC = () => {
           <ChevronDown className="w-3.5 h-3.5 text-black/55" />
         </div>
       }
-      className="h-[210px] flex flex-col justify-between"
+      className="min-h-[240px] flex flex-col justify-between"
     >
-      <div className="flex items-center gap-4 my-auto h-full pt-1 pb-1">
-        {/* Left: Stacked Bar (width 28px, same total height as 4 rows, 4px gap matching reference) */}
+      {/* Card body: flex row, align-items: stretch, gap 16px, 16px margin from title */}
+      <div className="flex flex-row items-stretch gap-4 mt-4 select-none">
+        {/* LEFT: stacked bar column, width 36px, flex-shrink 0, display flex column, gap 6px */}
         <div
-          className="w-[28px] h-full flex flex-col flex-shrink-0 select-none"
-          style={{ gap: '4px' }}
+          className="w-[36px] h-[160px] flex flex-col flex-shrink-0 select-none"
+          style={{ gap: '6px' }}
         >
-          {/* Block 1: PRIMARY #F5B800 solid matching top block in reference, radius 8px */}
+          {/* Block 1: flex 2.2, background PRIMARY #F5B800, radius 10px */}
           <div
-            className="w-full rounded-[8px] bg-primary transition-all"
-            style={{ height: '24%' }}
+            className="w-full bg-primary transition-all"
+            style={{
+              flex: 2.2,
+              minHeight: '12px',
+              borderRadius: '10px',
+            }}
             title="Block 1 (Sarah Mitchell)"
           />
 
-          {/* Block 2: SECONDARY #FCE8A3 solid, radius 6px */}
+          {/* Block 2: flex 1, background SECONDARY #FCE8A3, border 1px solid #F5B800, radius 8px */}
           <div
-            className="w-full rounded-[6px] bg-secondary transition-all"
-            style={{ height: '13%' }}
+            className="w-full bg-secondary transition-all"
+            style={{
+              flex: 1,
+              minHeight: '12px',
+              borderRadius: '8px',
+              border: '1px solid #F5B800',
+            }}
             title="Block 2 (David Kim)"
           />
 
-          {/* Block 3: PRIMARY at 40% opacity, radius 5px */}
+          {/* Block 3: flex 0.8, background rgba(245,184,0,0.45), radius 8px */}
           <div
-            className="w-full rounded-[5px] transition-all"
+            className="w-full transition-all"
             style={{
-              height: '9%',
-              backgroundColor: 'rgba(245, 184, 0, 0.40)',
+              flex: 0.8,
+              minHeight: '12px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(245, 184, 0, 0.45)',
             }}
             title="Block 3 (Priya Patel)"
           />
 
-          {/* Block 4: Hatched pattern (.hatch class, radius 8px) */}
+          {/* Block 4: flex 4.5, class .hatch, radius 10px, no border */}
           <div
-            className="w-full flex-1 rounded-[8px] hatch transition-all"
+            className="w-full hatch transition-all"
+            style={{
+              flex: 4.5,
+              minHeight: '12px',
+              borderRadius: '10px',
+              border: 'none',
+            }}
             title="Block 4 (Others)"
           />
         </div>
 
-        {/* Right: 4 Contact Rows */}
-        <div className="flex-1 flex flex-col justify-between h-full min-w-0 py-0.5">
+        {/* RIGHT: rows container, flex-1, 4 rows with equal height (each row height 40px) */}
+        <div className="flex-1 flex flex-col justify-between h-[160px] min-w-0">
           {contactsData.map((row) => (
-            <div key={row.id} className="flex items-center gap-2.5 text-[13px] leading-tight">
-              {/* Row Dots matching blocks */}
+            <div
+              key={row.id}
+              className="h-[40px] flex items-center gap-2.5 min-w-0"
+            >
+              {/* Row Dots (match blocks exactly) */}
               {row.dotType === 'block1' && (
                 <div className="w-[8px] h-[8px] rounded-full bg-primary flex-shrink-0" />
               )}
               {row.dotType === 'block2' && (
-                <div className="w-[8px] h-[8px] rounded-full bg-secondary flex-shrink-0" />
+                <div
+                  className="w-[8px] h-[8px] rounded-full bg-secondary flex-shrink-0"
+                  style={{ border: '1px solid #F5B800' }}
+                />
               )}
               {row.dotType === 'block3' && (
                 <div
                   className="w-[8px] h-[8px] rounded-full flex-shrink-0"
-                  style={{ backgroundColor: 'rgba(245, 184, 0, 0.40)' }}
+                  style={{ backgroundColor: 'rgba(245, 184, 0, 0.45)' }}
                 />
               )}
               {row.dotType === 'hollow' && (
                 <div className="w-[8px] h-[8px] rounded-full border-[1.5px] border-primary bg-transparent flex-shrink-0" />
               )}
 
-              {/* Name: weight 400, text-black, Poppins 12px */}
-              <span className="font-sans font-normal text-black text-[12px] whitespace-nowrap">
-                {row.name}
-              </span>
+              {/* Text columns: sitting on one baseline */}
+              <div className="flex-1 min-w-0 flex items-baseline gap-2.5">
+                {/* Name: Poppins 13px, black, no truncation */}
+                <span className="font-sans font-normal text-black text-[13px] whitespace-nowrap flex-shrink-0">
+                  {row.name}
+                </span>
 
-              {/* Email: #000000 at 55% opacity, Poppins 11px */}
-              <span className="font-sans text-[11px] text-black/55 truncate flex-1 min-w-0">
-                {row.email}
-              </span>
+                {/* Email: Poppins 12px, black 45%, flex-1, ellipsis */}
+                <span className="font-sans text-[12px] text-black/45 truncate flex-1 min-w-0">
+                  {row.email}
+                </span>
 
-              {/* Percent: 40px right-aligned, #000000 at 55%, Poppins 12px */}
-              <span className="font-sans text-[12px] text-black/55 w-[40px] text-right tabular-nums flex-shrink-0">
-                {row.share}
-              </span>
+                {/* Percent: 12px, black 55%, width 40px, right-aligned */}
+                <span className="font-sans text-[12px] text-black/55 w-[40px] text-right tabular-nums flex-shrink-0">
+                  {row.share}
+                </span>
 
-              {/* Count: 56px right-aligned, weight 400, text-black, Poppins 12px */}
-              <span className="font-sans font-normal text-black text-[12px] w-[56px] text-right tabular-nums flex-shrink-0">
-                {row.count}
-              </span>
+                {/* Count: 13px, weight 500, width 56px, right-aligned, tabular-nums */}
+                <span className="font-sans font-medium text-black text-[13px] w-[56px] text-right tabular-nums flex-shrink-0">
+                  {row.count}
+                </span>
+              </div>
             </div>
           ))}
         </div>
