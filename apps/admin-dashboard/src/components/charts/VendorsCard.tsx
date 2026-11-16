@@ -13,7 +13,7 @@ export const VendorsCard: React.FC = () => {
       title="Campaigns"
       className="h-[135px] flex flex-col justify-between"
     >
-      <div className="flex items-baseline justify-between mt-1 mb-2">
+      <div className="flex items-baseline justify-between mt-0.5 mb-2">
         <div className="flex items-baseline gap-2">
           <span className="text-3xl font-semibold text-[#222026] tracking-tight leading-none">
             25
@@ -24,14 +24,10 @@ export const VendorsCard: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-auto">
+      <div className="mt-auto w-full">
         <SegmentedBar
-          totalTicks={40}
-          filledRatio={0.25}
-          color="#F5B800"
-          unfilledColor="#ECECF0"
-          height={22}
-          gap={3}
+          totalTicks={48}
+          filledCount={15} // approx 31% filled like reference Campaigns
         />
       </div>
     </Card>

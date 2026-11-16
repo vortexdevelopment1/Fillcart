@@ -30,17 +30,18 @@ export const ProductsDonutCard: React.FC = () => {
       className="h-[210px] flex flex-col justify-between"
     >
       <div className="flex items-center gap-3 my-auto">
-        {/* Donut Chart with Callout Badges */}
+        {/* Donut Chart: Ring thickness ~26px (outer 58, inner 32), 3px gap, center 24% */}
         <div className="relative w-[130px] h-[130px] flex-shrink-0 flex items-center justify-center">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={donutData}
-                innerRadius={36}
-                outerRadius={56}
-                paddingAngle={4}
+                innerRadius={32}
+                outerRadius={58}
+                paddingAngle={3}
                 dataKey="value"
-                strokeWidth={0}
+                stroke="#FFFFFF"
+                strokeWidth={2}
               >
                 {donutData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -49,9 +50,9 @@ export const ProductsDonutCard: React.FC = () => {
             </PieChart>
           </ResponsiveContainer>
 
-          {/* Center 24% */}
+          {/* Center Text: 24% semibold */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-base font-bold text-[#222026]">24%</span>
+            <span className="text-base font-semibold text-[#222026]">24%</span>
           </div>
 
           {/* Callout pill 18% (top left) */}

@@ -4,18 +4,18 @@ import { TrendingUp } from 'lucide-react';
 
 interface RiderMonthBar {
   label: string;
-  heightPercent: number; // relative to ~45% container
+  heightPercent: number; // percentage of bar area
   isHatched?: boolean;
 }
 
 const riderBars: RiderMonthBar[] = [
-  { label: 'J', heightPercent: 88, isHatched: false },
-  { label: 'F', heightPercent: 52, isHatched: false },
-  { label: 'M', heightPercent: 74, isHatched: false },
-  { label: 'A', heightPercent: 38, isHatched: false },
+  { label: 'J', heightPercent: 90, isHatched: false },
+  { label: 'F', heightPercent: 48, isHatched: false },
+  { label: 'M', heightPercent: 76, isHatched: false },
+  { label: 'A', heightPercent: 36, isHatched: false },
   { label: 'M', heightPercent: 50, isHatched: false },
-  { label: 'J', heightPercent: 78, isHatched: false },
-  { label: 'J', heightPercent: 62, isHatched: true }, // last bar hatched
+  { label: 'J', heightPercent: 80, isHatched: false },
+  { label: 'J', heightPercent: 62, isHatched: true }, // last bar hatched white on yellow
 ];
 
 export const RidersTallCard: React.FC = () => {
@@ -31,13 +31,33 @@ export const RidersTallCard: React.FC = () => {
         border border-white/20 flex-[1.4] min-h-[220px]
       "
       style={{
-        backgroundImage: 'linear-gradient(135deg, #DE9E00 0%, #F5B800 45%, #F0B300 85%, #E29E00 100%)',
+        backgroundImage: 'linear-gradient(145deg, #DE9E00 0%, #F5B800 40%, #EA9F00 75%, #D68F00 100%)',
       }}
     >
-      {/* Decorative subtle texture wave */}
-      <div className="absolute inset-0 opacity-15 pointer-events-none mix-blend-overlay">
-        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 300 300">
-          <path d="M0,100 C150,200 150,0 300,100 L300,300 L0,300 Z" fill="white" />
+      {/* Subtle wave contours overlay matching reference */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 320 260">
+          <path
+            d="M-20,40 C80,60 140,20 240,45 C280,55 310,40 340,30 L340,260 L-20,260 Z"
+            fill="none"
+            stroke="white"
+            strokeWidth="1.5"
+            opacity="0.6"
+          />
+          <path
+            d="M-20,90 C70,110 160,80 250,105 C290,115 320,100 340,90"
+            fill="none"
+            stroke="white"
+            strokeWidth="1.2"
+            opacity="0.4"
+          />
+          <path
+            d="M-20,150 C90,170 170,140 260,165 C300,175 320,160 340,150"
+            fill="none"
+            stroke="white"
+            strokeWidth="1.2"
+            opacity="0.3"
+          />
         </svg>
       </div>
 
@@ -55,7 +75,7 @@ export const RidersTallCard: React.FC = () => {
 
       {/* Top Header & Stats */}
       <div className="relative z-10">
-        <h3 className="text-[15px] font-semibold text-white/90">Contacts</h3>
+        <h3 className="text-[15px] font-semibold text-white/95">Contacts</h3>
         <div className="text-3xl font-semibold tracking-tight text-white mt-0.5 mb-1.5 leading-none">
           3,241
         </div>
@@ -66,26 +86,27 @@ export const RidersTallCard: React.FC = () => {
         </div>
       </div>
 
-      {/* 7 Pill Bars: Max height ~45% of card, 26px wide, labels directly under */}
-      <div className="relative z-10 h-[45%] min-h-[90px] flex flex-col justify-end mt-auto">
-        <div className="flex-1 flex items-end justify-between gap-1 sm:gap-2 px-1">
+      {/* 7 Pill Bars: 24px wide, border-radius 999px (full pill), last bar hatched */}
+      <div className="relative z-10 h-[48%] min-h-[95px] flex flex-col justify-end mt-auto">
+        <div className="flex-1 flex items-end justify-between gap-1 px-1">
           {riderBars.map((bar, idx) => (
             <div key={idx} className="flex-1 flex flex-col items-center h-full min-h-0">
               {/* Bar Area */}
               <div className="w-full flex-1 flex items-end justify-center min-h-0">
                 <div
-                  className={`w-full max-w-[26px] rounded-full transition-all duration-300 ${
-                    bar.isHatched
-                      ? 'hatched-pattern-white border border-white/40'
-                      : 'bg-white shadow-xs'
-                  }`}
+                  className="w-[24px] rounded-full transition-all duration-300"
                   style={{
                     height: `${bar.heightPercent}%`,
+                    backgroundColor: bar.isHatched ? 'rgba(255, 255, 255, 0.28)' : '#FFFFFF',
+                    backgroundImage: bar.isHatched
+                      ? 'repeating-linear-gradient(45deg, rgba(255,255,255,0.92) 0, rgba(255,255,255,0.92) 1.5px, transparent 1.5px, transparent 5px)'
+                      : 'none',
+                    boxShadow: bar.isHatched ? 'none' : '0 2px 6px rgba(0,0,0,0.06)',
                   }}
                 />
               </div>
 
-              {/* Month Label */}
+              {/* Month Label directly under each bar */}
               <span className="text-[11px] font-medium text-white/90 mt-1.5 block leading-none">
                 {bar.label}
               </span>

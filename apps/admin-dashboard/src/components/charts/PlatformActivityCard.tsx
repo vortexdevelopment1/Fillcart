@@ -2,37 +2,37 @@ import React, { useState } from 'react';
 import { Card } from '../common/Card';
 import { ChevronDown } from 'lucide-react';
 
-interface MonthData {
+interface MonthBarData {
   month: string;
-  totalPercent: number; // 35 to 95
-  hatchedPercent: number; // percent of bar that is hatched
+  totalHeight: number; // percentage of chart area (40 to 100)
+  hatchedRatio: number; // percentage of totalHeight that is hatched (25 to 45)
   open: number;
   closed: number;
   total: number;
   isHighlighted?: boolean;
 }
 
-const monthlyData: MonthData[] = [
-  { month: 'Jan', totalPercent: 62, hatchedPercent: 32, open: 340, closed: 850, total: 1190 },
-  { month: 'Feb', totalPercent: 42, hatchedPercent: 35, open: 220, closed: 420, total: 640 },
-  { month: 'Mar', totalPercent: 78, hatchedPercent: 30, open: 410, closed: 980, total: 1390 },
-  { month: 'Apr', totalPercent: 70, hatchedPercent: 28, open: 390, closed: 870, total: 1260 },
-  { month: 'May', totalPercent: 86, hatchedPercent: 28, open: 480, closed: 1140, total: 1620 },
-  { month: 'Jun', totalPercent: 92, hatchedPercent: 26, open: 510, closed: 1280, total: 1790 },
+const monthlyData: MonthBarData[] = [
+  { month: 'Jan', totalHeight: 55, hatchedRatio: 38, open: 340, closed: 850, total: 1190 },
+  { month: 'Feb', totalHeight: 40, hatchedRatio: 36, open: 220, closed: 420, total: 640 },
+  { month: 'Mar', totalHeight: 70, hatchedRatio: 32, open: 410, closed: 980, total: 1390 },
+  { month: 'Apr', totalHeight: 62, hatchedRatio: 30, open: 390, closed: 870, total: 1260 },
+  { month: 'May', totalHeight: 85, hatchedRatio: 26, open: 480, closed: 1140, total: 1620 },
+  { month: 'Jun', totalHeight: 75, hatchedRatio: 30, open: 510, closed: 1280, total: 1790 },
   {
     month: 'Jul',
-    totalPercent: 82,
-    hatchedPercent: 0, // full solid #F5B800
+    totalHeight: 100,
+    hatchedRatio: 22,
     open: 38,
     closed: 1196,
     total: 1234,
     isHighlighted: true,
   },
-  { month: 'Aug', totalPercent: 72, hatchedPercent: 30, open: 380, closed: 890, total: 1270 },
-  { month: 'Sep', totalPercent: 64, hatchedPercent: 30, open: 290, closed: 780, total: 1070 },
-  { month: 'Oct', totalPercent: 82, hatchedPercent: 26, open: 440, closed: 1020, total: 1460 },
-  { month: 'Nov', totalPercent: 94, hatchedPercent: 24, open: 520, closed: 1310, total: 1830 },
-  { month: 'Dec', totalPercent: 86, hatchedPercent: 28, open: 460, closed: 1180, total: 1640 },
+  { month: 'Aug', totalHeight: 58, hatchedRatio: 35, open: 380, closed: 890, total: 1270 },
+  { month: 'Sep', totalHeight: 48, hatchedRatio: 32, open: 290, closed: 780, total: 1070 },
+  { month: 'Oct', totalHeight: 66, hatchedRatio: 28, open: 440, closed: 1020, total: 1460 },
+  { month: 'Nov', totalHeight: 95, hatchedRatio: 25, open: 520, closed: 1310, total: 1830 },
+  { month: 'Dec', totalHeight: 72, hatchedRatio: 30, open: 460, closed: 1180, total: 1640 },
 ];
 
 export const PlatformActivityCard: React.FC = () => {
@@ -68,79 +68,98 @@ export const PlatformActivityCard: React.FC = () => {
       }
       className="h-full flex-1 min-h-[220px] flex flex-col justify-between"
     >
-      {/* 12 Equal Columns (Jan..Dec) inside chart area with flex-1 + min-h-0 */}
-      <div className="flex-1 min-h-0 w-full pt-11 pb-1 flex flex-col">
-        <div className="flex-1 min-h-0 w-full grid grid-cols-12 gap-1 md:gap-2">
+      {/* Chart Canvas: flex-1 min-h-0 with pt-12 for tooltip room */}
+      <div className="flex-1 min-h-0 w-full pt-10 pb-0 flex flex-col justify-end">
+        {/* 12 Columns aligned to bottom axis */}
+        <div className="flex-1 min-h-0 w-full grid grid-cols-12 gap-1 md:gap-2 items-end">
           {monthlyData.map((item) => {
             const isSelected = item.month === selectedMonth;
+
+            // Height calculations
+            // Hatched block: percentage of totalHeight
+            const hatchedHeightPercent = item.hatchedRatio;
+            // Bottom solid block: remaining percentage
+            const solidHeightPercent = 100 - hatchedHeightPercent;
 
             return (
               <div
                 key={item.month}
                 onClick={() => setSelectedMonth(item.month)}
-                className="flex flex-col items-center h-full min-h-0 cursor-pointer group"
+                className="flex flex-col items-center justify-end h-full min-h-0 cursor-pointer relative"
               >
-                {/* Bar Area: Flex-1, items-end to align bar to bottom */}
-                <div className="w-full flex-1 flex items-end justify-center min-h-0 relative">
-                  {/* Floating Dark Tooltip above highlighted month */}
-                  {isSelected && (
-                    <div className="absolute -top-[44px] left-1/2 -translate-x-1/2 z-30 bg-[#222026] text-white text-[10px] py-1.5 px-2.5 rounded-xl shadow-xl whitespace-nowrap border border-white/10 pointer-events-none">
-                      <div className="font-semibold text-[11px] leading-tight">
-                        {item.total.toLocaleString()} Total
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5 text-white/80 text-[9px] leading-none">
-                        <span className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full border border-white inline-block" />
-                          {item.open} Open
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#F5B800] inline-block" />
-                          {item.closed.toLocaleString()} Closed
-                        </span>
-                      </div>
-
-                      {/* Tooltip Down Arrow */}
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#222026] rotate-45 border-r border-b border-white/10" />
+                {/* Floating Dark Tooltip above Jul (or selected month) */}
+                {isSelected && (
+                  <div className="absolute -top-[48px] left-1/2 -translate-x-1/2 z-30 bg-[#222026] text-white text-[11px] py-1.5 px-3 rounded-[12px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none">
+                    <div className="font-bold text-[11px] leading-tight text-white mb-0.5">
+                      {item.total.toLocaleString()} Total
                     </div>
-                  )}
+                    <div className="flex items-center gap-2 text-white/80 text-[10px] leading-none">
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full border border-white inline-block" />
+                        {item.open} Open
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#F5B800] inline-block" />
+                        {item.closed.toLocaleString()} Closed
+                      </span>
+                    </div>
 
-                  {/* Pill Bar Container (width ~28px, border-radius 999px) */}
-                  <div
-                    className={`w-full max-w-[28px] rounded-full overflow-hidden flex flex-col justify-end transition-all duration-300 ${
-                      isSelected
-                        ? 'ring-4 ring-[#F5B800]/25 scale-[1.02]'
-                        : 'group-hover:opacity-90'
-                    }`}
-                    style={{ height: `${item.totalPercent}%` }}
-                  >
-                    {/* Top Segment: Hatched Pattern (Solid #F5B800 if selected) */}
-                    {item.hatchedPercent > 0 && !isSelected ? (
-                      <div
-                        className="w-full hatched-pattern-yellow border-t border-[#FCE8A3] transition-all duration-300"
-                        style={{ height: `${item.hatchedPercent}%` }}
-                      />
-                    ) : null}
-
-                    {/* Bottom Segment: Solid fill */}
-                    <div
-                      className={`w-full flex-1 transition-all duration-300 ${
-                        isSelected ? 'bg-[#F5B800]' : 'bg-[#FCE8A3]'
-                      }`}
-                    />
+                    {/* Caret pointing down */}
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#222026] rotate-45 border-r border-b border-white/10" />
                   </div>
-                </div>
+                )}
 
-                {/* Month Label (Centered directly below the bar) */}
-                <span
-                  className={`text-[11px] mt-2 block leading-none transition-colors select-none ${
-                    isSelected
-                      ? 'text-[#222026] font-bold'
-                      : 'text-[#8A8A93] group-hover:text-[#222026]'
-                  }`}
+                {/* Stacked Bar Container: max-w-[36px], centered */}
+                <div
+                  className="w-full max-w-[36px] flex flex-col justify-end transition-all duration-300"
+                  style={{
+                    height: `${item.totalHeight}%`,
+                    gap: '6px', // 6px gap between top hatched block and bottom solid block
+                  }}
                 >
-                  {item.month}
-                </span>
+                  {/* TOP BLOCK: Hatched diagonal lines, rounded-[14px] on all corners */}
+                  <div
+                    className="w-full rounded-[14px] flex-shrink-0 transition-all duration-300"
+                    style={{
+                      height: `calc(${hatchedHeightPercent}% - 3px)`,
+                      minHeight: '12px',
+                      backgroundColor: isSelected ? '#FFF2C6' : '#FFF6D6',
+                      backgroundImage: isSelected
+                        ? 'repeating-linear-gradient(45deg, #D99A00 0, #D99A00 1.5px, transparent 1.5px, transparent 5px)'
+                        : 'repeating-linear-gradient(45deg, #F3C94A 0, #F3C94A 1.5px, transparent 1.5px, transparent 5px)',
+                    }}
+                  />
+
+                  {/* BOTTOM BLOCK: Solid fill, rounded-[14px] on all corners */}
+                  <div
+                    className="w-full rounded-[14px] flex-1 transition-all duration-300"
+                    style={{
+                      minHeight: '16px',
+                      backgroundColor: isSelected ? '#F5B800' : '#F9DC85',
+                    }}
+                  />
+                </div>
               </div>
+            );
+          })}
+        </div>
+
+        {/* Month Labels in a dedicated bottom row for perfect one-line vertical axis alignment */}
+        <div className="grid grid-cols-12 gap-1 md:gap-2 text-center mt-2.5 pt-1 border-t border-transparent select-none">
+          {monthlyData.map((item) => {
+            const isSelected = item.month === selectedMonth;
+            return (
+              <span
+                key={item.month}
+                onClick={() => setSelectedMonth(item.month)}
+                className={`text-[12px] block leading-none cursor-pointer transition-colors ${
+                  isSelected
+                    ? 'text-[#B87700] font-semibold'
+                    : 'text-[#8A8A93] hover:text-[#222026]'
+                }`}
+              >
+                {item.month}
+              </span>
             );
           })}
         </div>
