@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../common/Card';
 import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-
-const donutData = [
-  { name: 'Direct', value: 48, color: '#222026', change: '0.3%', isPositive: true },
-  { name: 'Campaigns', value: 28, color: '#FCE8A3', change: '25.4%', isPositive: false },
-  { name: 'Automations', value: 24, color: '#F5B800', change: '15%', isPositive: true },
-];
 
 export const ProductsDonutCard: React.FC = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('This Month');
+
+  // SVG Donut Geometry:
+  // Center: (60, 60), Radius: 48, StrokeWidth: 14
+  // Circumference: 2 * PI * 48 ≈ 301.6
+  // Segment 1 (Direct, dark #222026): stroke-dasharray="98 203.6", offset="-7"
+  // Segment 3 (Automations, #F5B800): stroke-dasharray="70 231.6", offset="-119"
+  // Segment 2 (Campaigns, #FCE8A3): stroke-dasharray="84 217.6", offset="-203"
 
   return (
     <Card
@@ -29,79 +29,135 @@ export const ProductsDonutCard: React.FC = () => {
       }
       className="h-[210px] flex flex-col justify-between"
     >
-      <div className="flex items-center gap-3 my-auto h-full pt-1 pb-1">
-        {/* Donut Chart: Ring thickness 24px (outer 60, inner 36), 6px gap, rounded caps */}
-        <div className="relative w-[130px] h-[130px] flex-shrink-0 flex items-center justify-center select-none">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={donutData}
-                innerRadius={36}
-                outerRadius={60}
-                paddingAngle={6}
-                cornerRadius={12} // Rounded line caps
-                dataKey="value"
-                strokeWidth={0}
-              >
-                {donutData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
+      <div className="flex items-center my-auto h-full pt-1 pb-1">
+        {/* ──────────── DONUT WRAPPER (120px x 120px, mr-24px, flex-shrink-0) ──────────── */}
+        <div className="w-[120px] h-[120px] mr-[24px] flex-shrink-0 relative flex items-center justify-center select-none">
+          {/* SVG Donut Circle with 3 rounded-cap segments and gaps */}
+          <svg
+            width="120"
+            height="120"
+            viewBox="0 0 120 120"
+            className="w-[120px] h-[120px] transform -rotate-90"
+          >
+            {/* Segment 1: Direct, dark #222026 (~34%, top-right) */}
+            <circle
+              cx="60"
+              cy="60"
+              r="48"
+              fill="none"
+              stroke="#222026"
+              strokeWidth="14"
+              strokeLinecap="round"
+              strokeDasharray="98 203.6"
+              strokeDashoffset="-7"
+            />
 
-          {/* Center 24%: 16px, weight 400 */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-[16px] font-normal text-[#222026]">24%</span>
+            {/* Segment 3: Automations, PRIMARY #F5B800 (~26%, bottom-right) */}
+            <circle
+              cx="60"
+              cy="60"
+              r="48"
+              fill="none"
+              stroke="#F5B800"
+              strokeWidth="14"
+              strokeLinecap="round"
+              strokeDasharray="70 231.6"
+              strokeDashoffset="-119"
+            />
+
+            {/* Segment 2: Campaigns, SECONDARY #FCE8A3 (~34%, bottom-left to top-left) */}
+            <circle
+              cx="60"
+              cy="60"
+              r="48"
+              fill="none"
+              stroke="#FCE8A3"
+              strokeWidth="14"
+              strokeLinecap="round"
+              strokeDasharray="84 217.6"
+              strokeDashoffset="-203"
+            />
+          </svg>
+
+          {/* Center Text "24%": 15px, weight 400, #222026, perfectly centered */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15px] font-normal text-[#222026] pointer-events-none leading-none">
+            24%
           </div>
 
-          {/* White Pill Badge 18% placed ON the ring with 1px dark border */}
-          <div className="absolute top-2 left-0 bg-white text-[#222026] text-[11px] font-normal px-2 py-[1px] rounded-full border border-[#222026] shadow-xs pointer-events-none">
+          {/* ──────────── PERCENT BADGES (White pill badges ON the ring) ──────────── */}
+          {/* Badge "18%" at top-left of the ring (Campaigns arc start) */}
+          <div
+            className="absolute bg-white text-[#222026] text-[10px] font-normal px-[6px] py-[1px] rounded-full border border-[#222026] pointer-events-none leading-none z-10"
+            style={{ top: '18%', left: '8%' }}
+          >
             18%
           </div>
 
-          {/* White Pill Badge 17% placed ON the ring with 1px dark border */}
-          <div className="absolute bottom-2 left-1 bg-white text-[#222026] text-[11px] font-normal px-2 py-[1px] rounded-full border border-[#222026] shadow-xs pointer-events-none">
+          {/* Badge "24%" at the right of the ring (Direct arc end) -- as in reference */}
+          <div
+            className="absolute bg-white text-[#222026] text-[10px] font-normal px-[6px] py-[1px] rounded-full border border-[#222026] pointer-events-none leading-none z-10"
+            style={{ top: '44%', left: '80%' }}
+          >
+            24%
+          </div>
+
+          {/* Badge "17%" at bottom-left of the ring */}
+          <div
+            className="absolute bg-white text-[#222026] text-[10px] font-normal px-[6px] py-[1px] rounded-full border border-[#222026] pointer-events-none leading-none z-10"
+            style={{ top: '74%', left: '14%' }}
+          >
             17%
           </div>
         </div>
 
-        {/* Right Legend */}
-        <div className="flex-1 flex flex-col justify-between h-full min-w-0 py-1">
-          {donutData.map((item, idx) => (
-            <div key={idx} className="flex items-center justify-between gap-1.5 text-[13px]">
-              <div className="flex items-center gap-2 min-w-0">
-                <div
-                  className="w-[8px] h-[8px] rounded-full flex-shrink-0"
-                  style={{
-                    backgroundColor: item.color,
-                    border: item.color === '#FCE8A3' ? '1px solid #F3D77A' : 'none',
-                  }}
-                />
-                <span className="font-normal text-[#222026] text-[13px] truncate">
-                  {item.name}
+        {/* ──────────── LEGEND (flex-1, 14px row spacing, 10px dots, 14px labels) ──────────── */}
+        <div className="flex-1 flex flex-col justify-center h-full min-w-0">
+          <div className="flex flex-col gap-[14px]">
+            {/* Row 1: Direct */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-[10px] h-[10px] rounded-full bg-[#222026] flex-shrink-0" />
+                <span className="font-normal text-[#222026] text-[14px] truncate leading-none">
+                  Direct
                 </span>
               </div>
-
-              {/* Small Trend Badge */}
-              <div
-                className={`flex items-center gap-0.5 text-[11px] font-normal px-2 py-[1.5px] rounded-full ${
-                  item.isPositive
-                    ? 'bg-[#FFF3C4] text-[#8A6500]'
-                    : 'bg-[#FDE8E8] text-[#D32F2F]'
-                }`}
-              >
-                {item.isPositive ? (
-                  <TrendingUp className="w-2.5 h-2.5 inline" />
-                ) : (
-                  <TrendingDown className="w-2.5 h-2.5 inline" />
-                )}
-                <span>{item.change}</span>
+              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-[#FFF3C4] text-[#8A6500] leading-none flex-shrink-0">
+                <TrendingUp className="w-2.5 h-2.5 inline" />
+                <span>0.3%</span>
               </div>
             </div>
-          ))}
 
-          <div className="text-right text-[10px] text-[#9A9AA3] mt-auto">
+            {/* Row 2: Campaigns */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-[10px] h-[10px] rounded-full bg-[#FCE8A3] border border-[#F3D77A] flex-shrink-0" />
+                <span className="font-normal text-[#222026] text-[14px] truncate leading-none">
+                  Campaigns
+                </span>
+              </div>
+              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-[#FDE8E8] text-[#D32F2F] leading-none flex-shrink-0">
+                <TrendingDown className="w-2.5 h-2.5 inline" />
+                <span>25.4%</span>
+              </div>
+            </div>
+
+            {/* Row 3: Automations */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-[10px] h-[10px] rounded-full bg-[#F5B800] flex-shrink-0" />
+                <span className="font-normal text-[#222026] text-[14px] truncate leading-none">
+                  Automations
+                </span>
+              </div>
+              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-[#FFF3C4] text-[#8A6500] leading-none flex-shrink-0">
+                <TrendingUp className="w-2.5 h-2.5 inline" />
+                <span>15%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom-right: "vs last month" (11px muted) */}
+          <div className="text-right text-[11px] text-[#9A9AA3] mt-2 leading-none">
             vs last month
           </div>
         </div>
