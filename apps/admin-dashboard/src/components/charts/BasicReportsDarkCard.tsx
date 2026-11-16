@@ -30,10 +30,10 @@ export const BasicReportsDarkCard: React.FC = () => {
 
       {/* Top Header */}
       <div className="flex items-center justify-between pr-5">
-        <h3 className="text-[16px] font-normal text-white leading-tight">Texts Sent</h3>
+        <h3 className="font-sans text-[15px] font-normal text-white leading-tight">Texts Sent</h3>
         <div
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1 text-[11px] text-white/70 bg-white/10 px-2.5 py-0.5 rounded-full hover:text-white"
+          className="flex items-center gap-1 font-sans text-[12px] text-white/70 bg-white/10 px-2.5 py-0.5 rounded-full hover:text-white"
         >
           <span>All time</span>
           <ChevronDown className="w-3 h-3 text-white/70" />
@@ -42,12 +42,12 @@ export const BasicReportsDarkCard: React.FC = () => {
 
       {/* Numbers */}
       <div className="mt-3 mb-1">
-        <div className="text-[34px] font-normal text-white tracking-normal leading-none">
+        <div className="font-heading text-[28px] font-normal text-white tracking-normal leading-[1.1]">
           95,215
         </div>
         <div className="flex items-center gap-2 mt-1.5">
-          <span className="text-[12px] text-white/60">1,243 today</span>
-          <div className="inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-[6px] bg-white/15 text-[10px] font-normal text-white leading-none">
+          <span className="font-sans text-[12px] text-white/60">1,243 today</span>
+          <div className="inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-[6px] bg-white/15 font-sans text-[10px] font-normal text-white leading-none">
             <TrendingUp className="w-2.5 h-2.5 inline text-white" />
             <span>51%</span>
           </div>

@@ -84,11 +84,11 @@ export const PlatformActivityCard: React.FC = () => {
               >
                 {/* Floating Dark Tooltip above Jul (BLACK #000000, white text) */}
                 {isSelected && (
-                  <div className="absolute -top-[48px] left-1/2 -translate-x-1/2 z-30 bg-black text-white text-[11px] py-1.5 px-3 rounded-[12px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none">
-                    <div className="font-bold text-[11px] leading-tight text-white mb-0.5">
+                  <div className="absolute -top-[48px] left-1/2 -translate-x-1/2 z-30 bg-black text-white text-[11px] font-sans py-1.5 px-3 rounded-[12px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none">
+                    <div className="font-medium text-[11px] leading-tight text-white mb-0.5 font-sans">
                       {item.total.toLocaleString()} Total
                     </div>
-                    <div className="flex items-center gap-2 text-white/80 text-[10px] leading-none">
+                    <div className="flex items-center gap-2 text-white/80 text-[10px] leading-none font-sans font-normal">
                       <span className="flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full border border-white inline-block" />
                         {item.open} Open
@@ -144,7 +144,7 @@ export const PlatformActivityCard: React.FC = () => {
           })}
         </div>
 
-        {/* Month Labels in dedicated bottom row */}
+        {/* Month Labels in dedicated bottom row: Poppins 11px, #000000 at 55% opacity, selected 500 */}
         <div className="grid grid-cols-12 gap-1 md:gap-2 text-center mt-2.5 pt-1 select-none">
           {monthlyData.map((item) => {
             const isSelected = item.month === selectedMonth;
@@ -152,10 +152,10 @@ export const PlatformActivityCard: React.FC = () => {
               <span
                 key={item.month}
                 onClick={() => setSelectedMonth(item.month)}
-                className={`text-[12px] block leading-none cursor-pointer transition-colors ${
+                className={`font-sans text-[11px] block leading-none cursor-pointer transition-colors ${
                   isSelected
-                    ? 'text-black font-semibold'
-                    : 'text-black/55 hover:text-black'
+                    ? 'text-black font-medium'
+                    : 'text-black/55 hover:text-black font-normal'
                 }`}
               >
                 {item.month}

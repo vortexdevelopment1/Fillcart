@@ -15,7 +15,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Arbutus Slab"', 'Georgia', 'serif'],
+        sans: ['"Poppins"', 'sans-serif'],
+        heading: ['"Arbutus Slab"', 'Georgia', 'serif'],
         serif: ['"Arbutus Slab"', 'Georgia', 'serif'],
       },
       borderRadius: {

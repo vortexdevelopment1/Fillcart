@@ -13,7 +13,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <Sidebar />
 
       {/* Main Screen Area */}
-      <main className="flex-1 lg:pl-[96px] h-screen flex flex-col pt-5 pb-4 px-4 lg:px-6 w-full max-w-[1600px] mx-auto overflow-hidden bg-white">
+      <main className="flex-1 md:pl-[88px] h-screen flex flex-col pt-5 pb-4 px-4 lg:px-6 w-full max-w-[1600px] mx-auto overflow-hidden bg-white">
         {/* Global Header */}
         <Header />
 

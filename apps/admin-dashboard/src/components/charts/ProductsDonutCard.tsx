@@ -105,12 +105,12 @@ export const ProductsDonutCard: React.FC = () => {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-[10px] h-[10px] rounded-full bg-black flex-shrink-0" />
-                <span className="font-normal text-black text-[14px] truncate leading-none">
+                <span className="font-sans font-normal text-black text-[13px] truncate leading-none">
                   Direct
                 </span>
               </div>
-              {/* Positive: background SECONDARY #FCE8A3, text #000000 */}
-              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-secondary text-black leading-none flex-shrink-0">
+              {/* Positive: background SECONDARY #FCE8A3, text #000000, Poppins 10px */}
+              <div className="flex items-center gap-0.5 font-sans text-[10px] font-normal px-[8px] py-[2px] rounded-[8px] bg-secondary text-black leading-none flex-shrink-0">
                 <TrendingUp className="w-2.5 h-2.5 inline text-black" />
                 <span>0.3%</span>
               </div>
@@ -120,12 +120,12 @@ export const ProductsDonutCard: React.FC = () => {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-[10px] h-[10px] rounded-full bg-secondary flex-shrink-0" />
-                <span className="font-normal text-black text-[14px] truncate leading-none">
+                <span className="font-sans font-normal text-black text-[13px] truncate leading-none">
                   Campaigns
                 </span>
               </div>
-              {/* Negative badge: background #FFFFFF with 1px #000000 border, text #000000, down-arrow (no red) */}
-              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-white border border-black text-black leading-none flex-shrink-0">
+              {/* Negative badge: background #FFFFFF with 1px #000000 border, text #000000, down-arrow, Poppins 10px */}
+              <div className="flex items-center gap-0.5 font-sans text-[10px] font-normal px-[8px] py-[2px] rounded-[8px] bg-white border border-black text-black leading-none flex-shrink-0">
                 <TrendingDown className="w-2.5 h-2.5 inline text-black" />
                 <span>25.4%</span>
               </div>
@@ -135,20 +135,20 @@ export const ProductsDonutCard: React.FC = () => {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-[10px] h-[10px] rounded-full bg-primary flex-shrink-0" />
-                <span className="font-normal text-black text-[14px] truncate leading-none">
+                <span className="font-sans font-normal text-black text-[13px] truncate leading-none">
                   Automations
                 </span>
               </div>
-              {/* Positive: background SECONDARY #FCE8A3, text #000000 */}
-              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-secondary text-black leading-none flex-shrink-0">
+              {/* Positive: background SECONDARY #FCE8A3, text #000000, Poppins 10px */}
+              <div className="flex items-center gap-0.5 font-sans text-[10px] font-normal px-[8px] py-[2px] rounded-[8px] bg-secondary text-black leading-none flex-shrink-0">
                 <TrendingUp className="w-2.5 h-2.5 inline text-black" />
                 <span>15%</span>
               </div>
             </div>
           </div>
 
-          {/* Bottom-right: "vs last month" (#000000 at 55% opacity) */}
-          <div className="text-right text-[11px] text-black/55 mt-2 leading-none">
+          {/* Bottom-right: "vs last month" (#000000 at 55% opacity, Poppins 11px) */}
+          <div className="text-right font-sans text-[11px] text-black/55 mt-2 leading-none">
             vs last month
           </div>
         </div>

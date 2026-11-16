@@ -68,11 +68,11 @@ export const RidersTallCard: React.FC = () => {
 
       {/* Top Header & Stats */}
       <div className="relative z-10">
-        <h3 className="text-[16px] font-normal text-white leading-tight">Contacts</h3>
-        <div className="text-[34px] font-normal tracking-normal text-white mt-3 mb-2 leading-none">
+        <h3 className="font-sans text-[15px] font-normal text-white leading-tight">Contacts</h3>
+        <div className="font-heading text-[28px] font-normal tracking-normal text-white mt-3 mb-2 leading-[1.1]">
           3,241
         </div>
-        <div className="inline-flex items-center gap-1.5 px-2 py-[2px] rounded-[8px] bg-white/20 backdrop-blur-sm text-[11px] font-normal text-white border border-white/20 leading-none">
+        <div className="inline-flex items-center gap-1.5 px-2 py-[2px] rounded-[8px] bg-white/20 backdrop-blur-sm font-sans text-[10px] font-normal text-white border border-white/20 leading-none">
           <span>192 New in July</span>
           <TrendingUp className="w-2.5 h-2.5 text-white inline" />
           <span>12%</span>

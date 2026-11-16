@@ -52,13 +52,13 @@ export const Card: React.FC<CardProps> = ({
         <div className="flex items-center justify-between mb-0 pr-6">
           <div>
             {typeof title === 'string' ? (
-              <h3 className="text-[16px] font-normal text-black tracking-[0px] leading-tight">
+              <h3 className="font-sans text-[15px] font-normal text-black tracking-[0px] leading-tight">
                 {title}
               </h3>
             ) : (
               title
             )}
-            {subtitle && <p className="text-xs text-black/55 mt-0.5">{subtitle}</p>}
+            {subtitle && <p className="font-sans text-[12px] text-black/55 mt-0.5">{subtitle}</p>}
           </div>
           {action && <div className="flex items-center gap-2">{action}</div>}
         </div>

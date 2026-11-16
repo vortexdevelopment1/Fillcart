@@ -13,16 +13,16 @@ export const PaymentsCreditsCard: React.FC = () => {
     >
       <div className="flex items-center gap-1.5 text-black/55">
         <CreditCard className="w-3.5 h-3.5 text-black/55" />
-        <span className="text-[16px] font-normal text-black">Credits</span>
+        <span className="font-sans text-[15px] font-normal text-black">Credits</span>
       </div>
 
       <div className="flex items-baseline justify-between mt-auto">
         <div className="flex items-baseline gap-2">
-          {/* 34px, weight 400 */}
-          <div className="text-[34px] font-normal text-black leading-none tracking-normal">
+          {/* Arbutus Slab 28px, line-height 1.1 */}
+          <div className="font-heading text-[28px] font-normal text-black leading-[1.1] tracking-normal">
             $2,450
           </div>
-          <div className="text-[13px] text-black/55 font-normal">
+          <div className="font-sans text-[12px] text-black/55 font-normal">
             $350 Used
           </div>
         </div>

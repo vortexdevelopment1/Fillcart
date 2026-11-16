@@ -128,23 +128,23 @@ export const TopOrdersCard: React.FC = () => {
                 <div className="w-[8px] h-[8px] rounded-full border-[1.5px] border-primary bg-white flex-shrink-0" />
               )}
 
-              {/* Name: weight 400, text-black */}
-              <span className="font-normal text-black text-[13px] whitespace-nowrap">
+              {/* Name: weight 400, text-black, Poppins 12px */}
+              <span className="font-sans font-normal text-black text-[12px] whitespace-nowrap">
                 {row.name}
               </span>
 
-              {/* Email: #000000 at 55% opacity */}
-              <span className="text-[12px] text-black/55 truncate flex-1 min-w-0">
+              {/* Email: #000000 at 55% opacity, Poppins 11px */}
+              <span className="font-sans text-[11px] text-black/55 truncate flex-1 min-w-0">
                 {row.email}
               </span>
 
-              {/* Percent: 40px right-aligned, #000000 at 55% */}
-              <span className="text-[12px] text-black/55 w-[40px] text-right tabular-nums flex-shrink-0">
+              {/* Percent: 40px right-aligned, #000000 at 55%, Poppins 12px */}
+              <span className="font-sans text-[12px] text-black/55 w-[40px] text-right tabular-nums flex-shrink-0">
                 {row.share}
               </span>
 
-              {/* Count: 56px right-aligned, weight 500, text-black */}
-              <span className="font-medium text-black text-[13px] w-[56px] text-right tabular-nums flex-shrink-0">
+              {/* Count: 56px right-aligned, weight 400, text-black, Poppins 12px */}
+              <span className="font-sans font-normal text-black text-[12px] w-[56px] text-right tabular-nums flex-shrink-0">
                 {row.count}
               </span>
             </div>

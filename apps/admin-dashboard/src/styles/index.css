@@ -11,7 +11,7 @@
 
 @layer base {
   body {
-    font-family: "Arbutus Slab", Georgia, serif;
+    font-family: "Poppins", sans-serif;
     background-color: var(--white);
     color: var(--black);
   }
