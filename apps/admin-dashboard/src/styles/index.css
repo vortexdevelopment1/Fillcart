@@ -2,45 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primary: #F5B800;
+  --secondary: #FCE8A3;
+  --black: #000000;
+  --white: #FFFFFF;
+}
+
 @layer base {
   body {
     font-family: "Arbutus Slab", Georgia, serif;
-    background-color: #F6F6F8;
-    color: #222026;
+    background-color: var(--white);
+    color: var(--black);
   }
 }
 
 /* Hatched / striped pattern styling */
-.hatched-pattern-yellow {
-  background-color: #FFF9E6;
+.hatched-pattern-primary-secondary {
+  background-color: var(--secondary);
   background-image: repeating-linear-gradient(
-    -45deg,
-    #FCE8A3,
-    #FCE8A3 3px,
-    transparent 3px,
-    transparent 7px
+    45deg,
+    var(--primary) 0,
+    var(--primary) 1.5px,
+    transparent 1.5px,
+    transparent 5px
   );
 }
 
-.hatched-pattern-primary {
-  background-color: #FFF2C6;
+.hatched-pattern-primary-white {
+  background-color: var(--white);
   background-image: repeating-linear-gradient(
-    -45deg,
-    #F5B800,
-    #F5B800 3px,
-    transparent 3px,
-    transparent 7px
+    45deg,
+    var(--primary) 0,
+    var(--primary) 1.5px,
+    transparent 1.5px,
+    transparent 5px
   );
 }
 
 .hatched-pattern-white {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.25);
   background-image: repeating-linear-gradient(
-    -45deg,
-    rgba(255, 255, 255, 0.8),
-    rgba(255, 255, 255, 0.8) 3px,
-    transparent 3px,
-    transparent 7px
+    45deg,
+    rgba(255, 255, 255, 0.95) 0,
+    rgba(255, 255, 255, 0.95) 1.5px,
+    transparent 1.5px,
+    transparent 5px
   );
 }
 
@@ -53,9 +60,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ECECF0;
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #FCE8A3;
+  background: rgba(0, 0, 0, 0.18);
 }

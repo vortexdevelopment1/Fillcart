@@ -11,14 +11,14 @@ export const BasicReportsDarkCard: React.FC = () => {
     <div
       onClick={() => navigate('/reports')}
       className="
-        bg-[#222026] text-white rounded-[20px] p-5
-        shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(34,32,38,0.05)]
-        hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_12px_28px_rgba(34,32,38,0.08)]
-        transition-all duration-300 relative cursor-pointer border border-white/5
+        bg-black text-white rounded-[20px] p-5
+        shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.05)]
+        hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_12px_28px_rgba(0,0,0,0.08)]
+        transition-all duration-300 relative cursor-pointer border border-white/10
         flex flex-col justify-between overflow-hidden flex-1 min-h-[160px]
       "
     >
-      {/* 2x2 Grid of 4 Dots (top-right at 20px/20px) */}
+      {/* 2x2 Grid of 4 Dots (top-right at 20px/20px, white at 40% opacity) */}
       <div className="absolute top-5 right-5 p-0 select-none pointer-events-none">
         <div className="grid grid-cols-2 gap-[3px]">
           <div className="w-[3px] h-[3px] rounded-full bg-white/40" />
@@ -30,13 +30,13 @@ export const BasicReportsDarkCard: React.FC = () => {
 
       {/* Top Header */}
       <div className="flex items-center justify-between pr-5">
-        <h3 className="text-[16px] font-normal text-white/90 leading-tight">Texts Sent</h3>
+        <h3 className="text-[16px] font-normal text-white leading-tight">Texts Sent</h3>
         <div
           onClick={(e) => e.stopPropagation()}
           className="flex items-center gap-1 text-[11px] text-white/70 bg-white/10 px-2.5 py-0.5 rounded-full hover:text-white"
         >
           <span>All time</span>
-          <ChevronDown className="w-3 h-3" />
+          <ChevronDown className="w-3 h-3 text-white/70" />
         </div>
       </div>
 
@@ -48,13 +48,13 @@ export const BasicReportsDarkCard: React.FC = () => {
         <div className="flex items-center gap-2 mt-1.5">
           <span className="text-[12px] text-white/60">1,243 today</span>
           <div className="inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-[6px] bg-white/15 text-[10px] font-normal text-white leading-none">
-            <TrendingUp className="w-2.5 h-2.5 inline" />
+            <TrendingUp className="w-2.5 h-2.5 inline text-white" />
             <span>51%</span>
           </div>
         </div>
       </div>
 
-      {/* Smooth Yellow Area Curve */}
+      {/* Line Chart: line = PRIMARY #F5B800, area fill = PRIMARY to transparent */}
       <div className="h-16 -mx-5 -mb-5 relative mt-auto">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart

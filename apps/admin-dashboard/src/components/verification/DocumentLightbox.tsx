@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ZoomIn, ZoomOut, RotateCw, Download, FileText } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, RotateCw, FileText } from 'lucide-react';
 
 interface DocumentLightboxProps {
   isOpen: boolean;
@@ -22,48 +22,48 @@ export const DocumentLightbox: React.FC<DocumentLightboxProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#222026]/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-4xl bg-white rounded-3xl overflow-hidden shadow-2xl border border-[#ECECF0] flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-4xl bg-white rounded-3xl overflow-hidden shadow-2xl border border-black/[0.08] flex flex-col max-h-[90vh]">
         {/* Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#ECECF0] bg-[#F6F6F8]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-black/[0.08] bg-white">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#FCE8A3] text-[#8A6500] flex items-center justify-center">
-              <FileText className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-secondary text-black flex items-center justify-center">
+              <FileText className="w-5 h-5 text-black" />
             </div>
             <div>
-              <h3 className="text-base font-semibold text-[#222026]">{documentName}</h3>
+              <h3 className="text-base font-semibold text-black">{documentName}</h3>
               {documentNumber && (
-                <p className="text-xs text-[#8A8A93] font-mono">Doc ID: {documentNumber}</p>
+                <p className="text-xs text-black/55 font-mono">Doc ID: {documentNumber}</p>
               )}
             </div>
           </div>
 
-          {/* Controls: Zoom, Rotate, Close */}
+          {/* Controls */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setScale((s) => Math.min(s + 0.25, 2.5))}
-              className="p-2 rounded-xl text-[#222026] hover:bg-white transition-colors"
+              className="p-2 rounded-xl text-black hover:bg-black/[0.04] transition-colors"
               title="Zoom In"
             >
-              <ZoomIn className="w-4 h-4" />
+              <ZoomIn className="w-4 h-4 text-black" />
             </button>
             <button
               onClick={() => setScale((s) => Math.max(s - 0.25, 0.5))}
-              className="p-2 rounded-xl text-[#222026] hover:bg-white transition-colors"
+              className="p-2 rounded-xl text-black hover:bg-black/[0.04] transition-colors"
               title="Zoom Out"
             >
-              <ZoomOut className="w-4 h-4" />
+              <ZoomOut className="w-4 h-4 text-black" />
             </button>
             <button
               onClick={() => setRotation((r) => (r + 90) % 360)}
-              className="p-2 rounded-xl text-[#222026] hover:bg-white transition-colors"
+              className="p-2 rounded-xl text-black hover:bg-black/[0.04] transition-colors"
               title="Rotate 90deg"
             >
-              <RotateCw className="w-4 h-4" />
+              <RotateCw className="w-4 h-4 text-black" />
             </button>
             <button
               onClick={onClose}
-              className="p-2 ml-2 rounded-xl text-[#222026] hover:bg-red-50 hover:text-red-600 transition-colors"
+              className="p-2 ml-2 rounded-xl text-black hover:bg-black hover:text-white transition-colors"
               title="Close Preview"
             >
               <X className="w-5 h-5" />
@@ -72,7 +72,7 @@ export const DocumentLightbox: React.FC<DocumentLightboxProps> = ({
         </div>
 
         {/* Image Preview Canvas */}
-        <div className="flex-1 overflow-auto p-6 bg-[#222026]/5 flex items-center justify-center min-h-[350px]">
+        <div className="flex-1 overflow-auto p-6 bg-black/[0.02] flex items-center justify-center min-h-[350px]">
           <div
             className="transition-transform duration-200 shadow-lg rounded-2xl overflow-hidden bg-white max-w-full"
             style={{
@@ -88,9 +88,9 @@ export const DocumentLightbox: React.FC<DocumentLightboxProps> = ({
         </div>
 
         {/* Footer info */}
-        <div className="px-6 py-3 border-t border-[#ECECF0] bg-white flex items-center justify-between text-xs text-[#8A8A93]">
+        <div className="px-6 py-3 border-t border-black/[0.08] bg-white flex items-center justify-between text-xs text-black/55">
           <span>Zoom: {Math.round(scale * 100)}% | Rotation: {rotation}°</span>
-          <span className="text-[#8A6500] font-medium bg-[#FCE8A3] px-2.5 py-0.5 rounded-full">
+          <span className="text-black font-medium bg-secondary px-2.5 py-0.5 rounded-full">
             Official Fillcart Partner Verification Node
           </span>
         </div>

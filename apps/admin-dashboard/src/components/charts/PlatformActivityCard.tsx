@@ -43,27 +43,27 @@ export const PlatformActivityCard: React.FC = () => {
     <Card
       title={
         <div className="flex items-center gap-4">
-          <h3 className="text-[16px] font-normal text-[#222026] tracking-[0px]">
+          <h3 className="text-[16px] font-normal text-black tracking-[0px]">
             Messages By Month
           </h3>
-          <div className="flex items-center gap-3 text-xs text-[#8A8A93]">
+          <div className="flex items-center gap-3 text-xs text-black/55">
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full border border-[#8A8A93]" />
-              <span className="text-[11px] text-[#9A9AA3]">Open conversations</span>
+              <span className="w-2 h-2 rounded-full border border-black/55" />
+              <span className="text-[11px] text-black/55">Open conversations</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#F5B800]" />
-              <span className="text-[11px] text-[#9A9AA3]">Closed</span>
+              <span className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-[11px] text-black/55">Closed</span>
             </div>
           </div>
         </div>
       }
       action={
         <div
-          className="flex items-center gap-1.5 text-[12px] text-[#222026] bg-white px-3 py-1 rounded-full cursor-pointer hover:bg-[#F6F6F8] border border-[#ECECF0] shadow-xs"
+          className="flex items-center gap-1.5 text-[12px] text-black bg-white px-3 py-1 rounded-full cursor-pointer hover:bg-black/[0.03] border border-black/[0.08]"
         >
           <span>{filter}</span>
-          <ChevronDown className="w-3.5 h-3.5 text-[#8A8A93]" />
+          <ChevronDown className="w-3.5 h-3.5 text-black/55" />
         </div>
       }
       className="h-full flex-1 min-h-[220px] flex flex-col justify-between"
@@ -82,9 +82,9 @@ export const PlatformActivityCard: React.FC = () => {
                 onClick={() => setSelectedMonth(item.month)}
                 className="flex flex-col items-center justify-end h-full min-h-0 cursor-pointer relative"
               >
-                {/* Floating Dark Tooltip above Jul */}
+                {/* Floating Dark Tooltip above Jul (BLACK #000000, white text) */}
                 {isSelected && (
-                  <div className="absolute -top-[48px] left-1/2 -translate-x-1/2 z-30 bg-[#222026] text-white text-[11px] py-1.5 px-3 rounded-[12px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none">
+                  <div className="absolute -top-[48px] left-1/2 -translate-x-1/2 z-30 bg-black text-white text-[11px] py-1.5 px-3 rounded-[12px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none">
                     <div className="font-bold text-[11px] leading-tight text-white mb-0.5">
                       {item.total.toLocaleString()} Total
                     </div>
@@ -94,13 +94,13 @@ export const PlatformActivityCard: React.FC = () => {
                         {item.open} Open
                       </span>
                       <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#F5B800] inline-block" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
                         {item.closed.toLocaleString()} Closed
                       </span>
                     </div>
 
                     {/* Caret */}
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#222026] rotate-45 border-r border-b border-white/10" />
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-black rotate-45 border-r border-b border-white/10" />
                   </div>
                 )}
 
@@ -112,25 +112,30 @@ export const PlatformActivityCard: React.FC = () => {
                     gap: '6px', // 6px gap
                   }}
                 >
-                  {/* TOP BLOCK: Hatched diagonal lines, rounded-[14px] */}
+                  {/* TOP BLOCK:
+                      Normal month: PRIMARY #F5B800 lines over SECONDARY #FCE8A3
+                      Highlighted month: PRIMARY #F5B800 lines over WHITE #FFFFFF
+                  */}
                   <div
                     className="w-full rounded-[14px] flex-shrink-0 transition-all duration-300"
                     style={{
                       height: `calc(${hatchedHeightPercent}% - 3px)`,
                       minHeight: '12px',
-                      backgroundColor: isSelected ? '#FFF2C6' : '#FFF6D6',
-                      backgroundImage: isSelected
-                        ? 'repeating-linear-gradient(45deg, #D99A00 0, #D99A00 1.5px, transparent 1.5px, transparent 5px)'
-                        : 'repeating-linear-gradient(45deg, #F3C94A 0, #F3C94A 1.5px, transparent 1.5px, transparent 5px)',
+                      backgroundColor: isSelected ? '#FFFFFF' : '#FCE8A3',
+                      backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.5px, transparent 1.5px, transparent 5px)',
+                      border: isSelected ? '1px solid rgba(0, 0, 0, 0.08)' : 'none',
                     }}
                   />
 
-                  {/* BOTTOM BLOCK: Solid fill, rounded-[14px] */}
+                  {/* BOTTOM BLOCK:
+                      Normal month: solid SECONDARY #FCE8A3
+                      Highlighted month: solid PRIMARY #F5B800
+                  */}
                   <div
                     className="w-full rounded-[14px] flex-1 transition-all duration-300"
                     style={{
                       minHeight: '16px',
-                      backgroundColor: isSelected ? '#F5B800' : '#F9DC85',
+                      backgroundColor: isSelected ? '#F5B800' : '#FCE8A3',
                     }}
                   />
                 </div>
@@ -149,8 +154,8 @@ export const PlatformActivityCard: React.FC = () => {
                 onClick={() => setSelectedMonth(item.month)}
                 className={`text-[12px] block leading-none cursor-pointer transition-colors ${
                   isSelected
-                    ? 'text-[#B87700] font-semibold'
-                    : 'text-[#8A8A93] hover:text-[#222026]'
+                    ? 'text-black font-semibold'
+                    : 'text-black/55 hover:text-black'
                 }`}
               >
                 {item.month}

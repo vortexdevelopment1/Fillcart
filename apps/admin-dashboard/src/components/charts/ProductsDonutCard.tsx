@@ -7,13 +7,6 @@ export const ProductsDonutCard: React.FC = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('This Month');
 
-  // SVG Donut Geometry:
-  // Center: (60, 60), Radius: 48, StrokeWidth: 14
-  // Circumference: 2 * PI * 48 ≈ 301.6
-  // Segment 1 (Direct, dark #222026): stroke-dasharray="98 203.6", offset="-7"
-  // Segment 3 (Automations, #F5B800): stroke-dasharray="70 231.6", offset="-119"
-  // Segment 2 (Campaigns, #FCE8A3): stroke-dasharray="84 217.6", offset="-203"
-
   return (
     <Card
       onClick={() => navigate('/products')}
@@ -21,16 +14,16 @@ export const ProductsDonutCard: React.FC = () => {
       action={
         <div
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1.5 text-[12px] text-[#222026] bg-white px-3 py-1 rounded-full cursor-pointer hover:bg-[#F6F6F8] border border-[#ECECF0] shadow-xs"
+          className="flex items-center gap-1.5 text-[12px] text-black bg-white px-3 py-1 rounded-full cursor-pointer hover:bg-black/[0.03] border border-black/[0.08]"
         >
           <span>{filter}</span>
-          <ChevronDown className="w-3.5 h-3.5 text-[#8A8A93]" />
+          <ChevronDown className="w-3.5 h-3.5 text-black/55" />
         </div>
       }
       className="h-[210px] flex flex-col justify-between"
     >
       <div className="flex items-center my-auto h-full pt-1 pb-1">
-        {/* ──────────── DONUT WRAPPER (120px x 120px, mr-24px, flex-shrink-0) ──────────── */}
+        {/* ──────────── DONUT WRAPPER (120px x 120px, mr-24px) ──────────── */}
         <div className="w-[120px] h-[120px] mr-[24px] flex-shrink-0 relative flex items-center justify-center select-none">
           {/* SVG Donut Circle with 3 rounded-cap segments and gaps */}
           <svg
@@ -39,20 +32,20 @@ export const ProductsDonutCard: React.FC = () => {
             viewBox="0 0 120 120"
             className="w-[120px] h-[120px] transform -rotate-90"
           >
-            {/* Segment 1: Direct, dark #222026 (~34%, top-right) */}
+            {/* Segment 1: Direct, BLACK #000000 (right arc: ~11° to 165°) */}
             <circle
               cx="60"
               cy="60"
               r="48"
               fill="none"
-              stroke="#222026"
+              stroke="#000000"
               strokeWidth="14"
               strokeLinecap="round"
-              strokeDasharray="98 203.6"
-              strokeDashoffset="-7"
+              strokeDasharray="129 172.6"
+              strokeDashoffset="-9.2"
             />
 
-            {/* Segment 3: Automations, PRIMARY #F5B800 (~26%, bottom-right) */}
+            {/* Segment 2: Automations, PRIMARY #F5B800 (bottom-left arc: ~187° to 257°) */}
             <circle
               cx="60"
               cy="60"
@@ -61,11 +54,11 @@ export const ProductsDonutCard: React.FC = () => {
               stroke="#F5B800"
               strokeWidth="14"
               strokeLinecap="round"
-              strokeDasharray="70 231.6"
-              strokeDashoffset="-119"
+              strokeDasharray="58.6 243"
+              strokeDashoffset="-156.6"
             />
 
-            {/* Segment 2: Campaigns, SECONDARY #FCE8A3 (~34%, bottom-left to top-left) */}
+            {/* Segment 3: Campaigns, SECONDARY #FCE8A3 (top-left arc: ~279° to 349°) */}
             <circle
               cx="60"
               cy="60"
@@ -74,90 +67,88 @@ export const ProductsDonutCard: React.FC = () => {
               stroke="#FCE8A3"
               strokeWidth="14"
               strokeLinecap="round"
-              strokeDasharray="84 217.6"
-              strokeDashoffset="-203"
+              strokeDasharray="58.6 243"
+              strokeDashoffset="-233.7"
             />
           </svg>
 
-          {/* Center Text "24%": 15px, weight 400, #222026, perfectly centered */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15px] font-normal text-[#222026] pointer-events-none leading-none">
-            24%
-          </div>
-
-          {/* ──────────── PERCENT BADGES (White pill badges ON the ring) ──────────── */}
-          {/* Badge "18%" at top-left of the ring (Campaigns arc start) */}
+          {/* Three White Pill Badges ON the Ring (center hole is empty) */}
+          {/* Badge "16%" on top-left (Campaigns) arc */}
           <div
-            className="absolute bg-white text-[#222026] text-[10px] font-normal px-[6px] py-[1px] rounded-full border border-[#222026] pointer-events-none leading-none z-10"
-            style={{ top: '18%', left: '8%' }}
+            className="absolute bg-white text-black text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-black pointer-events-none leading-none z-10 shadow-sm"
+            style={{ top: '22%', left: '21%', transform: 'translate(-50%, -50%)' }}
           >
-            18%
+            16%
           </div>
 
-          {/* Badge "24%" at the right of the ring (Direct arc end) -- as in reference */}
+          {/* Badge "24%" on right (Direct) arc */}
           <div
-            className="absolute bg-white text-[#222026] text-[10px] font-normal px-[6px] py-[1px] rounded-full border border-[#222026] pointer-events-none leading-none z-10"
-            style={{ top: '44%', left: '80%' }}
+            className="absolute bg-white text-black text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-black pointer-events-none leading-none z-10 shadow-sm"
+            style={{ top: '50%', left: '90%', transform: 'translate(-50%, -50%)' }}
           >
             24%
           </div>
 
-          {/* Badge "17%" at bottom-left of the ring */}
+          {/* Badge "17%" on bottom-left (Automations) arc */}
           <div
-            className="absolute bg-white text-[#222026] text-[10px] font-normal px-[6px] py-[1px] rounded-full border border-[#222026] pointer-events-none leading-none z-10"
-            style={{ top: '74%', left: '14%' }}
+            className="absolute bg-white text-black text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-black pointer-events-none leading-none z-10 shadow-sm"
+            style={{ top: '80%', left: '23%', transform: 'translate(-50%, -50%)' }}
           >
             17%
           </div>
         </div>
 
-        {/* ──────────── LEGEND (flex-1, 14px row spacing, 10px dots, 14px labels) ──────────── */}
+        {/* ──────────── LEGEND ──────────── */}
         <div className="flex-1 flex flex-col justify-center h-full min-w-0">
           <div className="flex flex-col gap-[14px]">
-            {/* Row 1: Direct */}
+            {/* Row 1: Direct (BLACK) */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-[10px] h-[10px] rounded-full bg-[#222026] flex-shrink-0" />
-                <span className="font-normal text-[#222026] text-[14px] truncate leading-none">
+                <div className="w-[10px] h-[10px] rounded-full bg-black flex-shrink-0" />
+                <span className="font-normal text-black text-[14px] truncate leading-none">
                   Direct
                 </span>
               </div>
-              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-[#FFF3C4] text-[#8A6500] leading-none flex-shrink-0">
-                <TrendingUp className="w-2.5 h-2.5 inline" />
+              {/* Positive: background SECONDARY #FCE8A3, text #000000 */}
+              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-secondary text-black leading-none flex-shrink-0">
+                <TrendingUp className="w-2.5 h-2.5 inline text-black" />
                 <span>0.3%</span>
               </div>
             </div>
 
-            {/* Row 2: Campaigns */}
+            {/* Row 2: Campaigns (SECONDARY #FCE8A3) */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-[10px] h-[10px] rounded-full bg-[#FCE8A3] border border-[#F3D77A] flex-shrink-0" />
-                <span className="font-normal text-[#222026] text-[14px] truncate leading-none">
+                <div className="w-[10px] h-[10px] rounded-full bg-secondary flex-shrink-0" />
+                <span className="font-normal text-black text-[14px] truncate leading-none">
                   Campaigns
                 </span>
               </div>
-              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-[#FDE8E8] text-[#D32F2F] leading-none flex-shrink-0">
-                <TrendingDown className="w-2.5 h-2.5 inline" />
+              {/* Negative badge: background #FFFFFF with 1px #000000 border, text #000000, down-arrow (no red) */}
+              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-white border border-black text-black leading-none flex-shrink-0">
+                <TrendingDown className="w-2.5 h-2.5 inline text-black" />
                 <span>25.4%</span>
               </div>
             </div>
 
-            {/* Row 3: Automations */}
+            {/* Row 3: Automations (PRIMARY #F5B800) */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-[10px] h-[10px] rounded-full bg-[#F5B800] flex-shrink-0" />
-                <span className="font-normal text-[#222026] text-[14px] truncate leading-none">
+                <div className="w-[10px] h-[10px] rounded-full bg-primary flex-shrink-0" />
+                <span className="font-normal text-black text-[14px] truncate leading-none">
                   Automations
                 </span>
               </div>
-              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-[#FFF3C4] text-[#8A6500] leading-none flex-shrink-0">
-                <TrendingUp className="w-2.5 h-2.5 inline" />
+              {/* Positive: background SECONDARY #FCE8A3, text #000000 */}
+              <div className="flex items-center gap-0.5 text-[11px] font-normal px-[8px] py-[2px] rounded-[8px] bg-secondary text-black leading-none flex-shrink-0">
+                <TrendingUp className="w-2.5 h-2.5 inline text-black" />
                 <span>15%</span>
               </div>
             </div>
           </div>
 
-          {/* Bottom-right: "vs last month" (11px muted) */}
-          <div className="text-right text-[11px] text-[#9A9AA3] mt-2 leading-none">
+          {/* Bottom-right: "vs last month" (#000000 at 55% opacity) */}
+          <div className="text-right text-[11px] text-black/55 mt-2 leading-none">
             vs last month
           </div>
         </div>

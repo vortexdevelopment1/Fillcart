@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import {
   Search,
   ChevronDown,
-  Filter,
   CheckCircle,
   XCircle,
   Clock,
@@ -10,13 +9,12 @@ import {
   Bike,
   Store,
   ChevronRight,
-  ArrowUpDown,
 } from 'lucide-react';
 import { Card } from '../components/common/Card';
 import { Badge } from '../components/common/Badge';
 import { ApplicantDrawer } from '../components/verification/ApplicantDrawer';
 import { useVerification } from '../context/VerificationContext';
-import { Applicant, ApplicantType, VerificationStatus } from '../types';
+import { Applicant, VerificationStatus } from '../types';
 
 export const DocumentVerificationPage: React.FC = () => {
   const { applicants, stats, selectedApplicant, setSelectedApplicant } = useVerification();
@@ -70,88 +68,88 @@ export const DocumentVerificationPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-white">
       {/* Page Header */}
       <div>
-        <h2 className="text-2xl font-bold text-[#222026] tracking-tight">
+        <h2 className="text-2xl font-bold text-black tracking-tight">
           Document Verification
         </h2>
-        <p className="text-sm text-[#8A8A93] mt-1">
+        <p className="text-sm text-black/55 mt-1">
           Review, approve, or reject mandatory regulatory compliance documents for onboarding partners
         </p>
       </div>
 
-      {/* Top 4 Stat Cards in Exact Reference Card Style */}
+      {/* Top 4 Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Submissions */}
         <Card className="p-5 flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-[#8A8A93] uppercase tracking-wider block">
+            <span className="text-xs font-semibold text-black/55 uppercase tracking-wider block">
               Total Submissions
             </span>
-            <div className="text-3xl font-semibold text-[#222026] mt-1 tracking-tight">
+            <div className="text-3xl font-semibold text-black mt-1 tracking-tight">
               {stats.total}
             </div>
             <div className="mt-1">
-              <Badge variant="soft-amber">Across India</Badge>
+              <Badge variant="secondary">Across India</Badge>
             </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-[#F6F6F8] border border-[#ECECF0] flex items-center justify-center text-[#222026]">
-            <FileCheck2 className="w-6 h-6 text-[#222026]" />
+          <div className="w-12 h-12 rounded-2xl bg-black/[0.04] border border-black/[0.08] flex items-center justify-center text-black">
+            <FileCheck2 className="w-6 h-6 text-black" />
           </div>
         </Card>
 
         {/* Pending Verifications */}
         <Card className="p-5 flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-[#8A8A93] uppercase tracking-wider block">
+            <span className="text-xs font-semibold text-black/55 uppercase tracking-wider block">
               Pending Review
             </span>
-            <div className="text-3xl font-semibold text-[#F5B800] mt-1 tracking-tight">
+            <div className="text-3xl font-semibold text-primary mt-1 tracking-tight">
               {stats.pending}
             </div>
             <div className="mt-1">
-              <Badge variant="soft-amber">Urgent Queue</Badge>
+              <Badge variant="secondary">Urgent Queue</Badge>
             </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-[#FFF8E6] border border-[#FCE8A3] flex items-center justify-center text-[#F5B800]">
-            <Clock className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-2xl bg-secondary border border-black/[0.08] flex items-center justify-center text-black">
+            <Clock className="w-6 h-6 text-black" />
           </div>
         </Card>
 
         {/* Approved Partners */}
         <Card className="p-5 flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-[#8A8A93] uppercase tracking-wider block">
+            <span className="text-xs font-semibold text-black/55 uppercase tracking-wider block">
               Approved
             </span>
-            <div className="text-3xl font-semibold text-emerald-600 mt-1 tracking-tight">
+            <div className="text-3xl font-semibold text-black mt-1 tracking-tight">
               {stats.approved}
             </div>
             <div className="mt-1">
-              <Badge variant="success">Active on app</Badge>
+              <Badge variant="secondary">Active on app</Badge>
             </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-            <CheckCircle className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-2xl bg-secondary border border-black/[0.08] flex items-center justify-center text-black">
+            <CheckCircle className="w-6 h-6 text-black" />
           </div>
         </Card>
 
         {/* Rejected Documents */}
         <Card className="p-5 flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-[#8A8A93] uppercase tracking-wider block">
+            <span className="text-xs font-semibold text-black/55 uppercase tracking-wider block">
               Rejected / Non-Compliant
             </span>
-            <div className="text-3xl font-semibold text-red-600 mt-1 tracking-tight">
+            <div className="text-3xl font-semibold text-black mt-1 tracking-tight">
               {stats.rejected}
             </div>
             <div className="mt-1">
-              <Badge variant="danger">Re-upload needed</Badge>
+              <Badge variant="negative">Re-upload needed</Badge>
             </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600">
-            <XCircle className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-2xl bg-white border border-black flex items-center justify-center text-black">
+            <XCircle className="w-6 h-6 text-black" />
           </div>
         </Card>
       </div>
@@ -159,17 +157,17 @@ export const DocumentVerificationPage: React.FC = () => {
       {/* Main Table Card */}
       <Card className="p-6">
         {/* Controls Bar: Tab Pills + Search + Filters */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-6 pb-6 border-b border-[#ECECF0]">
-          {/* Tab Pills: All | Riders | Vendors (Active = #F5B800) */}
-          <div className="flex items-center gap-1.5 p-1 bg-[#F6F6F8] rounded-2xl border border-[#ECECF0] self-start">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-6 pb-6 border-b border-black/[0.08]">
+          {/* Tab Pills: All | Riders | Vendors (Active = PRIMARY #F5B800) */}
+          <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl border border-black/[0.08] self-start">
             {(['All', 'Riders', 'Vendors'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-5 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
                   activeTab === tab
-                    ? 'bg-[#F5B800] text-[#222026] shadow-sm'
-                    : 'text-[#8A8A93] hover:text-[#222026]'
+                    ? 'bg-primary text-black shadow-sm'
+                    : 'text-black/55 hover:text-black'
                 }`}
               >
                 {tab}
@@ -181,13 +179,13 @@ export const DocumentVerificationPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-3">
             {/* Search Input */}
             <div className="relative flex-1 sm:w-64">
-              <Search className="w-4 h-4 text-[#8A8A93] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-black/55 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search by name, phone, city..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-[#F6F6F8] border border-[#ECECF0] rounded-full text-xs text-[#222026] placeholder-[#8A8A93] focus:outline-none focus:ring-2 focus:ring-[#F5B800] focus:bg-white transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-white border border-black/[0.08] rounded-full text-xs text-black placeholder-black/55 focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               />
             </div>
 
@@ -196,14 +194,14 @@ export const DocumentVerificationPage: React.FC = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="appearance-none bg-[#F6F6F8] border border-[#ECECF0] rounded-full px-4 py-2 pr-8 text-xs font-medium text-[#222026] focus:outline-none focus:ring-2 focus:ring-[#F5B800] cursor-pointer"
+                className="appearance-none bg-white border border-black/[0.08] rounded-full px-4 py-2 pr-8 text-xs font-medium text-black focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
               >
                 <option value="All">All Statuses</option>
                 <option value="Pending">Pending / Under Review</option>
                 <option value="Approved">Approved</option>
                 <option value="Rejected">Rejected</option>
               </select>
-              <ChevronDown className="w-3.5 h-3.5 text-[#8A8A93] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-3.5 h-3.5 text-black/55 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
             {/* Date Range Dropdown */}
@@ -211,14 +209,14 @@ export const DocumentVerificationPage: React.FC = () => {
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="appearance-none bg-[#F6F6F8] border border-[#ECECF0] rounded-full px-4 py-2 pr-8 text-xs font-medium text-[#222026] focus:outline-none focus:ring-2 focus:ring-[#F5B800] cursor-pointer"
+                className="appearance-none bg-white border border-black/[0.08] rounded-full px-4 py-2 pr-8 text-xs font-medium text-black focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
               >
                 <option value="All Time">All Time</option>
                 <option value="Today">Today</option>
                 <option value="This Week">This Week</option>
                 <option value="This Month">This Month</option>
               </select>
-              <ChevronDown className="w-3.5 h-3.5 text-[#8A8A93] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-3.5 h-3.5 text-black/55 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -227,7 +225,7 @@ export const DocumentVerificationPage: React.FC = () => {
         <div className="overflow-x-auto no-scrollbar -mx-6 px-6">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-[#ECECF0] text-[#8A8A93] uppercase font-bold text-[10px] tracking-wider">
+              <tr className="border-b border-black/[0.08] text-black/55 uppercase font-bold text-[10px] tracking-wider">
                 <th className="py-3 px-3">Applicant</th>
                 <th className="py-3 px-3">Partner Type</th>
                 <th className="py-3 px-3">Location</th>
@@ -237,12 +235,12 @@ export const DocumentVerificationPage: React.FC = () => {
                 <th className="py-3 px-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#ECECF0]">
+            <tbody className="divide-y divide-black/[0.08]">
               {filteredApplicants.length > 0 ? (
                 filteredApplicants.map((applicant) => (
                   <tr
                     key={applicant.id}
-                    className="hover:bg-[#F6F6F8]/60 transition-colors group"
+                    className="hover:bg-black/[0.02] transition-colors group"
                   >
                     {/* Name & Avatar */}
                     <td className="py-4 px-3">
@@ -250,13 +248,13 @@ export const DocumentVerificationPage: React.FC = () => {
                         <img
                           src={applicant.avatar}
                           alt={applicant.name}
-                          className="w-10 h-10 rounded-full object-cover ring-1 ring-[#ECECF0]"
+                          className="w-10 h-10 rounded-full object-cover ring-1 ring-black/[0.08]"
                         />
                         <div>
-                          <span className="font-bold text-[#222026] block text-sm group-hover:text-[#F5B800] transition-colors">
+                          <span className="font-bold text-black block text-sm group-hover:text-primary transition-colors">
                             {applicant.name}
                           </span>
-                          <span className="text-[#8A8A93] text-[11px] font-mono">
+                          <span className="text-black/55 text-[11px] font-mono">
                             {applicant.phone}
                           </span>
                         </div>
@@ -268,14 +266,14 @@ export const DocumentVerificationPage: React.FC = () => {
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-semibold text-[11px] ${
                           applicant.type === 'Rider'
-                            ? 'bg-[#FCE8A3] text-[#8A6500]'
-                            : 'bg-[#222026] text-white'
+                            ? 'bg-secondary text-black'
+                            : 'bg-black text-white'
                         }`}
                       >
                         {applicant.type === 'Rider' ? (
-                          <Bike className="w-3 h-3" />
+                          <Bike className="w-3 h-3 text-black" />
                         ) : (
-                          <Store className="w-3 h-3" />
+                          <Store className="w-3 h-3 text-white" />
                         )}
                         {applicant.type}
                       </span>
@@ -283,23 +281,23 @@ export const DocumentVerificationPage: React.FC = () => {
 
                     {/* City & State */}
                     <td className="py-4 px-3">
-                      <span className="font-semibold text-[#222026] block">{applicant.city}</span>
-                      <span className="text-[#8A8A93] text-[11px]">{applicant.state}</span>
+                      <span className="font-semibold text-black block">{applicant.city}</span>
+                      <span className="text-black/55 text-[11px]">{applicant.state}</span>
                     </td>
 
                     {/* Submitted Date */}
-                    <td className="py-4 px-3 text-[#63636E] font-medium">
+                    <td className="py-4 px-3 text-black/70 font-medium">
                       {applicant.submittedAt}
                     </td>
 
-                    {/* Documents Count with Mini Badges */}
+                    {/* Documents Count */}
                     <td className="py-4 px-3">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-[#222026]">
+                        <span className="font-bold text-black">
                           {applicant.documents.filter((d) => d.status === 'Approved').length} /{' '}
                           {applicant.documents.length}
                         </span>
-                        <span className="text-[10px] text-[#8A8A93]">approved</span>
+                        <span className="text-[10px] text-black/55">approved</span>
                       </div>
                     </td>
 
@@ -308,16 +306,16 @@ export const DocumentVerificationPage: React.FC = () => {
                       <span
                         className={`inline-flex items-center gap-1 px-3 py-1 rounded-full font-semibold text-xs ${
                           applicant.status === 'Approved'
-                            ? 'bg-emerald-100 text-emerald-800'
+                            ? 'bg-secondary text-black'
                             : applicant.status === 'Rejected'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-[#FCE8A3] text-[#8A6500]'
+                            ? 'bg-white text-black border border-black'
+                            : 'bg-secondary text-black'
                         }`}
                       >
-                        {applicant.status === 'Approved' && <CheckCircle className="w-3 h-3" />}
-                        {applicant.status === 'Rejected' && <XCircle className="w-3 h-3" />}
+                        {applicant.status === 'Approved' && <CheckCircle className="w-3 h-3 text-black" />}
+                        {applicant.status === 'Rejected' && <XCircle className="w-3 h-3 text-black" />}
                         {(applicant.status === 'Pending' || applicant.status === 'Under Review') && (
-                          <Clock className="w-3 h-3" />
+                          <Clock className="w-3 h-3 text-black" />
                         )}
                         {applicant.status}
                       </span>
@@ -327,7 +325,7 @@ export const DocumentVerificationPage: React.FC = () => {
                     <td className="py-4 px-3 text-right">
                       <button
                         onClick={() => handleOpenReview(applicant)}
-                        className="inline-flex items-center gap-1 px-4 py-2 bg-[#222026] hover:bg-[#F5B800] hover:text-[#222026] text-white font-semibold rounded-xl transition-all shadow-sm group-hover:scale-105"
+                        className="inline-flex items-center gap-1 px-4 py-2 bg-black hover:bg-primary hover:text-black text-white font-semibold rounded-xl transition-all shadow-sm group-hover:scale-105"
                       >
                         <span>Review</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -336,18 +334,18 @@ export const DocumentVerificationPage: React.FC = () => {
                   </tr>
                 ))
               ) : (
-                /* Empty state when no results match search/filter */
+                /* Empty state */
                 <tr>
                   <td colSpan={7} className="py-12 text-center">
-                    <div className="flex flex-col items-center justify-center text-[#8A8A93]">
-                      <div className="w-14 h-14 rounded-2xl bg-[#F6F6F8] flex items-center justify-center mb-3 text-[#C4C4CC]">
-                        <Search className="w-7 h-7" />
+                    <div className="flex flex-col items-center justify-center text-black/55">
+                      <div className="w-14 h-14 rounded-2xl bg-black/[0.04] flex items-center justify-center mb-3 text-black/40">
+                        <Search className="w-7 h-7 text-black/40" />
                       </div>
-                      <h4 className="text-base font-semibold text-[#222026]">
+                      <h4 className="text-base font-semibold text-black">
                         No matching applicants found
                       </h4>
-                      <p className="text-xs text-[#8A8A93] mt-1 max-w-sm">
-                        Try adjusting your search terms or filters (e.g. changing tab or status filter)
+                      <p className="text-xs text-black/55 mt-1 max-w-sm">
+                        Try adjusting your search terms or filters
                       </p>
                       <button
                         onClick={() => {
@@ -355,7 +353,7 @@ export const DocumentVerificationPage: React.FC = () => {
                           setStatusFilter('All');
                           setActiveTab('All');
                         }}
-                        className="mt-4 px-4 py-2 rounded-xl bg-[#F6F6F8] text-[#222026] font-semibold text-xs hover:bg-[#ECECF0]"
+                        className="mt-4 px-4 py-2 rounded-xl bg-secondary text-black font-semibold text-xs hover:bg-primary"
                       >
                         Reset Filters
                       </button>
@@ -368,17 +366,17 @@ export const DocumentVerificationPage: React.FC = () => {
         </div>
 
         {/* Footer info & pagination */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 pt-4 border-t border-[#ECECF0] text-xs text-[#8A8A93]">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 pt-4 border-t border-black/[0.08] text-xs text-black/55">
           <div>
-            Showing <span className="font-semibold text-[#222026]">{filteredApplicants.length}</span>{' '}
-            of <span className="font-semibold text-[#222026]">{applicants.length}</span> applicants
+            Showing <span className="font-semibold text-black">{filteredApplicants.length}</span>{' '}
+            of <span className="font-semibold text-black">{applicants.length}</span> applicants
           </div>
           <div className="flex items-center gap-1">
-            <button className="px-3 py-1.5 rounded-lg border border-[#ECECF0] hover:bg-[#F6F6F8] text-[#222026] font-medium disabled:opacity-40">
+            <button className="px-3 py-1.5 rounded-lg border border-black/[0.08] hover:bg-black/[0.03] text-black font-medium disabled:opacity-40">
               Previous
             </button>
-            <span className="px-3 py-1.5 rounded-lg bg-[#222026] text-white font-bold">1</span>
-            <button className="px-3 py-1.5 rounded-lg border border-[#ECECF0] hover:bg-[#F6F6F8] text-[#222026] font-medium">
+            <span className="px-3 py-1.5 rounded-lg bg-black text-white font-bold">1</span>
+            <button className="px-3 py-1.5 rounded-lg border border-black/[0.08] hover:bg-black/[0.03] text-black font-medium">
               Next
             </button>
           </div>

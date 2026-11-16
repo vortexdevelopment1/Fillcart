@@ -33,12 +33,12 @@ export const Header: React.FC = () => {
 
   return (
     <header className="flex items-center justify-between gap-4 mb-3.5 flex-shrink-0 pl-11 lg:pl-0">
-      {/* Left: Greeting heading 32px, weight 400; subtitle 13px, muted */}
+      {/* Left: Greeting heading 32px, weight 400; subtitle 13px, muted (#000000 at 55%) */}
       <div>
-        <h1 className="text-[32px] font-normal text-[#222026] tracking-tight leading-tight">
+        <h1 className="text-[32px] font-normal text-black tracking-tight leading-tight">
           {greeting}, <span className="font-normal">Sarah</span>
         </h1>
-        <p className="text-[13px] text-[#9A9AA3] mt-0.5 font-sans leading-none">
+        <p className="text-[13px] text-black/55 mt-0.5 font-sans leading-none">
           Your latest platform updates here
         </p>
       </div>
@@ -47,27 +47,27 @@ export const Header: React.FC = () => {
       <div className="flex items-center gap-3">
         {/* Search Icon Button */}
         <button
-          className="w-10 h-10 rounded-full bg-white border border-[#ECECF0] flex items-center justify-center text-[#222026] hover:bg-[#F6F6F8] transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F5B800]"
+          className="w-10 h-10 rounded-full bg-white border border-black/[0.08] flex items-center justify-center text-black hover:bg-black/[0.03] transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
           title="Search anything..."
           aria-label="Search"
         >
-          <Search className="w-4 h-4 text-[#222026]" />
+          <Search className="w-4 h-4 text-black" />
         </button>
 
         {/* Sync Pill: "Last sync / Just now" */}
         <button
           onClick={handleManualSync}
-          className="h-10 px-3.5 rounded-full bg-white border border-[#ECECF0] flex items-center gap-2 shadow-sm hover:bg-[#F6F6F8] transition-all group focus:outline-none focus:ring-2 focus:ring-[#F5B800]"
+          className="h-10 px-3.5 rounded-full bg-white border border-black/[0.08] flex items-center gap-2 shadow-sm hover:bg-black/[0.03] transition-all group focus:outline-none focus:ring-2 focus:ring-primary"
           title="Click to sync operations state"
         >
           <RotateCw
-            className={`w-3.5 h-3.5 text-[#8A8A93] group-hover:text-[#222026] transition-transform ${
-              isSyncing ? 'animate-spin text-[#F5B800]' : ''
+            className={`w-3.5 h-3.5 text-black/55 group-hover:text-black transition-transform ${
+              isSyncing ? 'animate-spin text-primary' : ''
             }`}
           />
           <div className="text-left text-xs leading-none">
-            <span className="text-[#8A8A93] block text-[9px] mb-0.5">Last sync</span>
-            <span className="text-[#222026] font-medium block text-[11px]">{lastSyncText}</span>
+            <span className="text-black/55 block text-[9px] mb-0.5">Last sync</span>
+            <span className="text-black font-medium block text-[11px]">{lastSyncText}</span>
           </div>
         </button>
 
@@ -76,9 +76,9 @@ export const Header: React.FC = () => {
           <img
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
             alt="Sarah Profile"
-            className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm ring-1 ring-[#ECECF0]"
+            className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm ring-1 ring-black/[0.08]"
           />
-          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white" />
+          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary rounded-full border-2 border-white" />
         </div>
       </div>
     </header>

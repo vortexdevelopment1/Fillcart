@@ -4,17 +4,15 @@ export const pendingVerificationsStats = {
   pendingLabel: "8.3% pending",
   totalPending: 18,
   totalSubmissions: 216,
-  // 48 ticks: true = filled (#F5B800), false = unfilled (#ECECF0)
-  ticks: Array.from({ length: 46 }, (_, i) => i < 38),
+  ticks: Array.from({ length: 72 }, (_, i) => i < 66),
 };
 
 export const vendorsStats = {
-  count: 248,
-  badge: "18 active",
-  // 48 ticks: first 14 filled in primary yellow, next 8 in primary light, rest unfilled
-  ticks: Array.from({ length: 46 }, (_, i) => ({
-    filled: i < 16,
-    color: i < 10 ? '#F5B800' : '#FCE8A3',
+  count: 25,
+  badge: "4 active",
+  ticks: Array.from({ length: 72 }, (_, i) => ({
+    filled: i < 18,
+    color: i >= 13 ? '#F5B800' : 'rgba(245, 184, 0, 0.55)',
   })),
 };
 
@@ -22,7 +20,6 @@ export const ridersTallStats = {
   count: "3,241",
   badge: "192 New in July",
   change: "12%",
-  // J, F, M, A, M, J, J (7 bars)
   bars: [
     { label: "J", value: 78, isHatched: false },
     { label: "F", value: 42, isHatched: false },
@@ -30,61 +27,61 @@ export const ridersTallStats = {
     { label: "A", value: 36, isHatched: false },
     { label: "M", value: 48, isHatched: false },
     { label: "J", value: 72, isHatched: false },
-    { label: "J", value: 55, isHatched: true }, // last bar is hatched
+    { label: "J", value: 55, isHatched: true },
   ],
 };
 
 export const topOrdersVendors = [
   {
     id: "v1",
-    name: "Fresh Mart Hub",
-    email: "freshmart.delhi@fillkart.in",
-    share: 12,
+    name: "Sarah Mitchell",
+    email: "sarah@brights...",
+    share: "12%",
     orders: "1,240",
-    color: "#F5B800",
-  },
-  {
-    id: "v2",
-    name: "Royal Kirana & Organics",
-    email: "royalkirana@gmail.com",
-    share: 8,
-    orders: "850",
     color: "#FCE8A3",
   },
   {
+    id: "v2",
+    name: "David Kim",
+    email: "david.kim@email...",
+    share: "8%",
+    orders: "850",
+    color: "#F5B800",
+  },
+  {
     id: "v3",
-    name: "Priya Dairy & Superstore",
-    email: "priya.store@mumbaidelight.in",
-    share: 4,
+    name: "Priya Patel",
+    email: "priya@oakrealty.c...",
+    share: "4%",
     orders: "425",
-    color: "#D49E00",
+    color: "rgba(245, 184, 0, 0.55)",
   },
   {
     id: "v4",
-    name: "Others (184 stores)",
-    email: "platform.network@fillkart.in",
-    share: 76,
+    name: "Others",
+    email: "",
+    share: "76%",
     orders: "7,011",
-    color: "#ECECF0",
+    color: "#FFFFFF",
   },
 ];
 
 export const productsCategoryDonutData = [
-  { name: "Grocery & Staples", value: 52, color: "#F5B800", change: "+3.2%", isPositive: true },
-  { name: "Fresh Produce & Dairy", value: 24, color: "#FCE8A3", change: "-25.4%", isPositive: false },
-  { name: "Beverages & Snacks", value: 24, color: "#222026", change: "+15%", isPositive: true },
+  { name: "Direct", value: 48, color: "#000000", change: "0.3%", isPositive: true },
+  { name: "Campaigns", value: 28, color: "#FCE8A3", change: "25.4%", isPositive: false },
+  { name: "Automations", value: 24, color: "#F5B800", change: "15%", isPositive: true },
 ];
 
 export const paymentsSummary = {
-  total: "₹ 2,45,000",
-  subtext: "₹ 34,200 Disbursed",
+  total: "$2,450",
+  subtext: "$350 Used",
   change: "+14.8%",
 };
 
 export const basicReportsData = {
   total: "95,215",
   subtext: "1,243 today",
-  badge: "58%",
+  badge: "51%",
   chartPoints: [
     { label: "1 Jul", value: 420 },
     { label: "5 Jul", value: 680 },

@@ -3,7 +3,7 @@ import React from 'react';
 interface SegmentedBarProps {
   totalTicks?: number; // 72 ticks
   filledCount: number; // e.g. 66 for Delivery Rate (~92%), 18 for Campaigns (~25%)
-  darkMarkerCount?: number; // 5 or 4
+  darkMarkerCount?: number; // 5
   className?: string;
 }
 
@@ -20,12 +20,13 @@ export const SegmentedBar: React.FC<SegmentedBarProps> = ({
     >
       {Array.from({ length: totalTicks }).map((_, idx) => {
         const isFilled = idx < filledCount;
-        let bg = '#EDEDF2';
+        let bg = 'rgba(0, 0, 0, 0.06)'; // #000000 at 6% opacity
 
         if (isFilled) {
-          // Majority of filled ticks = #F5B800; last darkMarkerCount ticks = #D99A00
+          // Last 5 filled ticks = PRIMARY #F5B800 at 100%
+          // Earlier filled ticks = PRIMARY #F5B800 at 55% opacity
           const isMarker = idx >= filledCount - darkMarkerCount;
-          bg = isMarker ? '#D99A00' : '#F5B800';
+          bg = isMarker ? '#F5B800' : 'rgba(245, 184, 0, 0.55)';
         }
 
         return (
