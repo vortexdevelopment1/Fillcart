@@ -141,9 +141,12 @@ export const Sidebar: React.FC = () => {
           aria-label="Fillcart Home"
         >
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <ellipse cx="9" cy="11" rx="5.5" ry="6.5" fill="#FFFFFF" />
-            <circle cx="18" cy="10" r="4.5" fill="#FFFFFF" />
-            <circle cx="14" cy="18" r="5" fill="#FFFFFF" />
+            {/* Top-Left: large tilted oval (-38 deg) */}
+            <ellipse cx="9.5" cy="10" rx="5.2" ry="3.8" transform="rotate(-38 9.5 10)" fill="#FFFFFF" />
+            {/* Top-Right: vertical oval (+8 deg) */}
+            <ellipse cx="19" cy="10.5" rx="2.4" ry="4.5" transform="rotate(8 19 10.5)" fill="#FFFFFF" />
+            {/* Bottom: horizontal oval (-3 deg) */}
+            <ellipse cx="14.5" cy="18.5" rx="4.8" ry="3.2" transform="rotate(-3 14.5 18.5)" fill="#FFFFFF" />
           </svg>
         </NavLink>
 

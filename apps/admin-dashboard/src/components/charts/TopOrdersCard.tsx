@@ -72,26 +72,26 @@ export const TopOrdersCard: React.FC = () => {
           className="w-[28px] h-full flex flex-col flex-shrink-0 select-none"
           style={{ gap: '4px' }}
         >
-          {/* Block 1: SECONDARY #FCE8A3 with subtle primary border so it's clearly visible, radius 8px */}
+          {/* Block 1: PRIMARY #F5B800 solid matching top block in reference, radius 8px */}
           <div
-            className="w-full rounded-[8px] bg-secondary border border-primary/40 transition-all"
+            className="w-full rounded-[8px] bg-primary transition-all"
             style={{ height: '24%' }}
             title="Block 1 (Sarah Mitchell)"
           />
 
-          {/* Block 2: PRIMARY #F5B800, radius 6px */}
+          {/* Block 2: SECONDARY #FCE8A3 solid, radius 6px */}
           <div
-            className="w-full rounded-[6px] bg-primary transition-all"
+            className="w-full rounded-[6px] bg-secondary transition-all"
             style={{ height: '13%' }}
             title="Block 2 (David Kim)"
           />
 
-          {/* Block 3: PRIMARY at 50% opacity, radius 5px */}
+          {/* Block 3: PRIMARY at 40% opacity, radius 5px */}
           <div
             className="w-full rounded-[5px] transition-all"
             style={{
               height: '9%',
-              backgroundColor: 'rgba(245, 184, 0, 0.50)',
+              backgroundColor: 'rgba(245, 184, 0, 0.40)',
             }}
             title="Block 3 (Priya Patel)"
           />
@@ -109,15 +109,15 @@ export const TopOrdersCard: React.FC = () => {
             <div key={row.id} className="flex items-center gap-2.5 text-[13px] leading-tight">
               {/* Row Dots matching blocks */}
               {row.dotType === 'block1' && (
-                <div className="w-[8px] h-[8px] rounded-full bg-secondary border border-primary/50 flex-shrink-0" />
+                <div className="w-[8px] h-[8px] rounded-full bg-primary flex-shrink-0" />
               )}
               {row.dotType === 'block2' && (
-                <div className="w-[8px] h-[8px] rounded-full bg-primary flex-shrink-0" />
+                <div className="w-[8px] h-[8px] rounded-full bg-secondary flex-shrink-0" />
               )}
               {row.dotType === 'block3' && (
                 <div
                   className="w-[8px] h-[8px] rounded-full flex-shrink-0"
-                  style={{ backgroundColor: 'rgba(245, 184, 0, 0.50)' }}
+                  style={{ backgroundColor: 'rgba(245, 184, 0, 0.40)' }}
                 />
               )}
               {row.dotType === 'hollow' && (
