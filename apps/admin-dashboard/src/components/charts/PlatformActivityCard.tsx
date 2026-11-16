@@ -108,23 +108,23 @@ export const PlatformActivityCard: React.FC = () => {
                   </div>
                 )}
 
-                {/* Stacked Bar Container: max-w-[34px], centered, 4px gap */}
+                {/* Stacked Bar Container: max-w-[34px], centered, 6px gap */}
                 <div
                   className="w-full max-w-[34px] flex flex-col justify-end transition-all duration-300"
                   style={{
                     height: `${item.totalHeight}%`,
-                    gap: '4px', // 4px gap matching reference
+                    gap: '6px', // 6px gap matching reference
                   }}
                 >
                   {/* TOP BLOCK (Open conversations):
-                      Reusable .hatch / .hatch-active class
+                      Reusable .hatch / .hatch-active class with 14px radius, no border
                   */}
                   <div
-                    className={`w-full rounded-[6px] flex-shrink-0 transition-all duration-300 ${
+                    className={`w-full rounded-[14px] flex-shrink-0 transition-all duration-300 ${
                       isSelected ? 'hatch-active' : 'hatch'
                     }`}
                     style={{
-                      height: `calc(${hatchedHeightPercent}% - 2px)`,
+                      height: `calc(${hatchedHeightPercent}% - 3px)`,
                       minHeight: '14px',
                     }}
                   />
@@ -135,7 +135,7 @@ export const PlatformActivityCard: React.FC = () => {
                       Glossy inner gradient overlay: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 60%)
                   */}
                   <div
-                    className="w-full rounded-[8px] flex-1 transition-all duration-300"
+                    className="w-full rounded-[14px] flex-1 transition-all duration-300"
                     style={{
                       minHeight: '18px',
                       backgroundColor: isSelected ? '#F5B800' : '#FCE8A3',

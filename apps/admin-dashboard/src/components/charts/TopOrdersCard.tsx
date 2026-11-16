@@ -67,10 +67,10 @@ export const TopOrdersCard: React.FC = () => {
       className="h-[210px] flex flex-col justify-between"
     >
       <div className="flex items-center gap-4 my-auto h-full pt-1 pb-1">
-        {/* Left: Stacked Bar (width 36px, same total height as 4 rows, 4px gap) */}
+        {/* Left: Stacked Bar (width 36px, same total height as 4 rows, 6px gap) */}
         <div
           className="w-[36px] h-full flex flex-col flex-shrink-0 select-none"
-          style={{ gap: '4px' }}
+          style={{ gap: '6px' }}
         >
           {/* Block 1: SECONDARY #FCE8A3, radius 10px */}
           <div
@@ -96,9 +96,9 @@ export const TopOrdersCard: React.FC = () => {
             title="Block 3 (Priya Patel)"
           />
 
-          {/* Block 4: Hatched pattern (.hatch class), radius 10px */}
+          {/* Block 4: Hatched pattern (.hatch class, radius 14px) */}
           <div
-            className="w-full flex-1 rounded-[10px] hatch transition-all"
+            className="w-full flex-1 rounded-[14px] hatch transition-all"
             title="Block 4 (Others)"
           />
         </div>
