@@ -87,13 +87,11 @@ export const RidersTallCard: React.FC = () => {
               {/* Bar Area */}
               <div className="w-full flex-1 flex items-end justify-center min-h-0">
                 <div
-                  className="w-[24px] rounded-full transition-all duration-300"
+                  className={`w-[24px] rounded-full transition-all duration-300 ${
+                    bar.isHatched ? 'hatch-white' : 'bg-white'
+                  }`}
                   style={{
                     height: `${bar.heightPercent}%`,
-                    backgroundColor: bar.isHatched ? 'rgba(255, 255, 255, 0.25)' : '#FFFFFF',
-                    backgroundImage: bar.isHatched
-                      ? 'repeating-linear-gradient(45deg, rgba(255,255,255,0.95) 0, rgba(255,255,255,0.95) 1.5px, transparent 1.5px, transparent 5px)'
-                      : 'none',
                   }}
                 />
               </div>

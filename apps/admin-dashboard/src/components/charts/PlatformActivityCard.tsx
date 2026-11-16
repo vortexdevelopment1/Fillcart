@@ -46,14 +46,14 @@ export const PlatformActivityCard: React.FC = () => {
           <h3 className="text-[16px] font-normal text-black tracking-[0px]">
             Messages By Month
           </h3>
-          <div className="flex items-center gap-3 text-xs text-black/55">
+          <div className="flex items-center gap-[14px]">
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full border-[1.5px] border-primary bg-white inline-block" />
-              <span className="text-[11px] text-black/55">Open conversations</span>
+              <span className="w-2 h-2 rounded-full border-[1.5px] border-primary bg-transparent inline-block flex-shrink-0" />
+              <span className="font-sans text-[11px] text-black/55 leading-none">Open conversations</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-primary inline-block" />
-              <span className="text-[11px] text-black/55">Closed</span>
+              <span className="w-2 h-2 rounded-full bg-primary inline-block flex-shrink-0" />
+              <span className="font-sans text-[11px] text-black/55 leading-none">Closed</span>
             </div>
           </div>
         </div>
@@ -69,7 +69,7 @@ export const PlatformActivityCard: React.FC = () => {
       className="h-full flex-1 min-h-[220px] flex flex-col justify-between"
     >
       {/* Chart Canvas */}
-      <div className="flex-1 min-h-0 w-full pt-12 pb-0 flex flex-col justify-end">
+      <div className="flex-1 min-h-0 w-full pt-16 pb-0 flex flex-col justify-end">
         {/* 12 Columns aligned to bottom axis */}
         <div className="flex-1 min-h-0 w-full grid grid-cols-12 gap-1 md:gap-2 items-end">
           {monthlyData.map((item) => {
@@ -82,21 +82,25 @@ export const PlatformActivityCard: React.FC = () => {
                 onClick={() => setSelectedMonth(item.month)}
                 className="flex flex-col items-center justify-end h-full min-h-0 cursor-pointer relative"
               >
-                {/* Floating Dark Tooltip above Jul (BLACK #000000, white text) */}
+                {/* Floating Dark Tooltip above Jul (BLACK #000000, 3 separate lines) */}
                 {isSelected && (
-                  <div className="absolute -top-[52px] left-1/2 -translate-x-1/2 z-30 bg-black text-white text-[11px] font-sans py-1.5 px-3 rounded-[10px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none">
-                    <div className="font-medium text-[11px] leading-tight text-white mb-0.5 font-sans">
-                      {item.total.toLocaleString()} Total
+                  <div className="absolute -top-[76px] left-1/2 -translate-x-1/2 z-30 bg-black text-white text-[11px] font-sans p-[10px_12px] rounded-[12px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none flex flex-col gap-1 leading-[1.5]">
+                    {/* Line 1: 1,234 Total (number weight 500, "Total" weight 400) */}
+                    <div className="text-[11px] leading-tight text-white">
+                      <span className="font-medium text-white">{item.total.toLocaleString()}</span>{' '}
+                      <span className="font-normal text-white/90">Total</span>
                     </div>
-                    <div className="flex items-center gap-2 text-white/80 text-[10px] leading-none font-sans font-normal">
-                      <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full border border-white inline-block" />
-                        {item.open} Open
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
-                        {item.closed.toLocaleString()} Closed
-                      </span>
+
+                    {/* Line 2: hollow dot (PRIMARY ring) + 38 Open */}
+                    <div className="flex items-center gap-1.5 text-white/90 text-[11px] leading-none font-normal">
+                      <span className="w-2 h-2 rounded-full border-[1.5px] border-primary bg-transparent inline-block flex-shrink-0" />
+                      <span>{item.open} Open</span>
+                    </div>
+
+                    {/* Line 3: solid PRIMARY dot + 1,196 Closed */}
+                    <div className="flex items-center gap-1.5 text-white/90 text-[11px] leading-none font-normal">
+                      <span className="w-2 h-2 rounded-full bg-primary inline-block flex-shrink-0" />
+                      <span>{item.closed.toLocaleString()} Closed</span>
                     </div>
 
                     {/* Caret */}
@@ -113,31 +117,29 @@ export const PlatformActivityCard: React.FC = () => {
                   }}
                 >
                   {/* TOP BLOCK (Open conversations):
-                      Reference: clean white background (#FFFFFF) with crisp PRIMARY (#F5B800) diagonal lines
-                      Selected month: 1.5px solid #F5B800 border
-                      Unselected month: 1px solid rgba(0, 0, 0, 0.08)
+                      Reusable .hatch / .hatch-active class
                   */}
                   <div
-                    className="w-full rounded-[6px] flex-shrink-0 transition-all duration-300"
+                    className={`w-full rounded-[6px] flex-shrink-0 transition-all duration-300 ${
+                      isSelected ? 'hatch-active' : 'hatch'
+                    }`}
                     style={{
                       height: `calc(${hatchedHeightPercent}% - 2px)`,
                       minHeight: '14px',
-                      backgroundColor: '#FFFFFF',
-                      backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.5px, transparent 1.5px, transparent 5.5px)',
-                      border: isSelected ? '1.5px solid #F5B800' : '1px solid rgba(0, 0, 0, 0.08)',
                     }}
                   />
 
                   {/* BOTTOM BLOCK:
-                      Reference: rounded rectangle with rounded-[8px]
                       Normal month: solid SECONDARY #FCE8A3
                       Highlighted month: solid PRIMARY #F5B800
+                      Glossy inner gradient overlay: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 60%)
                   */}
                   <div
                     className="w-full rounded-[8px] flex-1 transition-all duration-300"
                     style={{
                       minHeight: '18px',
                       backgroundColor: isSelected ? '#F5B800' : '#FCE8A3',
+                      backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 60%)',
                     }}
                   />
                 </div>

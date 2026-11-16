@@ -17,38 +17,41 @@
   }
 }
 
-/* Hatched / striped pattern styling */
-.hatched-pattern-primary-secondary {
-  background-color: var(--secondary);
+/* Global Hatched Utilities */
+.hatch {
+  background-color: rgba(245, 184, 0, 0.12);
   background-image: repeating-linear-gradient(
-    45deg,
-    var(--primary) 0,
-    var(--primary) 1.5px,
-    transparent 1.5px,
-    transparent 5px
+    -45deg,
+    rgba(245, 184, 0, 0.65) 0px,
+    rgba(245, 184, 0, 0.65) 1px,
+    transparent 1px,
+    transparent 4px
   );
+  border: 1px solid rgba(245, 184, 0, 0.35);
 }
 
-.hatched-pattern-primary-white {
-  background-color: var(--white);
+.hatch-active {
+  background-color: rgba(245, 184, 0, 0.22);
   background-image: repeating-linear-gradient(
-    45deg,
-    var(--primary) 0,
-    var(--primary) 1.5px,
-    transparent 1.5px,
-    transparent 5px
+    -45deg,
+    #F5B800 0px,
+    #F5B800 1px,
+    transparent 1px,
+    transparent 4px
   );
+  border: 1px solid #F5B800;
 }
 
-.hatched-pattern-white {
+.hatch-white {
   background-color: rgba(255, 255, 255, 0.25);
   background-image: repeating-linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.95) 0,
-    rgba(255, 255, 255, 0.95) 1.5px,
-    transparent 1.5px,
-    transparent 5px
+    -45deg,
+    rgba(255, 255, 255, 0.9) 0px,
+    rgba(255, 255, 255, 0.9) 1px,
+    transparent 1px,
+    transparent 4px
   );
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 /* Custom scrollbars */

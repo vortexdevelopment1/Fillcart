@@ -72,37 +72,33 @@ export const TopOrdersCard: React.FC = () => {
           className="w-[36px] h-full flex flex-col flex-shrink-0 select-none"
           style={{ gap: '4px' }}
         >
-          {/* Block 1: SECONDARY #FCE8A3, radius 7px */}
+          {/* Block 1: SECONDARY #FCE8A3, radius 10px */}
           <div
-            className="w-full rounded-[7px] bg-secondary transition-all"
+            className="w-full rounded-[10px] bg-secondary transition-all"
             style={{ height: '28%' }}
             title="Block 1 (Sarah Mitchell)"
           />
 
-          {/* Block 2: PRIMARY #F5B800, radius 6px */}
+          {/* Block 2: PRIMARY #F5B800, radius 8px */}
           <div
-            className="w-full rounded-[6px] bg-primary transition-all"
+            className="w-full rounded-[8px] bg-primary transition-all"
             style={{ height: '11%' }}
             title="Block 2 (David Kim)"
           />
 
-          {/* Block 3: PRIMARY at 55% opacity, radius 6px */}
+          {/* Block 3: PRIMARY at 50% opacity, radius 8px */}
           <div
-            className="w-full rounded-[6px] transition-all"
+            className="w-full rounded-[8px] transition-all"
             style={{
               height: '9%',
-              backgroundColor: 'rgba(245, 184, 0, 0.55)',
+              backgroundColor: 'rgba(245, 184, 0, 0.50)',
             }}
             title="Block 3 (Priya Patel)"
           />
 
-          {/* Block 4: Hatched pattern (PRIMARY lines on white), radius 7px */}
+          {/* Block 4: Hatched pattern (.hatch class), radius 10px */}
           <div
-            className="w-full flex-1 rounded-[7px] border border-black/[0.08] transition-all"
-            style={{
-              backgroundColor: '#FFFFFF',
-              backgroundImage: 'repeating-linear-gradient(45deg, #F5B800 0, #F5B800 1.5px, transparent 1.5px, transparent 5.5px)',
-            }}
+            className="w-full flex-1 rounded-[10px] hatch transition-all"
             title="Block 4 (Others)"
           />
         </div>
@@ -121,11 +117,11 @@ export const TopOrdersCard: React.FC = () => {
               {row.dotType === 'block3' && (
                 <div
                   className="w-[8px] h-[8px] rounded-full flex-shrink-0"
-                  style={{ backgroundColor: 'rgba(245, 184, 0, 0.55)' }}
+                  style={{ backgroundColor: 'rgba(245, 184, 0, 0.50)' }}
                 />
               )}
               {row.dotType === 'hollow' && (
-                <div className="w-[8px] h-[8px] rounded-full border-[1.5px] border-primary bg-white flex-shrink-0" />
+                <div className="w-[8px] h-[8px] rounded-full border-[1.5px] border-primary bg-transparent flex-shrink-0" />
               )}
 
               {/* Name: weight 400, text-black, Poppins 12px */}
