@@ -4,7 +4,7 @@ import { TrendingUp } from 'lucide-react';
 
 interface RiderMonthBar {
   label: string;
-  heightPercent: number; // percentage of bar area
+  heightPercent: number;
   isHatched?: boolean;
 }
 
@@ -15,7 +15,7 @@ const riderBars: RiderMonthBar[] = [
   { label: 'A', heightPercent: 36, isHatched: false },
   { label: 'M', heightPercent: 50, isHatched: false },
   { label: 'J', heightPercent: 80, isHatched: false },
-  { label: 'J', heightPercent: 62, isHatched: true }, // last bar hatched white on yellow
+  { label: 'J', heightPercent: 62, isHatched: true }, // last bar hatched
 ];
 
 export const RidersTallCard: React.FC = () => {
@@ -25,16 +25,17 @@ export const RidersTallCard: React.FC = () => {
     <div
       onClick={() => navigate('/riders')}
       className="
-        rounded-[24px] p-5 text-white relative cursor-pointer
-        shadow-card hover:shadow-card-hover transition-all duration-300
-        flex flex-col justify-between overflow-hidden
+        rounded-[20px] p-5 text-white relative cursor-pointer
+        shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(34,32,38,0.05)]
+        hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_12px_28px_rgba(34,32,38,0.08)]
+        transition-all duration-300 flex flex-col justify-between overflow-hidden
         border border-white/20 flex-[1.4] min-h-[220px]
       "
       style={{
         backgroundImage: 'linear-gradient(145deg, #DE9E00 0%, #F5B800 40%, #EA9F00 75%, #D68F00 100%)',
       }}
     >
-      {/* Subtle wave contours overlay matching reference */}
+      {/* Subtle wave contours overlay */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 320 260">
           <path
@@ -61,32 +62,30 @@ export const RidersTallCard: React.FC = () => {
         </svg>
       </div>
 
-      {/* 6-dot drag handle in top right */}
-      <div className="absolute top-4 right-4 text-white/50 p-1">
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
-          <circle cx="3" cy="2" r="1.2" />
-          <circle cx="3" cy="6" r="1.2" />
-          <circle cx="3" cy="10" r="1.2" />
-          <circle cx="9" cy="2" r="1.2" />
-          <circle cx="9" cy="6" r="1.2" />
-          <circle cx="9" cy="10" r="1.2" />
-        </svg>
+      {/* 2x2 Grid of 4 Dots (top-right at 20px/20px) */}
+      <div className="absolute top-5 right-5 p-0 select-none pointer-events-none">
+        <div className="grid grid-cols-2 gap-[3px]">
+          <div className="w-[3px] h-[3px] rounded-full bg-white/60" />
+          <div className="w-[3px] h-[3px] rounded-full bg-white/60" />
+          <div className="w-[3px] h-[3px] rounded-full bg-white/60" />
+          <div className="w-[3px] h-[3px] rounded-full bg-white/60" />
+        </div>
       </div>
 
       {/* Top Header & Stats */}
       <div className="relative z-10">
-        <h3 className="text-[15px] font-semibold text-white/95">Contacts</h3>
-        <div className="text-3xl font-semibold tracking-tight text-white mt-0.5 mb-1.5 leading-none">
+        <h3 className="text-[16px] font-normal text-white/95 leading-tight">Contacts</h3>
+        <div className="text-[34px] font-normal tracking-normal text-white mt-3 mb-2 leading-none">
           3,241
         </div>
-        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-[11px] font-medium text-white border border-white/10">
+        <div className="inline-flex items-center gap-1.5 px-2 py-[2px] rounded-[8px] bg-white/20 backdrop-blur-sm text-[11px] font-normal text-white border border-white/10 leading-none">
           <span>192 New in July</span>
-          <TrendingUp className="w-3 h-3 text-white inline" />
+          <TrendingUp className="w-2.5 h-2.5 text-white inline" />
           <span>12%</span>
         </div>
       </div>
 
-      {/* 7 Pill Bars: 24px wide, border-radius 999px (full pill), last bar hatched */}
+      {/* 7 Pill Bars: 24px wide, full pills, last bar hatched */}
       <div className="relative z-10 h-[48%] min-h-[95px] flex flex-col justify-end mt-auto">
         <div className="flex-1 flex items-end justify-between gap-1 px-1">
           {riderBars.map((bar, idx) => (
@@ -107,7 +106,7 @@ export const RidersTallCard: React.FC = () => {
               </div>
 
               {/* Month Label directly under each bar */}
-              <span className="text-[11px] font-medium text-white/90 mt-1.5 block leading-none">
+              <span className="text-[11px] font-normal text-white/90 mt-1.5 block leading-none">
                 {bar.label}
               </span>
             </div>

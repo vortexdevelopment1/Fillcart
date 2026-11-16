@@ -32,13 +32,13 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="flex items-center justify-between gap-4 mb-4 flex-shrink-0">
-      {/* Left: Greeting & Subtitle (Arbutus Slab styling: 28px and 13px) */}
+    <header className="flex items-center justify-between gap-4 mb-3.5 flex-shrink-0 pl-11 lg:pl-0">
+      {/* Left: Greeting heading 32px, weight 400; subtitle 13px, muted */}
       <div>
-        <h1 className="text-[28px] font-normal text-[#222026] tracking-tight leading-tight">
-          {greeting}, <span className="font-semibold">Sarah</span>
+        <h1 className="text-[32px] font-normal text-[#222026] tracking-tight leading-tight">
+          {greeting}, <span className="font-normal">Sarah</span>
         </h1>
-        <p className="text-[13px] text-[#8A8A93] mt-0.5 font-sans">
+        <p className="text-[13px] text-[#9A9AA3] mt-0.5 font-sans leading-none">
           Your latest platform updates here
         </p>
       </div>

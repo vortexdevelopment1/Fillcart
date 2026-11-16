@@ -7,10 +7,9 @@ interface ContactRow {
   id: string;
   name: string;
   email: string;
-  share: number;
-  orders: string;
-  color: string;
-  isOthers?: boolean;
+  share: string;
+  count: string;
+  dotType: 'block1' | 'block2' | 'block3' | 'hollow';
 }
 
 const contactsData: ContactRow[] = [
@@ -18,34 +17,33 @@ const contactsData: ContactRow[] = [
     id: 'c1',
     name: 'Sarah Mitchell',
     email: 'sarah@brights...',
-    share: 12,
-    orders: '1,240',
-    color: '#F5B800',
+    share: '12%',
+    count: '1,240',
+    dotType: 'block1',
   },
   {
     id: 'c2',
     name: 'David Kim',
     email: 'david.kim@email...',
-    share: 8,
-    orders: '850',
-    color: '#FCE8A3',
+    share: '8%',
+    count: '850',
+    dotType: 'block2',
   },
   {
     id: 'c3',
     name: 'Priya Patel',
     email: 'priya@oakrealty.c...',
-    share: 4,
-    orders: '425',
-    color: '#8A6500',
+    share: '4%',
+    count: '425',
+    dotType: 'block3',
   },
   {
     id: 'c4',
     name: 'Others',
     email: '',
-    share: 76,
-    orders: '7,011',
-    color: '#ECECF0',
-    isOthers: true,
+    share: '76%',
+    count: '7,011',
+    dotType: 'hollow',
   },
 ];
 
@@ -60,75 +58,89 @@ export const TopOrdersCard: React.FC = () => {
       action={
         <div
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1 text-[11px] text-[#8A8A93] bg-[#F6F6F8] px-2.5 py-0.5 rounded-full cursor-pointer hover:text-[#222026] border border-[#ECECF0]"
+          className="flex items-center gap-1.5 text-[12px] text-[#222026] bg-white px-3 py-1 rounded-full cursor-pointer hover:bg-[#F6F6F8] border border-[#ECECF0] shadow-xs"
         >
           <span>{filter}</span>
-          <ChevronDown className="w-3 h-3 text-[#8A8A93]" />
+          <ChevronDown className="w-3.5 h-3.5 text-[#8A8A93]" />
         </div>
       }
       className="h-[210px] flex flex-col justify-between"
     >
-      <div className="flex items-stretch gap-4 my-auto">
-        {/* Left: Stacked Vertical Pill Bar matching exact height of 4 list rows */}
-        <div className="w-[22px] rounded-full bg-[#F6F6F8] p-[2px] flex flex-col justify-between overflow-hidden border border-[#ECECF0] flex-shrink-0">
-          {/* Segment 1: Solid Primary Yellow */}
+      <div className="flex items-center gap-4 my-auto h-full pt-1 pb-1">
+        {/* Left: Stacked Bar (width 36px, same total height as the 4 rows, 6px gap) */}
+        <div
+          className="w-[36px] h-full flex flex-col flex-shrink-0 select-none"
+          style={{ gap: '6px' }}
+        >
+          {/* Block 1: ~28% height, #FCE8A3, radius 10px */}
           <div
-            className="w-full bg-[#F5B800] rounded-t-full transition-all duration-300"
-            style={{ height: '22%' }}
-            title="Sarah Mitchell (12%)"
+            className="w-full rounded-[10px] bg-[#FCE8A3] border border-[#F3D77A]/50 transition-all"
+            style={{ height: '28%' }}
+            title="Block 1 (Sarah Mitchell)"
           />
-          {/* Segment 2: Light Yellow */}
+
+          {/* Block 2: ~10% height, #F5B800, radius 8px */}
           <div
-            className="w-full bg-[#FCE8A3] my-[2px] rounded-xs transition-all duration-300"
-            style={{ height: '16%' }}
-            title="David Kim (8%)"
+            className="w-full rounded-[8px] bg-[#F5B800] transition-all"
+            style={{ height: '11%' }}
+            title="Block 2 (David Kim)"
           />
-          {/* Segment 3: Amber Dark */}
+
+          {/* Block 3: ~8% height, #F8D45A, radius 8px */}
           <div
-            className="w-full bg-[#8A6500] my-[2px] rounded-xs transition-all duration-300"
-            style={{ height: '12%' }}
-            title="Priya Patel (4%)"
+            className="w-full rounded-[8px] bg-[#F8D45A] transition-all"
+            style={{ height: '9%' }}
+            title="Block 3 (Priya Patel)"
           />
-          {/* Segment 4: Hatched Pattern */}
+
+          {/* Block 4: ~45% height, Hatched pattern, radius 10px */}
           <div
-            className="w-full hatched-pattern-yellow rounded-b-full transition-all duration-300 border border-[#FCE8A3]"
-            style={{ height: '50%' }}
-            title="Others (76%)"
+            className="w-full flex-1 rounded-[10px] border border-[#F3E3A0] transition-all"
+            style={{
+              backgroundColor: '#FFF6D6',
+              backgroundImage: 'repeating-linear-gradient(45deg, #F3C94A 0, #F3C94A 1.5px, transparent 1.5px, transparent 5px)',
+            }}
+            title="Block 4 (Others)"
           />
         </div>
 
-        {/* Right: 4 List Rows */}
-        <div className="flex-1 flex flex-col justify-between gap-1.5 min-w-0">
-          {contactsData.map((contact) => (
-            <div key={contact.id} className="flex items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-2 min-w-0">
-                {/* Bullet */}
-                {contact.isOthers ? (
-                  <div className="w-2 h-2 rounded-full border border-[#8A8A93] flex-shrink-0" />
-                ) : (
-                  <div
-                    className="w-2 h-2 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: contact.color }}
-                  />
-                )}
-                <span className="font-semibold text-[#222026] truncate text-[12px]">
-                  {contact.name}
-                </span>
-                {contact.email && (
-                  <span className="text-[#8A8A93] text-[11px] truncate hidden sm:inline">
-                    {contact.email}
-                  </span>
-                )}
-              </div>
+        {/* Right: 4 Contact Rows (matching vertical rhythm) */}
+        <div className="flex-1 flex flex-col justify-between h-full min-w-0 py-0.5">
+          {contactsData.map((row) => (
+            <div key={row.id} className="flex items-center gap-2.5 text-[13px] leading-tight">
+              {/* Dot: 8px */}
+              {row.dotType === 'block1' && (
+                <div className="w-[8px] h-[8px] rounded-full bg-[#FCE8A3] border border-[#F3D77A] flex-shrink-0" />
+              )}
+              {row.dotType === 'block2' && (
+                <div className="w-[8px] h-[8px] rounded-full bg-[#F5B800] flex-shrink-0" />
+              )}
+              {row.dotType === 'block3' && (
+                <div className="w-[8px] h-[8px] rounded-full bg-[#F8D45A] flex-shrink-0" />
+              )}
+              {row.dotType === 'hollow' && (
+                <div className="w-[8px] h-[8px] rounded-full border-[1.5px] border-[#F3C94A] bg-white flex-shrink-0" />
+              )}
 
-              <div className="flex items-center gap-3 text-right flex-shrink-0 font-sans">
-                <span className="text-[#8A8A93] text-[11px] font-medium w-7 text-right">
-                  {contact.share}%
-                </span>
-                <span className="font-semibold text-[#222026] text-[12px] tabular-nums min-w-[36px] text-right">
-                  {contact.orders}
-                </span>
-              </div>
+              {/* Name: auto width, weight 400, NOT truncated */}
+              <span className="font-normal text-[#222026] text-[13px] whitespace-nowrap">
+                {row.name}
+              </span>
+
+              {/* Email: flex-1 with ellipsis, muted #9A9AA3 */}
+              <span className="text-[12px] text-[#9A9AA3] truncate flex-1 min-w-0">
+                {row.email}
+              </span>
+
+              {/* Percent: 40px right-aligned, muted, tabular-nums */}
+              <span className="text-[12px] text-[#9A9AA3] w-[40px] text-right tabular-nums flex-shrink-0">
+                {row.share}
+              </span>
+
+              {/* Count: 56px right-aligned, weight 500, tabular-nums */}
+              <span className="font-medium text-[#222026] text-[13px] w-[56px] text-right tabular-nums flex-shrink-0">
+                {row.count}
+              </span>
             </div>
           ))}
         </div>

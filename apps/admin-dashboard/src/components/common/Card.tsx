@@ -25,35 +25,36 @@ export const Card: React.FC<CardProps> = ({
     <div
       onClick={onClick}
       className={`
-        bg-white rounded-[24px] p-5 border border-[#ECECF0] shadow-card relative
+        bg-white rounded-[20px] p-5 border border-[#ECECF0]
+        shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(34,32,38,0.05)] relative
         transition-all duration-200 flex flex-col justify-between
-        ${hoverable ? 'hover:shadow-card-hover hover:border-[#E2E2E8]' : ''}
+        ${hoverable ? 'hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_12px_28px_rgba(34,32,38,0.08)] hover:border-[#E2E2E8]' : ''}
         ${onClick ? 'cursor-pointer' : ''}
         ${className}
       `}
     >
-      {/* 6-dot drag handle in top right (exact match to reference) */}
+      {/* 2x2 Grid of 4 Dots Drag Handle (top-right at 20px/20px) */}
       {showDragHandle && (
         <div
-          className="absolute top-4 right-4 text-[#C4C4CC] hover:text-[#8A8A93] transition-colors p-1"
+          className="absolute top-5 right-5 p-0 select-none pointer-events-none"
           aria-hidden="true"
         >
-          <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
-            <circle cx="3" cy="2" r="1.2" />
-            <circle cx="3" cy="6" r="1.2" />
-            <circle cx="3" cy="10" r="1.2" />
-            <circle cx="9" cy="2" r="1.2" />
-            <circle cx="9" cy="6" r="1.2" />
-            <circle cx="9" cy="10" r="1.2" />
-          </svg>
+          <div className="grid grid-cols-2 gap-[3px]">
+            <div className="w-[3px] h-[3px] rounded-full bg-[#C9C9D2]" />
+            <div className="w-[3px] h-[3px] rounded-full bg-[#C9C9D2]" />
+            <div className="w-[3px] h-[3px] rounded-full bg-[#C9C9D2]" />
+            <div className="w-[3px] h-[3px] rounded-full bg-[#C9C9D2]" />
+          </div>
         </div>
       )}
 
       {(title || action) && (
-        <div className="flex items-center justify-between mb-2 pr-6">
+        <div className="flex items-center justify-between mb-0 pr-6">
           <div>
             {typeof title === 'string' ? (
-              <h3 className="text-[15px] font-semibold text-[#222026] tracking-tight">{title}</h3>
+              <h3 className="text-[16px] font-normal text-[#222026] tracking-[0px] leading-tight">
+                {title}
+              </h3>
             ) : (
               title
             )}

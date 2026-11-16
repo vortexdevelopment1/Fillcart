@@ -43,43 +43,38 @@ export const PlatformActivityCard: React.FC = () => {
     <Card
       title={
         <div className="flex items-center gap-4">
-          <h3 className="text-[15px] font-semibold text-[#222026] tracking-tight">
+          <h3 className="text-[16px] font-normal text-[#222026] tracking-[0px]">
             Messages By Month
           </h3>
           <div className="flex items-center gap-3 text-xs text-[#8A8A93]">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full border border-[#8A8A93]" />
-              <span className="text-[11px]">Open conversations</span>
+              <span className="text-[11px] text-[#9A9AA3]">Open conversations</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#F5B800]" />
-              <span className="text-[11px]">Closed</span>
+              <span className="text-[11px] text-[#9A9AA3]">Closed</span>
             </div>
           </div>
         </div>
       }
       action={
         <div
-          className="flex items-center gap-1 text-[11px] text-[#8A8A93] bg-[#F6F6F8] px-2.5 py-0.5 rounded-full cursor-pointer hover:text-[#222026] border border-[#ECECF0]"
+          className="flex items-center gap-1.5 text-[12px] text-[#222026] bg-white px-3 py-1 rounded-full cursor-pointer hover:bg-[#F6F6F8] border border-[#ECECF0] shadow-xs"
         >
           <span>{filter}</span>
-          <ChevronDown className="w-3 h-3 text-[#8A8A93]" />
+          <ChevronDown className="w-3.5 h-3.5 text-[#8A8A93]" />
         </div>
       }
       className="h-full flex-1 min-h-[220px] flex flex-col justify-between"
     >
-      {/* Chart Canvas: flex-1 min-h-0 with pt-12 for tooltip room */}
+      {/* Chart Canvas */}
       <div className="flex-1 min-h-0 w-full pt-10 pb-0 flex flex-col justify-end">
         {/* 12 Columns aligned to bottom axis */}
         <div className="flex-1 min-h-0 w-full grid grid-cols-12 gap-1 md:gap-2 items-end">
           {monthlyData.map((item) => {
             const isSelected = item.month === selectedMonth;
-
-            // Height calculations
-            // Hatched block: percentage of totalHeight
             const hatchedHeightPercent = item.hatchedRatio;
-            // Bottom solid block: remaining percentage
-            const solidHeightPercent = 100 - hatchedHeightPercent;
 
             return (
               <div
@@ -87,7 +82,7 @@ export const PlatformActivityCard: React.FC = () => {
                 onClick={() => setSelectedMonth(item.month)}
                 className="flex flex-col items-center justify-end h-full min-h-0 cursor-pointer relative"
               >
-                {/* Floating Dark Tooltip above Jul (or selected month) */}
+                {/* Floating Dark Tooltip above Jul */}
                 {isSelected && (
                   <div className="absolute -top-[48px] left-1/2 -translate-x-1/2 z-30 bg-[#222026] text-white text-[11px] py-1.5 px-3 rounded-[12px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none">
                     <div className="font-bold text-[11px] leading-tight text-white mb-0.5">
@@ -104,7 +99,7 @@ export const PlatformActivityCard: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* Caret pointing down */}
+                    {/* Caret */}
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#222026] rotate-45 border-r border-b border-white/10" />
                   </div>
                 )}
@@ -114,10 +109,10 @@ export const PlatformActivityCard: React.FC = () => {
                   className="w-full max-w-[36px] flex flex-col justify-end transition-all duration-300"
                   style={{
                     height: `${item.totalHeight}%`,
-                    gap: '6px', // 6px gap between top hatched block and bottom solid block
+                    gap: '6px', // 6px gap
                   }}
                 >
-                  {/* TOP BLOCK: Hatched diagonal lines, rounded-[14px] on all corners */}
+                  {/* TOP BLOCK: Hatched diagonal lines, rounded-[14px] */}
                   <div
                     className="w-full rounded-[14px] flex-shrink-0 transition-all duration-300"
                     style={{
@@ -130,7 +125,7 @@ export const PlatformActivityCard: React.FC = () => {
                     }}
                   />
 
-                  {/* BOTTOM BLOCK: Solid fill, rounded-[14px] on all corners */}
+                  {/* BOTTOM BLOCK: Solid fill, rounded-[14px] */}
                   <div
                     className="w-full rounded-[14px] flex-1 transition-all duration-300"
                     style={{
@@ -144,8 +139,8 @@ export const PlatformActivityCard: React.FC = () => {
           })}
         </div>
 
-        {/* Month Labels in a dedicated bottom row for perfect one-line vertical axis alignment */}
-        <div className="grid grid-cols-12 gap-1 md:gap-2 text-center mt-2.5 pt-1 border-t border-transparent select-none">
+        {/* Month Labels in dedicated bottom row */}
+        <div className="grid grid-cols-12 gap-1 md:gap-2 text-center mt-2.5 pt-1 select-none">
           {monthlyData.map((item) => {
             const isSelected = item.month === selectedMonth;
             return (

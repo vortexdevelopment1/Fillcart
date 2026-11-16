@@ -11,29 +11,29 @@ export const BasicReportsDarkCard: React.FC = () => {
     <div
       onClick={() => navigate('/reports')}
       className="
-        bg-[#222026] text-white rounded-[24px] p-5 shadow-card hover:shadow-card-hover
+        bg-[#222026] text-white rounded-[20px] p-5
+        shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(34,32,38,0.05)]
+        hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_12px_28px_rgba(34,32,38,0.08)]
         transition-all duration-300 relative cursor-pointer border border-white/5
         flex flex-col justify-between overflow-hidden flex-1 min-h-[160px]
       "
     >
-      {/* 6-dot drag handle in top right */}
-      <div className="absolute top-4 right-4 text-white/40 p-1">
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
-          <circle cx="3" cy="2" r="1.2" />
-          <circle cx="3" cy="6" r="1.2" />
-          <circle cx="3" cy="10" r="1.2" />
-          <circle cx="9" cy="2" r="1.2" />
-          <circle cx="9" cy="6" r="1.2" />
-          <circle cx="9" cy="10" r="1.2" />
-        </svg>
+      {/* 2x2 Grid of 4 Dots (top-right at 20px/20px) */}
+      <div className="absolute top-5 right-5 p-0 select-none pointer-events-none">
+        <div className="grid grid-cols-2 gap-[3px]">
+          <div className="w-[3px] h-[3px] rounded-full bg-white/40" />
+          <div className="w-[3px] h-[3px] rounded-full bg-white/40" />
+          <div className="w-[3px] h-[3px] rounded-full bg-white/40" />
+          <div className="w-[3px] h-[3px] rounded-full bg-white/40" />
+        </div>
       </div>
 
       {/* Top Header */}
       <div className="flex items-center justify-between pr-5">
-        <h3 className="text-[15px] font-semibold text-white/90">Texts Sent</h3>
+        <h3 className="text-[16px] font-normal text-white/90 leading-tight">Texts Sent</h3>
         <div
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1 text-[11px] text-white/60 bg-white/10 px-2 py-0.5 rounded-full hover:text-white"
+          className="flex items-center gap-1 text-[11px] text-white/70 bg-white/10 px-2.5 py-0.5 rounded-full hover:text-white"
         >
           <span>All time</span>
           <ChevronDown className="w-3 h-3" />
@@ -41,15 +41,15 @@ export const BasicReportsDarkCard: React.FC = () => {
       </div>
 
       {/* Numbers */}
-      <div className="mt-1 mb-1">
-        <div className="text-3xl font-semibold text-white tracking-tight leading-none">
+      <div className="mt-3 mb-1">
+        <div className="text-[34px] font-normal text-white tracking-normal leading-none">
           95,215
         </div>
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-xs text-white/60">1,243 today</span>
-          <div className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full bg-white/15 text-[10px] font-medium text-white">
+        <div className="flex items-center gap-2 mt-1.5">
+          <span className="text-[12px] text-white/60">1,243 today</span>
+          <div className="inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-[6px] bg-white/15 text-[10px] font-normal text-white leading-none">
             <TrendingUp className="w-2.5 h-2.5 inline" />
-            <span>58%</span>
+            <span>51%</span>
           </div>
         </div>
       </div>
