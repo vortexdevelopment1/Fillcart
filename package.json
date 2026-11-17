@@ -34,7 +34,10 @@
     "docker:db:logs": "docker-compose logs -f postgres",
     "docker:db:clean": "docker-compose down -v",
     "db:generate": "turbo run db:generate",
-    "db:validate": "npm --workspace=@fillcart/backend run db:validate"
+    "db:validate": "npm --workspace=@fillcart/backend run db:validate",
+    "flutter:analyze": "node scripts/flutter-tooling.mjs analyze",
+    "flutter:test": "node scripts/flutter-tooling.mjs test",
+    "flutter:format": "node scripts/flutter-tooling.mjs format"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
