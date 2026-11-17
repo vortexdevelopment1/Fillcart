@@ -24,6 +24,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/health/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Root Readiness Probe
+         * @description Service readiness check verifying database connectivity.
+         */
+        get: operations["getRootReady"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -36,6 +56,26 @@ export interface paths {
          * @description Versioned HTTP service liveness check confirming the Express application process is running under /api/v1.
          */
         get: operations["getApiV1Health"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/health/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Versioned Readiness Probe
+         * @description Versioned service readiness check verifying database connectivity under /api/v1.
+         */
+        get: operations["getApiV1Ready"];
         put?: never;
         post?: never;
         delete?: never;
@@ -61,6 +101,42 @@ export interface components {
             timestamp: string;
             /** @example 0.1.0 */
             version: string;
+        };
+        ReadyResponse: {
+            /**
+             * @example ready
+             * @enum {string}
+             */
+            status: "ready";
+            /**
+             * @example connected
+             * @enum {string}
+             */
+            database: "connected";
+            /**
+             * Format: date-time
+             * @example 2026-11-17T12:00:00.000Z
+             */
+            timestamp: string;
+        };
+        DegradedResponse: {
+            /**
+             * @example degraded
+             * @enum {string}
+             */
+            status: "degraded";
+            /**
+             * @example disconnected
+             * @enum {string}
+             */
+            database: "disconnected";
+            /** @example Database service is temporarily unavailable */
+            message: string;
+            /**
+             * Format: date-time
+             * @example 2026-11-17T12:00:00.000Z
+             */
+            timestamp: string;
         };
         FieldError: {
             /** @example email */
@@ -121,6 +197,35 @@ export interface operations {
             };
         };
     };
+    getRootReady: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Service and database are ready to process traffic. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadyResponse"];
+                };
+            };
+            /** @description Service is degraded because the database is currently unreachable. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DegradedResponse"];
+                };
+            };
+        };
+    };
     getApiV1Health: {
         parameters: {
             query?: never;
@@ -146,6 +251,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getApiV1Ready: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Service and database are ready to process traffic. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadyResponse"];
+                };
+            };
+            /** @description Service is degraded because the database is currently unreachable. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DegradedResponse"];
                 };
             };
         };

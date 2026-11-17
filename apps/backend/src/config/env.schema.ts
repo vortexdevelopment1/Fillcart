@@ -117,6 +117,19 @@ export const envSchema = z.object({
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
     .default("info"),
+
+  DATABASE_URL: z
+    .string()
+    .default(
+      "postgresql://fillcart_user:fillcart_pass@127.0.0.1:5432/fillcart?schema=public"
+    )
+    .refine(
+      (val) => val.startsWith("postgresql://") || val.startsWith("postgres://"),
+      {
+        message:
+          "DATABASE_URL must be a valid PostgreSQL connection string starting with postgresql:// or postgres://",
+      }
+    ),
 });
 
 export type AppConfig = z.infer<typeof envSchema>;

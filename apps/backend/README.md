@@ -6,13 +6,14 @@ This package provides the single central modular-monolith HTTP backend service f
 
 ## 1. Architecture Overview
 
-- **Framework:** Express 5 (`^5.0.1`) with native asynchronous Promise error forwarding to `next(err)`.
+- **Framework:** Express 5 (`^5.3.0`) with native asynchronous Promise error forwarding to `next(err)`.
+- **Database & ORM:** PostgreSQL 16 managed via Prisma ORM 7 (`^7.10.1`), `@prisma/adapter-pg` driver adapter, and connection pooling.
 - **Environment & Configuration:** Decoupled pure validation via Zod schemas, with anchored `.env` resolution independent of `process.cwd()`.
-- **Logging:** High-performance structured JSON logging with Pino (`^9.6.0`) and `pino-http` (`^10.4.0`), with strict header and credential redaction.
+- **Logging:** High-performance structured JSON logging with Pino (`^10.4.0`) and `pino-http` (`^11.0.0`), with strict header, token, and credential redaction.
 - **Request Correlation:** Strict UUID validation (RFC-4122 / RFC-9562 versions 1–8) attached to `req.id`, `x-request-id` response header, Pino child logger context, and `ErrorResponse.error.requestId`.
 - **CORS Governance:** Strict parsing, validation, and normalization of HTTP/HTTPS origins. Pathnames, query strings, hashes, credentials, and wildcard (`*`) origins are rejected.
 - **Security:** Helmet security middleware (`^8.0.0`) enforcing CSP, HSTS, frameguard, and nosniff.
-- **Error Handling:** Standardized 3-tier error architecture distinguishing HTTP 400 client validation errors from HTTP 500 unexpected internal errors.
+- **Health Architecture:** Clear separation between **Process Liveness Probes** and **Database Readiness Probes**.
 - **API Contracts:** Complete alignment with OpenAPI 3.1 specification (`packages/api-contracts/openapi/v1/openapi.yaml`).
 
 ---
@@ -28,65 +29,104 @@ All environment variables are declared in `apps/backend/.env` (and documented in
 | `NODE_ENV` | string | `development` | Environment mode: `development`, `test`, or `production`. |
 | `CORS_ORIGIN` | string | `http://localhost:3000,http://127.0.0.1:3000` | Comma-separated list of allowed HTTP/HTTPS origins. |
 | `LOG_LEVEL` | string | `info` | Minimum log level: `fatal`, `error`, `warn`, `info`, `debug`, `trace`, `silent`. |
+| `DATABASE_URL` | string | `postgresql://...` | PostgreSQL connection string matching Docker Compose credentials. |
 
 ---
 
-## 3. Available Scripts
+## 3. Local PostgreSQL Infrastructure (Docker Compose)
 
-Execute scripts via npm workspace or Turborepo:
+A standalone Docker Compose configuration is provided at the repository root (`docker-compose.yml`) for local PostgreSQL orchestration:
 
-- `npm run dev`: Starts backend development server with watch mode (`tsx watch src/server.ts`).
-- `npm run build`: Compiles TypeScript source to `dist/` via `tsc -p tsconfig.json`.
-- `npm run start`: Runs compiled production JavaScript via `node dist/server.js`.
-- `npm run lint`: Runs ESLint on backend source and test suites.
-- `npm run test`: Executes Vitest test suite (`vitest run`).
-- `npm run type-check`: Performs TypeScript static type checking without emitting build artifacts.
+### 3.1 Starting the Database Container
+```bash
+# Start background PostgreSQL 16 container with healthcheck
+npm run docker:db:up
+```
+
+### 3.2 Stopping the Container (Preserves Persistent Data)
+```bash
+# Stops and removes container; persistent volume (fillcart_pgdata) is KEPT
+npm run docker:db:down
+```
+
+### 3.3 Inspecting Logs
+```bash
+npm run docker:db:logs
+```
+
+### 3.4 Destructive Volume Cleanup (Data Deletion)
+```bash
+# WARNING: Deletes container AND named volume (wipes local database data)
+npm run docker:db:clean
+```
 
 ---
 
-## 4. API Endpoints
+## 4. Prisma 7 Database Workflows
 
-### 4.1 Liveness Probes
-- `GET /health`: Root liveness check.
-- `GET /api/v1/health`: Versioned API liveness check.
+Prisma schema and migrations belong exclusively to `apps/backend/prisma/`. Configuration is declared in `apps/backend/prisma7.config.ts`.
 
-Both endpoints return:
+```bash
+# Validate Prisma schema
+npm run db:validate
+
+# Generate Prisma Client to src/database/generated/client
+npm run db:generate
+
+# Execute baseline seed script
+npm run db:seed
+```
+
+*Note: The first database migration will be generated when domain entities are established in Phase 3.*
+
+---
+
+## 5. API Endpoints
+
+### 5.1 Liveness Probes (Process Alive)
+- `GET /health`
+- `GET /api/v1/health`
+
+Returns HTTP 200 indicating the Node.js Express event loop is healthy:
 ```json
 {
   "status": "healthy",
-  "timestamp": "2026-11-17T10:30:00.000Z",
+  "timestamp": "2026-11-17T12:00:00.000Z",
   "version": "0.1.0"
 }
 ```
 
-*Note: These probes verify application process liveness only. Database readiness probes are deferred to Phase 2.2.5.*
+### 5.2 Readiness Probes (Database Connectivity)
+- `GET /health/ready`
+- `GET /api/v1/health/ready`
 
-### 4.2 Error Response Format
-All errors (client operational errors and internal failures) conform to the OpenAPI `ErrorResponse` schema:
+When PostgreSQL is connected and responsive:
 ```json
 {
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Request validation failed",
-    "requestId": "123e4567-e89b-12d3-a456-426614174000",
-    "details": [
-      {
-        "field": "body.email",
-        "message": "Invalid email format"
-      }
-    ]
-  }
+  "status": "ready",
+  "database": "connected",
+  "timestamp": "2026-11-17T12:00:00.000Z"
+}
+```
+
+When PostgreSQL is unreachable (HTTP 503):
+```json
+{
+  "status": "degraded",
+  "database": "disconnected",
+  "message": "Database service is temporarily unavailable",
+  "timestamp": "2026-11-17T12:00:00.000Z"
 }
 ```
 
 ---
 
-## 5. Process Lifecycle & Graceful Shutdown
+## 6. Process Lifecycle & Graceful Shutdown
 
-- **OS Signals:** `SIGTERM` and `SIGINT` trigger clean shutdown:
-  1. The server stops accepting new connections (`server.close()`).
-  2. In-flight HTTP requests complete.
-  3. Pino stream buffers and transports flush.
-  4. Process terminates with exit code `0`.
-- **Forced Timeout Safeguard:** An unreferenced 10-second timer forces process termination if connections fail to drain.
-- **Fatal Error Handling:** Uncaught exceptions and unhandled promise rejections trigger synchronous fallback termination (500ms) alongside log flushing.
+- **Resilient Startup:** If PostgreSQL is temporarily unreachable upon boot, the backend logs a warning and continues listening on HTTP so liveness checks, monitoring, and non-database routes remain active.
+- **Graceful Shutdown (`SIGTERM`/`SIGINT`):**
+  1. Stops receiving new HTTP requests (`server.close()`).
+  2. Drains in-flight requests.
+  3. Disconnects Prisma client and drains adapter connection pool via `prisma.$disconnect()`.
+  4. Flushes Pino stream buffers.
+  5. Terminates cleanly with code `0` (protected by a 10-second forced shutdown safeguard).

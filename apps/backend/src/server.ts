@@ -2,11 +2,16 @@ import type { Server } from "node:http";
 import { loadEnv, validateConfig } from "./config/index.js";
 import { createApp } from "./app.js";
 import { getLogger, flushAndCloseLogger } from "./utils/logger.js";
+import {
+  getPrismaClient,
+  checkDatabaseReadiness,
+  disconnectDatabase,
+} from "./database/index.js";
 
-// 1. Load environment variables from apps/backend/.env
+// 1. Load environment variables
 loadEnv();
 
-// 2. Validate configuration via pure Zod function
+// 2. Validate configuration
 let config;
 try {
   config = validateConfig(process.env);
@@ -18,10 +23,25 @@ try {
 // 3. Initialize logger
 const logger = getLogger(config);
 
-// 4. Create Express application
+// 4. Initialize Database & verify initial readiness (non-blocking)
+const prisma = getPrismaClient(config);
+checkDatabaseReadiness(prisma).then((readiness) => {
+  if (readiness.ok) {
+    logger.info(
+      { latencyMs: readiness.latencyMs },
+      "Database connection established successfully"
+    );
+  } else {
+    logger.warn(
+      "Initial database connection unreachable. Backend started in degraded state; readiness probe will report 503."
+    );
+  }
+});
+
+// 5. Create Express application
 const app = createApp(config);
 
-// 5. Bind HTTP server
+// 6. Bind HTTP server
 let server: Server | null = null;
 
 try {
@@ -41,10 +61,10 @@ try {
   flushAndCloseLogger(() => process.exit(1));
 }
 
-// 6. Graceful Shutdown & Process Lifecycle Management
+// 7. Graceful Shutdown & Process Lifecycle Management
 let isShuttingDown = false;
 
-function initiateGracefulShutdown(signal: string) {
+async function initiateGracefulShutdown(signal: string) {
   if (isShuttingDown) return;
   isShuttingDown = true;
 
@@ -57,36 +77,47 @@ function initiateGracefulShutdown(signal: string) {
   }, 10000);
   forceTimer.unref();
 
+  // 1. Drain HTTP server connections first
   if (server) {
-    server.close((err) => {
-      if (err) {
-        logger.error({ err }, "Error occurred while closing HTTP server");
-      } else {
-        logger.info("HTTP server closed cleanly. In-flight requests drained.");
-      }
-
-      flushAndCloseLogger(() => {
-        clearTimeout(forceTimer);
-        process.exit(0);
+    await new Promise<void>((resolve) => {
+      server?.close((err) => {
+        if (err) {
+          logger.error({ err }, "Error occurred while closing HTTP server");
+        } else {
+          logger.info("HTTP server closed cleanly. In-flight requests drained.");
+        }
+        resolve();
       });
     });
-  } else {
-    flushAndCloseLogger(() => {
-      clearTimeout(forceTimer);
-      process.exit(0);
-    });
   }
+
+  // 2. Disconnect Prisma & underlying PostgreSQL connection pool
+  try {
+    await disconnectDatabase(prisma);
+    logger.info("Database connection disconnected cleanly.");
+  } catch (err) {
+    logger.error({ err }, "Error disconnecting database connection pool");
+  }
+
+  // 3. Flush logger and exit
+  flushAndCloseLogger(() => {
+    clearTimeout(forceTimer);
+    process.exit(0);
+  });
 }
 
 // OS Termination Signals
-process.on("SIGTERM", () => initiateGracefulShutdown("SIGTERM"));
-process.on("SIGINT", () => initiateGracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => {
+  void initiateGracefulShutdown("SIGTERM");
+});
+process.on("SIGINT", () => {
+  void initiateGracefulShutdown("SIGINT");
+});
 
 // Fatal Uncaught Exceptions
 process.on("uncaughtException", (err) => {
   logger.fatal({ err }, "Uncaught Exception detected");
 
-  // Reliable fallback timer: actively referenced to ensure termination if flush hangs
   const fallbackTimer = setTimeout(() => {
     process.exit(1);
   }, 500);
@@ -101,7 +132,6 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (reason) => {
   logger.fatal({ reason }, "Unhandled Promise Rejection detected");
 
-  // Reliable fallback timer: actively referenced to ensure termination if flush hangs
   const fallbackTimer = setTimeout(() => {
     process.exit(1);
   }, 500);

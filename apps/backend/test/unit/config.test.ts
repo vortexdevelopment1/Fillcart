@@ -12,6 +12,9 @@ describe("Config Validation Unit Tests", () => {
       "http://localhost:3000",
       "http://127.0.0.1:3000",
     ]);
+    expect(config.DATABASE_URL).toBe(
+      "postgresql://fillcart_user:fillcart_pass@127.0.0.1:5432/fillcart?schema=public"
+    );
   });
 
   it("accepts custom valid PORT, HOST, NODE_ENV, and LOG_LEVEL", () => {
@@ -21,12 +24,41 @@ describe("Config Validation Unit Tests", () => {
       NODE_ENV: "production",
       LOG_LEVEL: "warn",
       CORS_ORIGIN: "https://admin.fillcart.com",
+      DATABASE_URL:
+        "postgresql://prod_user:secret@db.internal:5432/fillcart_prod",
     });
     expect(config.PORT).toBe(8080);
     expect(config.HOST).toBe("0.0.0.0");
     expect(config.NODE_ENV).toBe("production");
     expect(config.LOG_LEVEL).toBe("warn");
     expect(config.CORS_ORIGIN).toEqual(["https://admin.fillcart.com"]);
+    expect(config.DATABASE_URL).toBe(
+      "postgresql://prod_user:secret@db.internal:5432/fillcart_prod"
+    );
+  });
+
+  it("validates DATABASE_URL with postgresql:// and postgres:// protocols", () => {
+    const config1 = validateConfig({
+      DATABASE_URL: "postgresql://user:pass@localhost:5432/db",
+    });
+    expect(config1.DATABASE_URL).toBe(
+      "postgresql://user:pass@localhost:5432/db"
+    );
+
+    const config2 = validateConfig({
+      DATABASE_URL: "postgres://user:pass@localhost:5432/db",
+    });
+    expect(config2.DATABASE_URL).toBe("postgres://user:pass@localhost:5432/db");
+  });
+
+  it("rejects invalid DATABASE_URL scheme", () => {
+    expect(() =>
+      validateConfig({ DATABASE_URL: "mysql://user:pass@localhost:3306/db" })
+    ).toThrow(/DATABASE_URL/i);
+
+    expect(() =>
+      validateConfig({ DATABASE_URL: "mongodb://localhost:27017/db" })
+    ).toThrow(/DATABASE_URL/i);
   });
 
   it("rejects non-numeric or out-of-range PORT", () => {

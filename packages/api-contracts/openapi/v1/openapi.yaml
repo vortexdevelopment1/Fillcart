@@ -26,6 +26,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /health/ready:
+    get:
+      summary: Root Readiness Probe
+      description: Service readiness check verifying database connectivity.
+      operationId: getRootReady
+      security: []
+      responses:
+        "200":
+          description: Service and database are ready to process traffic.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadyResponse"
+        "503":
+          description: Service is degraded because the database is currently unreachable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DegradedResponse"
   /api/v1/health:
     get:
       summary: Versioned Liveness Probe
@@ -45,6 +64,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/health/ready:
+    get:
+      summary: Versioned Readiness Probe
+      description: Versioned service readiness check verifying database connectivity under /api/v1.
+      operationId: getApiV1Ready
+      security: []
+      responses:
+        "200":
+          description: Service and database are ready to process traffic.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadyResponse"
+        "503":
+          description: Service is degraded because the database is currently unreachable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DegradedResponse"
 
 components:
   schemas:
@@ -67,6 +105,54 @@ components:
         version:
           type: string
           example: "0.1.0"
+
+    ReadyResponse:
+      type: object
+      required:
+        - status
+        - database
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum:
+            - ready
+          example: ready
+        database:
+          type: string
+          enum:
+            - connected
+          example: connected
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-11-17T12:00:00.000Z"
+
+    DegradedResponse:
+      type: object
+      required:
+        - status
+        - database
+        - message
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum:
+            - degraded
+          example: degraded
+        database:
+          type: string
+          enum:
+            - disconnected
+          example: disconnected
+        message:
+          type: string
+          example: "Database service is temporarily unavailable"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-11-17T12:00:00.000Z"
 
     FieldError:
       type: object

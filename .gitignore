@@ -49,6 +49,9 @@ lerna-debug.log*
 prisma/*.db
 prisma/*.db-journal
 
+# Generated Prisma client
+apps/backend/src/database/generated/
+
 # IDEs & Operating Systems
 .DS_Store
 Thumbs.db

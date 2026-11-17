@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fillcart-postgres
+    restart: unless-stopped
+    ports:
+      # Bound strictly to loopback 127.0.0.1 for local development security
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-fillcart_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fillcart_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-fillcart}
+    volumes:
+      # Named persistent volume - preserved across normal container stops and restarts
+      - fillcart_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fillcart_user} -d ${POSTGRES_DB:-fillcart}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  fillcart_pgdata:
+    name: fillcart_pgdata
