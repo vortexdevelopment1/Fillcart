@@ -1,12 +1,15 @@
 {
-  "name": "admin-dashboard",
-  "private": true,
+  "name": "@fillcart/admin-dashboard",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "echo \"[@fillcart/admin-dashboard] lint\"",
+    "test": "echo \"[@fillcart/admin-dashboard] test\"",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -1,14 +1,39 @@
 {
-  "name": "fillkart-monorepo",
-  "version": "1.0.0",
+  "name": "fillcart",
+  "version": "0.0.1",
   "private": true,
+  "packageManager": "npm@11.20.0",
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/backend",
+    "apps/website",
+    "apps/admin-dashboard",
+    "packages/config",
+    "packages/design-tokens",
+    "packages/shared-types",
+    "packages/validations",
+    "packages/constants",
+    "packages/utils",
+    "packages/ui-web",
+    "packages/api-contracts/typescript"
   ],
   "scripts": {
-    "dev": "npm run dev --prefix apps/admin-dashboard",
-    "build": "npm run build --prefix apps/admin-dashboard",
-    "install:admin": "npm install --prefix apps/admin-dashboard"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "lint:openapi": "redocly lint",
+    "test": "turbo run test",
+    "type-check": "turbo run type-check",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md,yaml,yml}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,md,yaml,yml}\" --ignore-path .prettierignore"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@redocly/cli": "^2.79.0",
+    "eslint": "^10.15.0",
+    "prettier": "3.5.2",
+    "turbo": "2.11.11",
+    "typescript": "5.8.2",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0"
   }
 }

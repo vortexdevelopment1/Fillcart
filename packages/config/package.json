@@ -1,0 +1,27 @@
+{
+  "name": "@fillcart/config",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "files": [
+    "typescript",
+    "prettier",
+    "eslint",
+    "vitest"
+  ],
+  "exports": {
+    "./typescript/tsconfig.base.json": "./typescript/tsconfig.base.json",
+    "./typescript/tsconfig.node.json": "./typescript/tsconfig.node.json",
+    "./typescript/tsconfig.react.json": "./typescript/tsconfig.react.json",
+    "./prettier": "./prettier/index.json",
+    "./eslint": "./eslint/base.js",
+    "./eslint/base": "./eslint/base.js",
+    "./vitest": "./vitest/base.js",
+    "./vitest/base": "./vitest/base.js"
+  },
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0"
+  }
+}
