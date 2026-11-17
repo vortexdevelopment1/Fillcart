@@ -3,4 +3,110 @@ info:
   title: "Fillcart Platform API"
   version: "1.0.0"
   description: "Fillcart Multi-Vendor Commerce Platform API Specification Baseline"
-paths: {}
+servers:
+  - url: http://127.0.0.1:4000
+    description: Local development server
+paths:
+  /health:
+    get:
+      summary: Root Liveness Probe
+      description: Basic HTTP service liveness check confirming the Express application process is running.
+      operationId: getRootHealth
+      security: []
+      responses:
+        "200":
+          description: Service is healthy and processing HTTP requests.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "500":
+          description: Unexpected internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/health:
+    get:
+      summary: Versioned Liveness Probe
+      description: Versioned HTTP service liveness check confirming the Express application process is running under /api/v1.
+      operationId: getApiV1Health
+      security: []
+      responses:
+        "200":
+          description: Service is healthy and processing HTTP requests.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "500":
+          description: Unexpected internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+        - version
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-11-17T10:30:00.000Z"
+        version:
+          type: string
+          example: "0.1.0"
+
+    FieldError:
+      type: object
+      required:
+        - field
+        - message
+      properties:
+        field:
+          type: string
+          example: "email"
+        message:
+          type: string
+          example: "Invalid email format"
+
+    ErrorDetail:
+      type: object
+      required:
+        - code
+        - message
+        - requestId
+      properties:
+        code:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "Invalid request payload"
+        requestId:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldError"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          $ref: "#/components/schemas/ErrorDetail"
