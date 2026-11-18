@@ -15,7 +15,7 @@ import * as loggerModule from "../../src/utils/logger.js";
 describe("Database Client and Lifecycle Unit Tests", () => {
   const config = validateConfig({
     DATABASE_URL:
-      "postgresql://fillcart_user:fillcart_pass@127.0.0.1:5432/fillcart?schema=public",
+      "postgresql://fillcart_app_user:fillcart_app_pass@127.0.0.1:5432/fillcart?schema=public",
   });
 
   beforeEach(() => {

@@ -13,7 +13,7 @@ describe("Config Validation Unit Tests", () => {
       "http://127.0.0.1:3000",
     ]);
     expect(config.DATABASE_URL).toBe(
-      "postgresql://fillcart_user:fillcart_pass@127.0.0.1:5432/fillcart?schema=public"
+      "postgresql://fillcart_app_user:fillcart_app_pass@127.0.0.1:5432/fillcart?schema=public"
     );
   });
 

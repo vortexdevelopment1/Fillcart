@@ -121,7 +121,7 @@ export const envSchema = z.object({
   DATABASE_URL: z
     .string()
     .default(
-      "postgresql://fillcart_user:fillcart_pass@127.0.0.1:5432/fillcart?schema=public"
+      "postgresql://fillcart_app_user:fillcart_app_pass@127.0.0.1:5432/fillcart?schema=public"
     )
     .refine(
       (val) => val.startsWith("postgresql://") || val.startsWith("postgres://"),

@@ -7,7 +7,7 @@ import * as dbConnection from "../../src/database/connection/check-connection.js
 describe("Readiness Probes Integration Tests", () => {
   const config = validateConfig({
     DATABASE_URL:
-      "postgresql://fillcart_user:fillcart_pass@127.0.0.1:5432/fillcart?schema=public",
+      "postgresql://fillcart_app_user:fillcart_app_pass@127.0.0.1:5432/fillcart?schema=public",
     NODE_ENV: "test",
     LOG_LEVEL: "silent",
   });

@@ -9,6 +9,14 @@ dotenv.config({
   path: path.resolve(__dirname, ".env"),
 });
 
+const migrationDatabaseUrl = process.env.MIGRATION_DATABASE_URL;
+
+if (!migrationDatabaseUrl) {
+  throw new Error(
+    "Missing required environment variable: MIGRATION_DATABASE_URL. Prisma CLI and migration tooling must exclusively use MIGRATION_DATABASE_URL with schema-owner privileges."
+  );
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
@@ -16,6 +24,6 @@ export default defineConfig({
     seed: "tsx prisma/seeds/seed.ts",
   },
   datasource: {
-    url: process.env.DATABASE_URL ?? "",
+    url: migrationDatabaseUrl,
   },
 });

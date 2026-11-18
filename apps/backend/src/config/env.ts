@@ -16,7 +16,7 @@ export const DEFAULT_ENV_PATH = path.resolve(__dirname, "../../.env");
  * Uses DEFAULT_ENV_PATH unless an explicit customPath is provided.
  */
 export function loadEnv(customPath?: string): void {
-  const targetPath = customPath ?? DEFAULT_ENV_PATH;
+  const targetPath = customPath ?? process.env.DOTENV_CONFIG_PATH ?? DEFAULT_ENV_PATH;
   dotenv.config({ path: targetPath });
 }
 

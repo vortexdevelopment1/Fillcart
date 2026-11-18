@@ -6,3 +6,322 @@ generator client {
   provider = "prisma-client"
   output   = "../src/database/generated/client"
 }
+
+// -------------------------------------------------------------
+// Enums
+// -------------------------------------------------------------
+
+enum AccountType {
+  CUSTOMER
+  VENDOR_APPLICANT
+  RIDER_APPLICANT
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+  PENDING_APPROVAL
+}
+
+enum CredentialType {
+  PASSWORD
+}
+
+enum PermissionEffect {
+  ALLOW
+  DENY
+}
+
+enum ServiceClientStatus {
+  ACTIVE
+  SUSPENDED
+  REVOKED
+}
+
+enum AuditActorType {
+  USER
+  SERVICE_CLIENT
+  SYSTEM_CLI
+}
+
+// -------------------------------------------------------------
+// 1. Identity & Credentials
+// -------------------------------------------------------------
+
+model User {
+  id                      String                   @id @default(uuid())
+  emailNormalized         String                   @unique // Canonical lowercase, trimmed email
+  displayEmail            String?                  // Original display casing entered by user
+  fullName                String
+  phone                   String?                  // Optional; non-unique across distinct account types
+  accountType             AccountType              @default(CUSTOMER)
+  status                  UserStatus               @default(ACTIVE)
+  roleId                  String?                  // Nullable for applicants; enforces single operational role
+  role                    Role?                    @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  suspensionReason        String?
+  credentials             Credential[]
+  sessionFamilies         SessionFamily[]
+  adminProfileAssignments AdminProfileAssignment[]
+  staffDirectPermissions  StaffDirectPermission[]
+  adminInvitationsSent    AdminInvitation[]        @relation("AdminInvitedBy")
+  auditLogsTargeted       AuthAuditLog[]           @relation("TargetUserAudit")
+  auditLogsActed          AuthAuditLog[]           @relation("ActorUserAudit")
+  adminBootstrapMarker    AdminBootstrapMarker?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+
+  @@index([roleId])
+  @@index([status])
+  @@index([accountType])
+}
+
+model Credential {
+  id             String         @id @default(uuid())
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type           CredentialType @default(PASSWORD)
+  secretHash     String         // Argon2id password hash
+  failedAttempts Int            @default(0)
+  lockedUntil    DateTime?
+  lastRotatedAt  DateTime       @default(now())
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([userId, type])
+  @@index([userId])
+}
+
+model Role {
+  id               String            @id @default(uuid())
+  name             String            @unique // CUSTOMER, VENDOR, RIDER, ADMIN
+  description      String?
+  isSystem         Boolean           @default(true)
+  users            User[]
+  rolePermissions  RolePermission[]
+  adminInvitations AdminInvitation[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+// -------------------------------------------------------------
+// 2. Authorization, Roles, Profiles & Direct Permissions
+// -------------------------------------------------------------
+
+model Permission {
+  id                     String                  @id @default(uuid())
+  action                 String                  // e.g. "approve", "view", "cancel"
+  resource               String                  // e.g. "vendors", "orders", "finance"
+  description            String?
+  rolePermissions        RolePermission[]
+  profilePermissions     ProfilePermission[]
+  staffDirectPermissions StaffDirectPermission[]
+  createdAt              DateTime                @default(now())
+
+  @@unique([action, resource])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Restrict)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+model PermissionProfile {
+  id               String                   @id @default(uuid())
+  name             String                   @unique // e.g. "Operations_Lead", "Support_Tier_1"
+  description      String?
+  isSystem         Boolean                  @default(true)
+  permissions      ProfilePermission[]
+  adminAssignments AdminProfileAssignment[]
+  adminInvitations AdminInvitation[]
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+}
+
+model ProfilePermission {
+  profileId    String
+  permissionId String
+  createdAt    DateTime          @default(now())
+  profile      PermissionProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  permission   Permission        @relation(fields: [permissionId], references: [id], onDelete: Restrict)
+
+  @@id([profileId, permissionId])
+  @@index([permissionId])
+}
+
+model AdminProfileAssignment {
+  id               String            @id @default(uuid())
+  userId           String
+  profileId        String
+  assignedBy       String            // Actor ID who granted the profile
+  assignedAt       DateTime          @default(now())
+  revokedAt        DateTime?         // Populated on revocation; allows historical retention
+  revokedBy        String?
+  revocationReason String?
+  user             User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  profile          PermissionProfile @relation(fields: [profileId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([profileId])
+}
+
+model StaffDirectPermission {
+  id           String           @id @default(uuid())
+  userId       String
+  permissionId String
+  effect       PermissionEffect @default(ALLOW) // DENY strictly overrides ALLOW
+  grantedBy    String
+  reason       String?
+  revokedAt    DateTime?        // Populated on revocation; allows historical retention
+  revokedBy    String?
+  createdAt    DateTime         @default(now())
+  user         User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+  permission   Permission       @relation(fields: [permissionId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([permissionId])
+}
+
+model AdminInvitation {
+  id              String             @id @default(uuid())
+  emailNormalized String             // Canonical lowercase email
+  roleId          String
+  profileId       String?
+  tokenHash       String             @unique // SHA-256 hash of single-use invitation token
+  expiresAt       DateTime
+  isRevoked       Boolean            @default(false)
+  acceptedAt      DateTime?
+  invitedById     String
+  role            Role               @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  profile         PermissionProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  invitedBy       User               @relation("AdminInvitedBy", fields: [invitedById], references: [id], onDelete: Restrict)
+  createdAt       DateTime           @default(now())
+
+  @@index([emailNormalized])
+}
+
+// -------------------------------------------------------------
+// 3. Sessions & Refresh Tokens
+// -------------------------------------------------------------
+
+model SessionFamily {
+  id               String         @id @default(uuid())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress        String?
+  userAgent        String?
+  isRevoked        Boolean        @default(false)
+  revokedAt        DateTime?
+  revocationReason String?
+  expiresAt        DateTime       // Absolute 30-day session ceiling
+  refreshTokens    RefreshToken[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([userId, isRevoked])
+  @@index([expiresAt])
+}
+
+model RefreshToken {
+  id                  String        @id @default(uuid())
+  sessionId           String
+  session             SessionFamily @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  tokenHash           String        @unique // SHA-256 digest of 256-bit random opaque string
+  replacedByTokenHash String?
+  isRevoked           Boolean       @default(false)
+  rotatedAt           DateTime?
+  expiresAt           DateTime       // min(now() + 7 days, session.expiresAt)
+  createdAt           DateTime      @default(now())
+
+  @@index([sessionId, isRevoked])
+}
+
+// -------------------------------------------------------------
+// 4. Service Registry & Replay Protection
+// -------------------------------------------------------------
+
+model ServiceClient {
+  id                String               @id @default(uuid())
+  serviceIdentifier String               @unique // e.g. "customer-backend", "vendor-backend", "rider-backend", "admin-backend"
+  name              String
+  description       String?
+  status            ServiceClientStatus  @default(ACTIVE)
+  allowedScopes     String[]             // e.g. ["auth:verify_session", "auth:assign_role"]
+  publicKeys        ServicePublicKey[]
+  replayRecords     ServiceTokenReplay[]
+  auditLogsActed    AuthAuditLog[]       @relation("ActorServiceAudit")
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+}
+
+model ServicePublicKey {
+  id              String        @id @default(uuid())
+  serviceClientId String
+  serviceClient   ServiceClient @relation(fields: [serviceClientId], references: [id], onDelete: Cascade)
+  keyId           String        @unique // kid in Service JWT header
+  publicKeyPem    String
+  algorithm       String        @default("Ed25519")
+  isRevoked       Boolean       @default(false)
+  revokedAt       DateTime?
+  expiresAt       DateTime
+  createdAt       DateTime      @default(now())
+
+  @@index([serviceClientId, isRevoked])
+}
+
+model ServiceTokenReplay {
+  id              String        @id @default(uuid())
+  serviceClientId String
+  serviceClient   ServiceClient @relation(fields: [serviceClientId], references: [id], onDelete: Cascade)
+  jti             String        // JWT ID from S2S token
+  expiresAt       DateTime      // Token expiry + TTL buffer for pruning
+  consumedAt      DateTime      @default(now())
+
+  @@unique([serviceClientId, jti])
+  @@index([expiresAt])
+}
+
+// -------------------------------------------------------------
+// 5. Admin Bootstrap & Audit Foundation
+// -------------------------------------------------------------
+
+model AdminBootstrapMarker {
+  id             String   @id @default("root_admin_bootstrap_marker")
+  bootstrappedAt DateTime @default(now())
+  adminUserId    String   @unique
+  adminUser      User     @relation(fields: [adminUserId], references: [id], onDelete: Restrict)
+  ipAddress      String?
+}
+
+model AuthAuditLog {
+  id                   String          @id @default(uuid())
+  actorType            AuditActorType
+  actorId              String          // Concrete identifier of user, service, or CLI process
+  actorUserId          String?
+  actorServiceClientId String?
+  targetType           String          // e.g. "User", "SessionFamily", "StaffDirectPermission"
+  targetId             String
+  targetUserId         String?
+  action               String          // e.g. "USER_LOGIN", "ROLE_ASSIGNED", "TOKEN_REUSE_DETECTED"
+  requestId            String?
+  ipAddress            String?
+  userAgent            String?
+  metadata             Json?           // Strictly sanitized; no secrets
+  createdAt            DateTime        @default(now())
+
+  actorUser            User?           @relation("ActorUserAudit", fields: [actorUserId], references: [id], onDelete: Restrict)
+  actorServiceClient   ServiceClient?  @relation("ActorServiceAudit", fields: [actorServiceClientId], references: [id], onDelete: Restrict)
+  targetUser           User?           @relation("TargetUserAudit", fields: [targetUserId], references: [id], onDelete: Restrict)
+
+  @@index([actorId])
+  @@index([targetUserId])
+  @@index([action])
+  @@index([createdAt])
+}
