@@ -7,85 +7,400 @@ servers:
   - url: http://127.0.0.1:4000
     description: Local development server
 paths:
+  /.well-known/jwks.json:
+    get:
+      summary: RFC 8037 JSON Web Key Set (JWKS)
+      description: Returns active and unexpired retired Ed25519 public keys used for stateless JWT signature verification.
+      operationId: getJwks
+      security: []
+      responses:
+        "200":
+          description: Standard RFC 8037 JWKS containing OKP / Ed25519 keys.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JwksResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/auth/register:
+    post:
+      summary: Register Account
+      description: Registers a new Customer, Vendor Applicant, or Rider Applicant account with normalized email.
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Account created and authenticated session returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokens"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/auth/login:
+    post:
+      summary: Email/Password Login
+      description: Authenticates user credentials with progressive lockout and anti-enumeration.
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authentication successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokens"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/auth/refresh:
+    post:
+      summary: Rotate Refresh Token
+      description: Atomic zero-grace token rotation. Single-use refresh token is rotated; reuse triggers immediate family revocation.
+      operationId: refreshTokens
+      security: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        "200":
+          description: Fresh access and refresh tokens returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokens"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/auth/logout:
+    post:
+      summary: User Logout
+      description: Revokes the active session family and clears auth cookies.
+      operationId: logout
+      security: []
+      responses:
+        "200":
+          description: Logged out successfully.
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/auth/otp/send:
+    post:
+      summary: Send OTP
+      description: Generates a 6-digit OTP challenge and delivers via MSG91 SMS gateway.
+      operationId: sendOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendOtpRequest"
+      responses:
+        "200":
+          description: OTP challenge initiated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challengeId:
+                    type: string
+                    format: uuid
+                  cooldownSeconds:
+                    type: integer
+                    example: 60
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "429":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/auth/otp/verify:
+    post:
+      summary: Verify OTP
+      description: Verifies OTP against context-bound HMAC challenge.
+      operationId: verifyOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyOtpRequest"
+      responses:
+        "200":
+          description: OTP verified successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  verified:
+                    type: boolean
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/internal/auth/verify-session:
+    post:
+      summary: Canonical Live Central Auth Session Verification
+      description: S2S authenticated endpoint where business backends submit intact user JWTs for synchronous status and permission verification.
+      operationId: verifySession
+      security:
+        - S2SAssertion: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userAccessToken
+              properties:
+                userAccessToken:
+                  type: string
+                requiredPermission:
+                  type: string
+                  example: "orders:create"
+      responses:
+        "200":
+          description: Live session and permission validation outcome.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LiveSessionResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
   /health:
     get:
       summary: Root Liveness Probe
-      description: Basic HTTP service liveness check confirming the Express application process is running.
       operationId: getRootHealth
       security: []
       responses:
         "200":
-          description: Service is healthy and processing HTTP requests.
+          description: Service liveness probe status.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
         "500":
-          description: Unexpected internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
+          $ref: "#/components/responses/ErrorResponse"
   /health/ready:
     get:
       summary: Root Readiness Probe
-      description: Service readiness check verifying database connectivity.
       operationId: getRootReady
       security: []
       responses:
         "200":
-          description: Service and database are ready to process traffic.
+          description: Service readiness probe status.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ReadyResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
         "503":
-          description: Service is degraded because the database is currently unreachable.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DegradedResponse"
-  /api/v1/health:
-    get:
-      summary: Versioned Liveness Probe
-      description: Versioned HTTP service liveness check confirming the Express application process is running under /api/v1.
-      operationId: getApiV1Health
-      security: []
-      responses:
-        "200":
-          description: Service is healthy and processing HTTP requests.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HealthResponse"
-        "500":
-          description: Unexpected internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  /api/v1/health/ready:
-    get:
-      summary: Versioned Readiness Probe
-      description: Versioned service readiness check verifying database connectivity under /api/v1.
-      operationId: getApiV1Ready
-      security: []
-      responses:
-        "200":
-          description: Service and database are ready to process traffic.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ReadyResponse"
-        "503":
-          description: Service is degraded because the database is currently unreachable.
+          description: Service degraded or dependency unreachable.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/DegradedResponse"
 
 components:
+  securitySchemes:
+    S2SAssertion:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    ErrorResponse:
+      description: Standard API Error Envelope
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
   schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - fullName
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        fullName:
+          type: string
+        phone:
+          type: string
+          example: "+919876543210"
+        accountType:
+          type: string
+          enum: [CUSTOMER, VENDOR_APPLICANT, RIDER_APPLICANT]
+          default: CUSTOMER
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthTokens:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+        - expiresIn
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          example: 900
+
+    SendOtpRequest:
+      type: object
+      required:
+        - phone
+      properties:
+        phone:
+          type: string
+          example: "+919876543210"
+        accountType:
+          type: string
+          enum: [CUSTOMER, VENDOR_APPLICANT, RIDER_APPLICANT]
+          default: CUSTOMER
+        purpose:
+          type: string
+          enum: [REGISTRATION, LOGIN, PHONE_VERIFICATION]
+          default: LOGIN
+
+    VerifyOtpRequest:
+      type: object
+      required:
+        - challengeId
+        - otp
+        - phone
+      properties:
+        challengeId:
+          type: string
+          format: uuid
+        otp:
+          type: string
+          example: "123456"
+        phone:
+          type: string
+        accountType:
+          type: string
+          enum: [CUSTOMER, VENDOR_APPLICANT, RIDER_APPLICANT]
+          default: CUSTOMER
+        purpose:
+          type: string
+          default: LOGIN
+
+    LiveSessionResponse:
+      type: object
+      required:
+        - valid
+      properties:
+        valid:
+          type: boolean
+        authorized:
+          type: boolean
+        userId:
+          type: string
+        sessionId:
+          type: string
+        accountType:
+          type: string
+        status:
+          type: string
+        role:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+
+    JwksKey:
+      type: object
+      required:
+        - kty
+        - crv
+        - x
+        - kid
+      properties:
+        kty:
+          type: string
+          enum: [OKP]
+        crv:
+          type: string
+          enum: [Ed25519]
+        x:
+          type: string
+        kid:
+          type: string
+        use:
+          type: string
+        alg:
+          type: string
+
+    JwksResponse:
+      type: object
+      required:
+        - keys
+      properties:
+        keys:
+          type: array
+          items:
+            $ref: "#/components/schemas/JwksKey"
+
     HealthResponse:
       type: object
       required:
@@ -95,16 +410,12 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - healthy
-          example: healthy
+          enum: [healthy]
         timestamp:
           type: string
           format: date-time
-          example: "2026-11-17T10:30:00.000Z"
         version:
           type: string
-          example: "0.1.0"
 
     ReadyResponse:
       type: object
@@ -115,18 +426,13 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - ready
-          example: ready
+          enum: [ready]
         database:
           type: string
-          enum:
-            - connected
-          example: connected
+          enum: [connected]
         timestamp:
           type: string
           format: date-time
-          example: "2026-11-17T12:00:00.000Z"
 
     DegradedResponse:
       type: object
@@ -138,21 +444,15 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - degraded
-          example: degraded
+          enum: [degraded]
         database:
           type: string
-          enum:
-            - disconnected
-          example: disconnected
+          enum: [disconnected]
         message:
           type: string
-          example: "Database service is temporarily unavailable"
         timestamp:
           type: string
           format: date-time
-          example: "2026-11-17T12:00:00.000Z"
 
     FieldError:
       type: object
@@ -162,10 +462,8 @@ components:
       properties:
         field:
           type: string
-          example: "email"
         message:
           type: string
-          example: "Invalid email format"
 
     ErrorDetail:
       type: object
@@ -176,14 +474,11 @@ components:
       properties:
         code:
           type: string
-          example: "VALIDATION_ERROR"
         message:
           type: string
-          example: "Invalid request payload"
         requestId:
           type: string
           format: uuid
-          example: "123e4567-e89b-12d3-a456-426614174000"
         details:
           type: array
           items:

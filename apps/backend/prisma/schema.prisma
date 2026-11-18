@@ -160,9 +160,9 @@ model AdminProfileAssignment {
   id               String            @id @default(uuid())
   userId           String
   profileId        String
-  assignedBy       String            // Actor ID who granted the profile
+  assignedBy       String            // Canonical admin userId
   assignedAt       DateTime          @default(now())
-  revokedAt        DateTime?         // Populated on revocation; allows historical retention
+  revokedAt        DateTime?         // Populated on revocation; maintains audit history
   revokedBy        String?
   revocationReason String?
   user             User              @relation(fields: [userId], references: [id], onDelete: Restrict)
@@ -176,8 +176,8 @@ model StaffDirectPermission {
   id           String           @id @default(uuid())
   userId       String
   permissionId String
-  effect       PermissionEffect @default(ALLOW) // DENY strictly overrides ALLOW
-  grantedBy    String
+  effect       PermissionEffect @default(ALLOW)
+  grantedBy    String           // Canonical admin userId
   reason       String?
   revokedAt    DateTime?        // Populated on revocation; allows historical retention
   revokedBy    String?
@@ -324,4 +324,35 @@ model AuthAuditLog {
   @@index([targetUserId])
   @@index([action])
   @@index([createdAt])
+}
+
+// -------------------------------------------------------------
+// 6. Durable OTP Challenges & Distributed Rate Limiting
+// -------------------------------------------------------------
+
+model OtpChallenge {
+  id              String      @id @default(uuid())
+  phoneNormalized String
+  accountType     AccountType
+  purpose         String
+  tokenHash       String
+  attemptsLeft    Int         @default(3)
+  userId          String?
+  sessionId       String?
+  expiresAt       DateTime
+  cooldownUntil   DateTime
+  consumedAt      DateTime?
+  deliveryStatus  String      @default("PENDING") // PENDING, DISPATCHED, FAILED
+  createdAt       DateTime    @default(now())
+
+  @@index([phoneNormalized])
+  @@index([expiresAt])
+}
+
+model RateLimitRecord {
+  id        String   @id @default(uuid())
+  key       String   // e.g. "phone:+919876543210" or "ip:127.0.0.1"
+  timestamp DateTime @default(now())
+
+  @@index([key, timestamp])
 }

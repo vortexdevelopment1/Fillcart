@@ -21,3 +21,4 @@ export 'src/network/fc_network_client.dart';
 export 'src/network/fc_network_exception.dart';
 export 'src/network/interceptors/fc_correlation_interceptor.dart';
 export 'src/network/interceptors/fc_safe_logging_interceptor.dart';
+export 'src/network/interceptors/fc_auth_interceptor.dart';

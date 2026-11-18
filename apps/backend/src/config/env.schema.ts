@@ -130,6 +130,63 @@ export const envSchema = z.object({
           "DATABASE_URL must be a valid PostgreSQL connection string starting with postgresql:// or postgres://",
       }
     ),
+
+  MIGRATION_DATABASE_URL: z.string().optional(),
+
+  // ---------------------------------------------------------------------------
+  // Central Auth & JWT Configuration
+  // ---------------------------------------------------------------------------
+  JWT_ISSUER_URL: z
+    .string()
+    .url()
+    .default("https://auth.fillcart.internal"),
+
+  JWT_ACTIVE_KID: z.string().min(1).default("k-default-dev-1"),
+
+  JWT_ACTIVE_PRIVATE_KEY_PEM: z.string().min(1).optional(),
+  JWT_ACTIVE_PUBLIC_KEY_PEM: z.string().min(1).optional(),
+
+  JWT_RETIRED_PUBLIC_KEYS: z
+    .string()
+    .default("[]")
+    .transform((val, ctx) => {
+      try {
+        const parsed = JSON.parse(val);
+        if (!Array.isArray(parsed)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "JWT_RETIRED_PUBLIC_KEYS must be a JSON array string",
+          });
+          return z.NEVER;
+        }
+        return parsed as Array<{ kid: string; publicKeyPem: string; retiredAt?: string; expiresAt?: string }>;
+      } catch (e) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "JWT_RETIRED_PUBLIC_KEYS is not valid JSON",
+        });
+        return z.NEVER;
+      }
+    }),
+
+  JWT_REVOKED_KIDS: z
+    .string()
+    .default("")
+    .transform((val) =>
+      val
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    ),
+
+  CONFIG_VERSION: z.string().default("v1"),
+  REVOCATION_CONFIG_DIGEST: z.string().optional(),
+
+  // OTP & SMS Gateway Configuration
+  OTP_HMAC_SECRET: z.string().min(16).default("fillcart-dev-otp-hmac-secret-min16chars!"),
+  MSG91_AUTH_KEY: z.string().optional(),
+  MSG91_TEMPLATE_ID: z.string().optional(),
+  MSG91_BASE_URL: z.string().url().default("https://control.msg91.com"),
 });
 
 export type AppConfig = z.infer<typeof envSchema>;
