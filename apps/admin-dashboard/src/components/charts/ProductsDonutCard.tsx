@@ -1,38 +1,134 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../common/Card';
-import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
+import { ChevronDown, TrendingUp, TrendingDown, Check } from 'lucide-react';
+
+const REVENUE_TIMEFRAME_OPTIONS = ['Today', 'This Week', 'This Month', 'This Year'] as const;
+type RevenueTimeframe = typeof REVENUE_TIMEFRAME_OPTIONS[number];
+
+const REVENUE_DATA: Record<
+  RevenueTimeframe,
+  {
+    revPct: number;
+    commPct: number;
+    refPct: number;
+    revGrowth: string;
+    commGrowth: string;
+    refGrowth: string;
+    vsLabel: string;
+  }
+> = {
+  'Today': {
+    revPct: 80,
+    commPct: 15,
+    refPct: 5,
+    revGrowth: '+11.8%',
+    commGrowth: '+6.4%',
+    refGrowth: '-0.8%',
+    vsLabel: 'vs yesterday',
+  },
+  'This Week': {
+    revPct: 77,
+    commPct: 16,
+    refPct: 7,
+    revGrowth: '+13.5%',
+    commGrowth: '+7.9%',
+    refGrowth: '-1.0%',
+    vsLabel: 'vs last week',
+  },
+  'This Month': {
+    revPct: 78,
+    commPct: 16,
+    refPct: 6,
+    revGrowth: '+14.2%',
+    commGrowth: '+8.5%',
+    refGrowth: '-1.2%',
+    vsLabel: 'vs last month',
+  },
+  'This Year': {
+    revPct: 76,
+    commPct: 18,
+    refPct: 6,
+    revGrowth: '+28.4%',
+    commGrowth: '+22.1%',
+    refGrowth: '-2.5%',
+    vsLabel: 'vs last year',
+  },
+};
 
 export const ProductsDonutCard: React.FC = () => {
   const navigate = useNavigate();
-  const [filter, setFilter] = useState('This Month');
+  const [filter, setFilter] = useState<RevenueTimeframe>('This Month');
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  const activeData = REVENUE_DATA[filter];
 
   return (
     <Card
-      onClick={() => navigate('/products')}
-      title="Messages By Type"
+      onClick={() => navigate('/payments')}
+      title="Revenue split"
       action={
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1.5 text-[12px] text-black bg-white px-3 py-1 rounded-full cursor-pointer hover:bg-black/[0.03] border border-black/[0.08]"
-        >
-          <span>{filter}</span>
-          <ChevronDown className="w-3.5 h-3.5 text-black/55" />
+        <div ref={dropdownRef} className="relative select-none" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center gap-1.5 text-[12px] text-ink/80 bg-neutral px-3 py-1 rounded-full cursor-pointer hover:bg-neutral/80 border border-primary/[0.08] transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
+            aria-expanded={isOpen}
+            aria-haspopup="listbox"
+          >
+            <span>{filter}</span>
+            <ChevronDown className={`w-3.5 h-3.5 text-ink/60 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {isOpen && (
+            <div className="absolute right-0 top-full mt-1.5 z-40 bg-white rounded-xl shadow-lg border border-primary/15 py-1 min-w-[125px] animate-fadeIn">
+              {REVENUE_TIMEFRAME_OPTIONS.map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => {
+                    setFilter(opt);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full px-3 py-1.5 text-left text-xs flex items-center justify-between transition-colors ${
+                    filter === opt
+                      ? 'bg-secondary/10 text-primary font-semibold'
+                      : 'text-ink/80 hover:bg-neutral'
+                  }`}
+                >
+                  <span>{opt}</span>
+                  {filter === opt && <Check className="w-3.5 h-3.5 text-secondary" />}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       }
-      className="h-[210px] flex flex-col justify-between"
+      className="h-[210px] flex flex-col justify-between cursor-pointer hover:border-secondary transition-all"
     >
       <div className="flex items-center my-auto h-full pt-1 pb-1">
-        {/* ──────────── DONUT WRAPPER (120px x 120px, mr-24px) ──────────── */}
+        {/* DONUT WRAPPER (120px x 120px, mr-24px) */}
         <div className="w-[120px] h-[120px] mr-[24px] flex-shrink-0 relative flex items-center justify-center select-none">
-          {/* SVG Donut Circle with 3 rounded-cap segments and gaps */}
           <svg
             width="120"
             height="120"
             viewBox="0 0 120 120"
             className="w-[120px] h-[120px] transform -rotate-90"
           >
-            {/* Segment 1: Direct, BLACK #000000 (right arc: ~11° to 165°) */}
+            {/* Segment 1: Revenue, INK #000000 (right arc: ~78%) */}
             <circle
               cx="60"
               cy="60"
@@ -41,115 +137,108 @@ export const ProductsDonutCard: React.FC = () => {
               stroke="#000000"
               strokeWidth="14"
               strokeLinecap="round"
-              strokeDasharray="129 172.6"
+              strokeDasharray="180 121.6"
               strokeDashoffset="-9.2"
             />
 
-            {/* Segment 2: Automations, PRIMARY #F5B800 (bottom-left arc: ~187° to 257°) */}
+            {/* Segment 2: Commission, PRIMARY #123747 (~16%) */}
             <circle
               cx="60"
               cy="60"
               r="48"
               fill="none"
-              stroke="#F5B800"
+              stroke="#123747"
               strokeWidth="14"
               strokeLinecap="round"
-              strokeDasharray="58.6 243"
-              strokeDashoffset="-156.6"
+              strokeDasharray="52 249.6"
+              strokeDashoffset="-200"
             />
 
-            {/* Segment 3: Campaigns, SECONDARY #FCE8A3 (top-left arc: ~279° to 349°) */}
+            {/* Segment 3: Refund, SECONDARY #527781 (~6%) */}
             <circle
               cx="60"
               cy="60"
               r="48"
               fill="none"
-              stroke="#FCE8A3"
+              stroke="#527781"
               strokeWidth="14"
               strokeLinecap="round"
-              strokeDasharray="58.6 243"
-              strokeDashoffset="-233.7"
+              strokeDasharray="24 277.6"
+              strokeDashoffset="-260"
             />
           </svg>
 
-          {/* Three White Pill Badges ON the Ring (center hole is empty) */}
-          {/* Badge "16%" on top-left (Campaigns) arc */}
+          {/* Three White Pill Badges ON the Ring with 1px INK border */}
           <div
-            className="absolute bg-white text-black text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-black pointer-events-none leading-none z-10 shadow-sm"
+            className="absolute bg-white text-ink text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-ink pointer-events-none leading-none z-10 shadow-sm"
             style={{ top: '22%', left: '21%', transform: 'translate(-50%, -50%)' }}
           >
-            16%
+            {activeData.refPct}%
           </div>
 
-          {/* Badge "24%" on right (Direct) arc */}
           <div
-            className="absolute bg-white text-black text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-black pointer-events-none leading-none z-10 shadow-sm"
+            className="absolute bg-white text-ink text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-ink pointer-events-none leading-none z-10 shadow-sm"
             style={{ top: '50%', left: '90%', transform: 'translate(-50%, -50%)' }}
           >
-            24%
+            {activeData.revPct}%
           </div>
 
-          {/* Badge "17%" on bottom-left (Automations) arc */}
           <div
-            className="absolute bg-white text-black text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-black pointer-events-none leading-none z-10 shadow-sm"
+            className="absolute bg-white text-ink text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-ink pointer-events-none leading-none z-10 shadow-sm"
             style={{ top: '80%', left: '23%', transform: 'translate(-50%, -50%)' }}
           >
-            17%
+            {activeData.commPct}%
           </div>
         </div>
 
-        {/* ──────────── LEGEND ──────────── */}
+        {/* LEGEND */}
         <div className="flex-1 flex flex-col justify-center h-full min-w-0">
           <div className="flex flex-col gap-[14px]">
-            {/* Row 1: Direct (BLACK) */}
+            {/* Row 1: Net Revenue (INK) */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-[10px] h-[10px] rounded-full bg-black flex-shrink-0" />
-                <span className="font-sans font-normal text-black text-[13px] truncate leading-none">
-                  Direct
+                <div className="w-[10px] h-[10px] rounded-full bg-ink flex-shrink-0" />
+                <span className="font-sans font-normal text-ink text-[13px] truncate leading-none">
+                  Revenue
                 </span>
               </div>
-              {/* Positive: background SECONDARY #FCE8A3, text #000000, Poppins 10px */}
-              <div className="flex items-center gap-0.5 font-sans text-[10px] font-normal px-[8px] py-[2px] rounded-[8px] bg-secondary text-black leading-none flex-shrink-0">
-                <TrendingUp className="w-2.5 h-2.5 inline text-black" />
-                <span>0.3%</span>
+              <div className="flex items-center gap-0.5 font-sans text-[10px] font-normal px-[8px] py-[2px] rounded-[8px] bg-primary text-white leading-none flex-shrink-0">
+                <TrendingUp className="w-2.5 h-2.5 inline text-white" />
+                <span>{activeData.revGrowth}</span>
               </div>
             </div>
 
-            {/* Row 2: Campaigns (SECONDARY #FCE8A3) */}
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-[10px] h-[10px] rounded-full bg-secondary flex-shrink-0" />
-                <span className="font-sans font-normal text-black text-[13px] truncate leading-none">
-                  Campaigns
-                </span>
-              </div>
-              {/* Negative badge: background #FFFFFF with 1px #000000 border, text #000000, down-arrow, Poppins 10px */}
-              <div className="flex items-center gap-0.5 font-sans text-[10px] font-normal px-[8px] py-[2px] rounded-[8px] bg-white border border-black text-black leading-none flex-shrink-0">
-                <TrendingDown className="w-2.5 h-2.5 inline text-black" />
-                <span>25.4%</span>
-              </div>
-            </div>
-
-            {/* Row 3: Automations (PRIMARY #F5B800) */}
+            {/* Row 2: Commission (PRIMARY) */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-[10px] h-[10px] rounded-full bg-primary flex-shrink-0" />
-                <span className="font-sans font-normal text-black text-[13px] truncate leading-none">
-                  Automations
+                <span className="font-sans font-normal text-ink text-[13px] truncate leading-none">
+                  Commission
                 </span>
               </div>
-              {/* Positive: background SECONDARY #FCE8A3, text #000000, Poppins 10px */}
-              <div className="flex items-center gap-0.5 font-sans text-[10px] font-normal px-[8px] py-[2px] rounded-[8px] bg-secondary text-black leading-none flex-shrink-0">
-                <TrendingUp className="w-2.5 h-2.5 inline text-black" />
-                <span>15%</span>
+              <div className="flex items-center gap-0.5 font-sans text-[10px] font-normal px-[8px] py-[2px] rounded-[8px] bg-primary text-white leading-none flex-shrink-0">
+                <TrendingUp className="w-2.5 h-2.5 inline text-white" />
+                <span>{activeData.commGrowth}</span>
+              </div>
+            </div>
+
+            {/* Row 3: Refund (SECONDARY) */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-[10px] h-[10px] rounded-full bg-secondary flex-shrink-0" />
+                <span className="font-sans font-normal text-ink text-[13px] truncate leading-none">
+                  Refunds
+                </span>
+              </div>
+              <div className="flex items-center gap-0.5 font-sans text-[10px] font-normal px-[8px] py-[2px] rounded-[8px] bg-white border border-ink text-ink leading-none flex-shrink-0">
+                <TrendingDown className="w-2.5 h-2.5 inline text-ink" />
+                <span>{activeData.refGrowth}</span>
               </div>
             </div>
           </div>
 
-          {/* Bottom-right: "vs last month" (#000000 at 55% opacity, Poppins 11px) */}
-          <div className="text-right font-sans text-[11px] text-black/55 mt-2 leading-none">
-            vs last month
+          <div className="text-right font-sans text-[11px] text-ink/60 mt-2 leading-none">
+            {activeData.vsLabel}
           </div>
         </div>
       </div>

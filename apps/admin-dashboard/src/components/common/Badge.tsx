@@ -17,13 +17,13 @@ export const Badge: React.FC<BadgeProps> = ({
   size = 'sm',
 }) => {
   const variantStyles = {
-    'secondary': 'bg-secondary text-black font-normal',
-    'soft-amber': 'bg-secondary text-black font-normal',
-    'primary': 'bg-primary text-black font-normal',
-    'negative': 'bg-white text-black border border-black font-normal',
-    'outline': 'bg-white text-black border border-black/[0.12] font-normal',
-    'neutral': 'bg-black/[0.06] text-black font-normal',
-    'dark': 'bg-black text-white font-normal',
+    'secondary': 'bg-secondary text-white font-normal',
+    'soft-amber': 'bg-secondary/18 text-primary font-normal',
+    'primary': 'bg-primary text-white font-normal',
+    'negative': 'bg-white text-ink border border-ink font-normal',
+    'outline': 'bg-white text-ink border border-primary/20 font-normal',
+    'neutral': 'bg-neutral text-ink font-normal',
+    'dark': 'bg-ink text-white font-normal',
   };
 
   const sizeStyles = {
@@ -35,8 +35,8 @@ export const Badge: React.FC<BadgeProps> = ({
     <span
       className={`inline-flex items-center gap-1 leading-none ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
     >
-      {icon === 'up' && <TrendingUp className="w-2.5 h-2.5 text-black inline" />}
-      {icon === 'down' && <TrendingDown className="w-2.5 h-2.5 text-black inline" />}
+      {icon === 'up' && <TrendingUp className="w-2.5 h-2.5 inline" />}
+      {icon === 'down' && <TrendingDown className="w-2.5 h-2.5 inline" />}
       {children}
     </span>
   );

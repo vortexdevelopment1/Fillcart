@@ -12,7 +12,7 @@ export const vendorsStats = {
   badge: "4 active",
   ticks: Array.from({ length: 72 }, (_, i) => ({
     filled: i < 18,
-    color: i >= 13 ? '#F5B800' : 'rgba(245, 184, 0, 0.55)',
+    color: i >= 14 ? '#123747' : 'rgba(18, 55, 71, 0.55)',
   })),
 };
 
@@ -38,7 +38,7 @@ export const topOrdersVendors = [
     email: "sarah@brights...",
     share: "12%",
     orders: "1,240",
-    color: "#FCE8A3",
+    color: "#123747",
   },
   {
     id: "v2",
@@ -46,7 +46,7 @@ export const topOrdersVendors = [
     email: "david.kim@email...",
     share: "8%",
     orders: "850",
-    color: "#F5B800",
+    color: "#527781",
   },
   {
     id: "v3",
@@ -54,7 +54,7 @@ export const topOrdersVendors = [
     email: "priya@oakrealty.c...",
     share: "4%",
     orders: "425",
-    color: "rgba(245, 184, 0, 0.55)",
+    color: "rgba(82, 119, 129, 0.55)",
   },
   {
     id: "v4",
@@ -67,9 +67,9 @@ export const topOrdersVendors = [
 ];
 
 export const productsCategoryDonutData = [
-  { name: "Direct", value: 48, color: "#000000", change: "0.3%", isPositive: true },
-  { name: "Campaigns", value: 28, color: "#FCE8A3", change: "25.4%", isPositive: false },
-  { name: "Automations", value: 24, color: "#F5B800", change: "15%", isPositive: true },
+  { name: "Direct", value: 48, color: "#123747", change: "0.3%", isPositive: true },
+  { name: "Campaigns", value: 28, color: "#527781", change: "25.4%", isPositive: false },
+  { name: "Automations", value: 24, color: "rgba(82, 119, 129, 0.45)", change: "15%", isPositive: true },
 ];
 
 export const paymentsSummary = {

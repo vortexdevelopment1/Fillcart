@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -12,189 +12,595 @@ import {
   ShieldCheck,
   History,
   Settings,
+  PanelLeftOpen,
+  PanelLeftClose,
   Menu,
   X,
+  Landmark,
+  LogOut,
 } from 'lucide-react';
 import { useVerification } from '../../context/VerificationContext';
+import { useSidebar } from '../../context/SidebarContext';
+import { useApp } from '../../context/AppContext';
+import { useToast } from '../../context/ToastContext';
+import { ModuleName } from '../../data/staffData';
+import { SidebarTooltipPortal } from './SidebarTooltipPortal';
 
-interface NavItem {
+interface NavItemConfig {
+  id: string;
   name: string;
   path: string;
   icon: React.ElementType;
   badge?: number | string;
+  group: 'MAIN' | 'USERS' | 'MANAGEMENT' | 'FINANCE' | 'SYSTEM' | 'BOTTOM';
+  module?: ModuleName;
 }
 
 export const Sidebar: React.FC = () => {
   const location = useLocation();
   const { stats } = useVerification();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const {
+    isExpanded,
+    toggleExpanded,
+    isMobileOpen,
+    toggleMobileOpen,
+    closeMobile,
+  } = useSidebar();
+  const { hasPermission, currentRole } = useApp();
+  const { addToast } = useToast();
 
-  // Group 1: Core Operations
-  const group1Items: NavItem[] = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
+  const handleLogout = () => {
+    addToast(
+      'info',
+      'Admin Logout',
+      'Session ended (Mock). Production auth will clear tokens & redirect to login on backend integration.'
+    );
+  };
+
+  // Floating Portal Tooltip state for Collapsed Mode
+  const [tooltipState, setTooltipState] = useState<{
+    visible: boolean;
+    text: string;
+    badge?: number | string;
+    targetRect: DOMRect | null;
+  }>({
+    visible: false,
+    text: '',
+    targetRect: null,
+  });
+
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Check if touch device
+  const isTouchDevice =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(pointer: coarse)').matches;
+
+  // Single shared config array for all navigation items
+  const navItems: NavItemConfig[] = [
+    // Group: MAIN
+    { id: 'dashboard', name: 'Dashboard', path: '/', icon: LayoutDashboard, group: 'MAIN' },
     {
+      id: 'doc-verification',
       name: 'Document Verification',
       path: '/document-verification',
       icon: FileCheck2,
-      badge: stats.pending > 0 ? stats.pending : 3,
+      badge: stats.pending > 0 ? stats.pending : undefined,
+      group: 'MAIN',
+      module: 'Users',
     },
-    { name: 'Vendors', path: '/vendors', icon: Store },
-    { name: 'Riders', path: '/riders', icon: Bike },
-    { name: 'Orders', path: '/orders', icon: ShoppingBag },
+    { id: 'orders', name: 'Orders', path: '/orders', icon: ShoppingBag, group: 'MAIN', module: 'Orders' },
+
+    // Group: USERS
+    { id: 'vendors', name: 'Vendors', path: '/vendors', icon: Store, group: 'USERS', module: 'Users' },
+    { id: 'riders', name: 'Riders', path: '/riders', icon: Bike, group: 'USERS', module: 'Users' },
+
+    // Group: MANAGEMENT
+    {
+      id: 'products',
+      name: 'Products & Categories',
+      path: '/products',
+      icon: Layers,
+      group: 'MANAGEMENT',
+      module: 'Products',
+    },
+
+    // Group: FINANCE
+    { id: 'finance', name: 'Finance', path: '/finance', icon: Landmark, group: 'FINANCE', module: 'Payments' },
+
+    // Group: SYSTEM
+    { id: 'reports', name: 'Reports', path: '/reports', icon: BarChart3, group: 'SYSTEM', module: 'Reports' },
+    {
+      id: 'staff',
+      name: 'Staff Roles & Permissions',
+      path: '/staff',
+      icon: ShieldCheck,
+      group: 'SYSTEM',
+      module: 'Settings',
+    },
+    { id: 'audit-logs', name: 'Audit Logs', path: '/audit-logs', icon: History, group: 'SYSTEM', module: 'Audit Logs' },
+
+    // Pinned Bottom
+    { id: 'settings', name: 'Settings', path: '/settings', icon: Settings, group: 'BOTTOM' },
   ];
 
-  // Group 2: Management & Finance
-  const group2Items: NavItem[] = [
-    { name: 'Products & Categories', path: '/products', icon: Layers },
-    { name: 'Payments & Statements', path: '/payments', icon: CreditCard },
-    { name: 'Basic Reports', path: '/reports', icon: BarChart3 },
-  ];
+  // RBAC Filtering: Finance Admin sees MAIN (Dashboard, Orders view-only), FINANCE, and Reports; hide the rest.
+  const visibleItems = navItems.filter((i) => {
+    if (currentRole === 'Finance Admin') {
+      if (i.id === 'dashboard' || i.id === 'orders') return true;
+      if (i.id === 'finance') return true;
+      if (i.id === 'reports') return true;
+      return false;
+    }
+    return !i.module || hasPermission(i.module, 'View');
+  });
 
-  // Group 3: Administration
-  const group3Items: NavItem[] = [
-    { name: 'Staff Roles & Permissions', path: '/staff', icon: ShieldCheck },
-    { name: 'Audit Logs', path: '/audit-logs', icon: History },
-  ];
+  const mainItems = visibleItems.filter((i) => i.group === 'MAIN');
+  const userItems = visibleItems.filter((i) => i.group === 'USERS');
+  const managementItems = visibleItems.filter((i) => i.group === 'MANAGEMENT');
+  const financeItems = visibleItems.filter((i) => i.group === 'FINANCE');
+  const systemItems = visibleItems.filter((i) => i.group === 'SYSTEM');
+  const settingsItem = navItems.find((i) => i.group === 'BOTTOM')!;
+  const showSettings =
+    currentRole === 'Super Admin' ||
+    currentRole === 'Finance Admin' ||
+    currentRole === 'Marketing Admin';
 
-  const renderNavTile = (item: NavItem) => {
+  // Handle tooltip on mouseEnter / focus for collapsed mode
+  const handleMouseEnter = (
+    e: React.MouseEvent<HTMLElement> | React.FocusEvent<HTMLElement>,
+    name: string,
+    badge?: number | string
+  ) => {
+    if (isExpanded || isTouchDevice) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => {
+      setTooltipState({
+        visible: true,
+        text: name,
+        badge,
+        targetRect: rect,
+      });
+    }, 80);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    setTooltipState((prev) => ({ ...prev, visible: false }));
+  };
+
+  const handleNavClick = () => {
+    closeMobile();
+    // On tablet (< 1024px), close expanded overlay on navigation
+    if (typeof window !== 'undefined' && window.innerWidth < 1024 && isExpanded) {
+      toggleExpanded();
+    }
+  };
+
+  // Render individual nav item
+  const renderNavItem = (item: NavItemConfig) => {
     const Icon = item.icon;
     const isActive =
       item.path === '/'
         ? location.pathname === '/'
         : location.pathname.startsWith(item.path);
 
-    return (
-      <div key={item.path} className="relative group flex items-center justify-center flex-shrink-0">
+    if (isExpanded) {
+      // ──────────── EXPANDED MODE ROW ────────────
+      return (
         <NavLink
+          key={item.id}
           to={item.path}
-          onClick={() => setMobileOpen(false)}
+          onClick={handleNavClick}
+          aria-current={isActive ? 'page' : undefined}
           className={`
-            w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-all duration-150 relative
+            w-full h-[42px] rounded-full px-3.5 flex items-center gap-3 transition-all duration-150 select-none relative group focus:outline-none focus:ring-2 focus:ring-secondary
             ${
               isActive
-                ? 'bg-white text-black'
-                : 'bg-white/10 text-white/80 hover:bg-white/[0.18] hover:text-white'
+                ? 'bg-neutral text-primary font-medium shadow-xs'
+                : 'text-white/75 hover:bg-white/10 hover:text-white'
             }
           `}
-          aria-label={item.name}
         >
-          <Icon className="w-[18px] h-[18px] stroke-[1.5]" />
+          <Icon className="w-[18px] h-[18px] stroke-[1.5] flex-shrink-0" />
 
-          {/* Notification Badge on Document Verification */}
+          {/* Label with delay-fade animation so text never wraps during width transition */}
+          <span
+            className="text-[12.5px] font-sans whitespace-nowrap overflow-hidden transition-opacity duration-150 delay-100 opacity-100 tracking-tight"
+          >
+            {item.name}
+          </span>
+
+          {/* 20px SECONDARY Pill Notification Badge */}
           {item.badge !== undefined && (
-            <span
-              className="absolute -top-[4px] -right-[4px] w-[16px] h-[16px] rounded-full bg-primary text-black text-[9px] font-sans font-medium flex items-center justify-center leading-none shadow-sm pointer-events-none"
-              style={{ top: '-4px', right: '-4px' }}
-            >
+            <span className="ml-auto px-2 h-[20px] rounded-full bg-secondary text-white text-[10px] font-sans font-medium flex items-center justify-center leading-none flex-shrink-0 shadow-xs">
               {item.badge}
             </span>
           )}
         </NavLink>
+      );
+    }
 
-        {/* Floating Tooltip to the right: black pill, white text, Poppins 11px */}
-        <div className="absolute left-[54px] top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black text-white text-[11px] font-sans font-normal rounded-lg whitespace-nowrap shadow-xl border border-white/10 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
-          {item.name}
-          {item.badge && <span className="ml-1 text-primary">({item.badge})</span>}
-        </div>
+    // ──────────── COLLAPSED MODE TILE (40px) ────────────
+    return (
+      <div
+        key={item.id}
+        className="relative flex items-center justify-center flex-shrink-0 w-[40px] max-w-[40px]"
+        onMouseEnter={(e) => handleMouseEnter(e, item.name, item.badge)}
+        onMouseLeave={handleMouseLeave}
+        onFocus={(e) => handleMouseEnter(e, item.name, item.badge)}
+        onBlur={handleMouseLeave}
+      >
+        <NavLink
+          to={item.path}
+          onClick={handleNavClick}
+          aria-label={item.name}
+          aria-current={isActive ? 'page' : undefined}
+          className={`
+            w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-all duration-150 relative focus:outline-none focus:ring-2 focus:ring-secondary
+            ${
+              isActive
+                ? 'bg-white text-primary shadow-xs'
+                : 'bg-white/10 text-white/80 hover:bg-white/[0.18] hover:text-white'
+            }
+          `}
+        >
+          <Icon className="w-[18px] h-[18px] stroke-[1.5]" />
+
+          {/* 16px Circle Badge on Top-Right Corner */}
+          {item.badge !== undefined && (
+            <span className="absolute -top-[2px] right-0 w-[16px] h-[16px] rounded-full bg-secondary text-white text-[9px] font-sans font-medium flex items-center justify-center leading-none shadow-sm pointer-events-none">
+              {item.badge}
+            </span>
+          )}
+        </NavLink>
       </div>
     );
   };
 
   return (
     <>
-      {/* Mobile Hamburger Button */}
+      {/* ──────────── Mobile Hamburger in Top Left (< 768px) ──────────── */}
       <div className="md:hidden fixed top-3 left-3 z-50">
         <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg focus:outline-none focus:ring-2 focus:ring-primary"
-          aria-label="Toggle navigation menu"
+          onClick={toggleMobileOpen}
+          className="w-10 h-10 rounded-[14px] bg-primary text-white flex items-center justify-center shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+          aria-label={isMobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
         >
-          {mobileOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
+          {isMobileOpen ? (
+            <X className="w-5 h-5 text-white" />
+          ) : (
+            <Menu className="w-5 h-5 text-white" />
+          )}
         </button>
       </div>
 
-      {/* Mobile Backdrop */}
-      {mobileOpen && (
+      {/* ──────────── Overlay for Mobile / Tablet (< 1024px) ──────────── */}
+      {(isMobileOpen || (isExpanded && typeof window !== 'undefined' && window.innerWidth < 1024)) && (
         <div
-          onClick={() => setMobileOpen(false)}
-          className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+          onClick={() => {
+            closeMobile();
+            if (isExpanded && window.innerWidth < 1024) toggleExpanded();
+          }}
+          className="fixed inset-0 z-40 bg-primary/30 backdrop-blur-[6px] transition-opacity duration-200"
+          aria-hidden="true"
         />
       )}
 
-      {/* Sidebar Container */}
+      {/* ──────────── SIDEBAR CONTAINER ──────────── */}
       <aside
+        style={{
+          width: isExpanded ? '244px' : '56px',
+          backgroundColor: '#123747',
+          backgroundImage: 'none',
+          transition:
+            'width 250ms cubic-bezier(0.16, 1, 0.3, 1), transform 250ms cubic-bezier(0.16, 1, 0.3, 1)',
+          overflowX: 'hidden',
+        }}
         className={`
-          fixed top-4 left-4 bottom-4 w-[56px] h-[calc(100vh-32px)]
-          bg-black rounded-[24px] py-[12px] px-[8px] z-50
-          flex flex-col items-center gap-[10px]
-          transition-transform duration-300 ease-in-out select-none
-          overflow-y-auto no-scrollbar
-          ${mobileOpen ? 'translate-x-0' : '-translate-x-[150%] md:translate-x-0'}
+          fixed top-4 left-4 bottom-4 h-[calc(100vh-32px)]
+          bg-primary text-white rounded-[24px] z-50 select-none
+          flex flex-col overflow-y-hidden overflow-x-hidden shadow-2xl border border-white/[0.08]
+          ${isExpanded ? 'p-[14px_12px]' : 'py-[10px] px-[8px] items-center'}
+          ${
+            isMobileOpen
+              ? 'translate-x-0 w-[244px] p-[14px_12px]'
+              : '-translate-x-[150%] md:translate-x-0'
+          }
         `}
       >
-        {/* Top: Logo (36px, centered, no tile background) */}
-        <NavLink
-          to="/"
-          onClick={() => setMobileOpen(false)}
-          className="w-[36px] h-[36px] flex items-center justify-center flex-shrink-0 text-white hover:opacity-90 transition-opacity"
-          title="Fillcart"
-          aria-label="Fillcart Home"
-        >
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            {/* Top-Left: large tilted oval (-38 deg) */}
-            <ellipse cx="9.5" cy="10" rx="5.2" ry="3.8" transform="rotate(-38 9.5 10)" fill="#FFFFFF" />
-            {/* Top-Right: vertical oval (+8 deg) */}
-            <ellipse cx="19" cy="10.5" rx="2.4" ry="4.5" transform="rotate(8 19 10.5)" fill="#FFFFFF" />
-            {/* Bottom: horizontal oval (-3 deg) */}
-            <ellipse cx="14.5" cy="18.5" rx="4.8" ry="3.2" transform="rotate(-3 14.5 18.5)" fill="#FFFFFF" />
-          </svg>
-        </NavLink>
+        {/* ──────────── 1. HEADER ROW ──────────── */}
+        {isExpanded ? (
+          <div className="h-[44px] flex items-center justify-between mb-3 px-1 flex-shrink-0">
+            {/* Logo + App Name */}
+            <NavLink
+              to="/"
+              onClick={handleNavClick}
+              className="flex items-center gap-2.5 focus:outline-none focus:ring-2 focus:ring-secondary rounded-lg"
+              aria-label="Fillkart Dashboard Home"
+            >
+              <div className="w-[36px] h-[36px] rounded-full bg-secondary flex items-center justify-center flex-shrink-0 shadow-xs">
+                <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                  <ellipse
+                    cx="9.5"
+                    cy="10"
+                    rx="5.2"
+                    ry="3.8"
+                    transform="rotate(-38 9.5 10)"
+                    fill="#FFFFFF"
+                  />
+                  <ellipse
+                    cx="19"
+                    cy="10.5"
+                    rx="2.4"
+                    ry="4.5"
+                    transform="rotate(8 19 10.5)"
+                    fill="#FFFFFF"
+                  />
+                  <ellipse
+                    cx="14.5"
+                    cy="18.5"
+                    rx="4.8"
+                    ry="3.2"
+                    transform="rotate(-3 14.5 18.5)"
+                    fill="#FFFFFF"
+                  />
+                </svg>
+              </div>
 
-        {/* Group 1: Core Operations */}
-        <div className="flex flex-col items-center gap-[10px] w-full">
-          {group1Items.map(renderNavTile)}
-        </div>
+              <span className="font-sans text-[15px] font-medium text-white tracking-tight">
+                Fillkart
+              </span>
+            </NavLink>
 
-        {/* Divider 1: 1px, rgba(255,255,255,0.12), width 24px, margin 6px 0 */}
-        <div className="w-[24px] h-[1px] bg-white/[0.12] my-[6px] flex-shrink-0" />
-
-        {/* Group 2: Management & Finance */}
-        <div className="flex flex-col items-center gap-[10px] w-full">
-          {group2Items.map(renderNavTile)}
-        </div>
-
-        {/* Divider 2: 1px, rgba(255,255,255,0.12), width 24px, margin 6px 0 */}
-        <div className="w-[24px] h-[1px] bg-white/[0.12] my-[6px] flex-shrink-0" />
-
-        {/* Group 3: Administration */}
-        <div className="flex flex-col items-center gap-[10px] w-full">
-          {group3Items.map(renderNavTile)}
-        </div>
-
-        {/* Settings: pinned to very bottom (margin-top: auto), same 40px tile style */}
-        <div className="mt-auto relative group flex items-center justify-center flex-shrink-0 pt-1">
-          <NavLink
-            to="/staff"
-            onClick={() => setMobileOpen(false)}
-            className={`
-              w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-all duration-150 relative
-              ${
-                location.pathname === '/settings' || location.pathname === '/staff'
-                  ? 'bg-white text-black'
-                  : 'bg-white/10 text-white/80 hover:bg-white/[0.18] hover:text-white'
-              }
-            `}
-            aria-label="Settings"
-          >
-            <Settings className="w-[18px] h-[18px] stroke-[1.5]" />
-          </NavLink>
-
-          {/* Tooltip on hover */}
-          <div className="absolute left-[54px] top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black text-white text-[11px] font-sans font-normal rounded-lg whitespace-nowrap shadow-xl border border-white/10 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
-            Settings
+            {/* Collapse Toggle Button (Far Right) */}
+            <button
+              type="button"
+              onClick={toggleExpanded}
+              aria-label="Collapse sidebar"
+              aria-expanded={true}
+              className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
+            >
+              <PanelLeftClose className="w-5 h-5 stroke-[1.5]" />
+            </button>
           </div>
+        ) : (
+          <div className="flex flex-col items-center gap-[6px] flex-shrink-0 mb-[6px] w-[40px] overflow-x-hidden">
+            {/* Logo in Collapsed Mode */}
+            <NavLink
+              to="/"
+              onClick={handleNavClick}
+              className="w-[36px] h-[36px] rounded-full bg-secondary flex items-center justify-center flex-shrink-0 hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-secondary"
+              title="Fillkart"
+              aria-label="Fillkart Home"
+            >
+              <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                <ellipse
+                  cx="9.5"
+                  cy="10"
+                  rx="5.2"
+                  ry="3.8"
+                  transform="rotate(-38 9.5 10)"
+                  fill="#FFFFFF"
+                />
+                <ellipse
+                  cx="19"
+                  cy="10.5"
+                  rx="2.4"
+                  ry="4.5"
+                  transform="rotate(8 19 10.5)"
+                  fill="#FFFFFF"
+                />
+                <ellipse
+                  cx="14.5"
+                  cy="18.5"
+                  rx="4.8"
+                  ry="3.2"
+                  transform="rotate(-3 14.5 18.5)"
+                  fill="#FFFFFF"
+                />
+              </svg>
+            </NavLink>
+
+            {/* Toggle Button Directly Below Logo in Collapsed Mode */}
+            <div
+              onMouseEnter={(e) => handleMouseEnter(e, 'Expand sidebar')}
+              onMouseLeave={handleMouseLeave}
+              onFocus={(e) => handleMouseEnter(e, 'Expand sidebar')}
+              onBlur={handleMouseLeave}
+              className="flex items-center justify-center w-[40px]"
+            >
+              <button
+                type="button"
+                onClick={toggleExpanded}
+                aria-label="Expand sidebar"
+                aria-expanded={false}
+                className="w-[40px] h-[40px] rounded-[12px] bg-white/10 text-white/80 hover:bg-white/[0.18] hover:text-white flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-secondary"
+              >
+                <PanelLeftOpen className="w-[18px] h-[18px] stroke-[1.5]" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ──────────── 2. SCROLLABLE NAV AREA ──────────── */}
+        <div className="relative flex-1 min-h-0 w-full flex flex-col overflow-hidden overflow-x-hidden">
+          <nav
+            aria-label="Main"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', overflowX: 'hidden' }}
+            onScroll={(e) => {
+              if (e.currentTarget.scrollLeft !== 0) e.currentTarget.scrollLeft = 0;
+            }}
+            className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden no-scrollbar w-full flex flex-col ${
+              isExpanded ? 'gap-1.5 py-1' : 'py-0'
+            }`}
+          >
+            {/* Group 1: MAIN */}
+            {isExpanded && (
+              <span className="text-[10px] font-sans uppercase tracking-wider text-white/40 px-3 pt-1">
+                Main
+              </span>
+            )}
+            <div
+              className={`flex flex-col ${
+                isExpanded ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
+              }`}
+            >
+              {mainItems.map(renderNavItem)}
+            </div>
+
+            {/* Divider 1 */}
+            <div
+              className={`h-[1px] bg-white/[0.12] flex-shrink-0 ${
+                isExpanded ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
+              }`}
+            />
+
+            {/* Group 2: USERS */}
+            {userItems.length > 0 && (
+              <>
+                {isExpanded && (
+                  <span className="text-[10px] font-sans uppercase tracking-wider text-white/40 px-3 pt-1">
+                    Users
+                  </span>
+                )}
+                <div
+                  className={`flex flex-col ${
+                    isExpanded ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
+                  }`}
+                >
+                  {userItems.map(renderNavItem)}
+                </div>
+
+                {/* Divider between Users and Management */}
+                <div
+                  className={`h-[1px] bg-white/[0.12] flex-shrink-0 ${
+                    isExpanded ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
+                  }`}
+                />
+              </>
+            )}
+
+            {/* Group 3: MANAGEMENT */}
+            {managementItems.length > 0 && (
+              <>
+                {isExpanded && (
+                  <span className="text-[10px] font-sans uppercase tracking-wider text-white/40 px-3 pt-1">
+                    Management
+                  </span>
+                )}
+                <div
+                  className={`flex flex-col ${
+                    isExpanded ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
+                  }`}
+                >
+                  {managementItems.map(renderNavItem)}
+                </div>
+
+                {/* Divider between Management and Finance */}
+                <div
+                  className={`h-[1px] bg-white/[0.12] flex-shrink-0 ${
+                    isExpanded ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
+                  }`}
+                />
+              </>
+            )}
+
+            {/* Group 4: FINANCE */}
+            {financeItems.length > 0 && (
+              <>
+                {isExpanded && (
+                  <span className="text-[10px] font-sans uppercase tracking-wider text-white/40 px-3 pt-1">
+                    Finance
+                  </span>
+                )}
+                <div
+                  className={`flex flex-col ${
+                    isExpanded ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
+                  }`}
+                >
+                  {financeItems.map(renderNavItem)}
+                </div>
+
+                {/* Divider between Finance and System */}
+                <div
+                  className={`h-[1px] bg-white/[0.12] flex-shrink-0 ${
+                    isExpanded ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
+                  }`}
+                />
+              </>
+            )}
+
+            {/* Group 5: SYSTEM */}
+            {systemItems.length > 0 && (
+              <>
+                {isExpanded && (
+                  <span className="text-[10px] font-sans uppercase tracking-wider text-white/40 px-3 pt-1">
+                    System
+                  </span>
+                )}
+                <div
+                  className={`flex flex-col ${
+                    isExpanded ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
+                  }`}
+                >
+                  {systemItems.map(renderNavItem)}
+                </div>
+              </>
+            )}
+          </nav>
+        </div>
+
+        {/* ──────────── 3. PINNED SETTINGS & LOGOUT AT BOTTOM ──────────── */}
+        <div
+          className={`mt-auto flex-shrink-0 border-t border-white/[0.12] overflow-x-hidden flex flex-col ${
+            isExpanded ? 'w-full pt-2 gap-1' : 'w-full items-center pt-[4px] gap-[6px]'
+          }`}
+        >
+          {showSettings && renderNavItem(settingsItem)}
+
+          {isExpanded ? (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="h-[42px] px-3.5 rounded-full flex items-center gap-3 transition-all duration-150 relative text-left w-full focus:outline-none focus:ring-2 focus:ring-secondary text-white/70 hover:text-red-300 hover:bg-red-500/15"
+              aria-label="Logout"
+            >
+              <LogOut className="w-[18px] h-[18px] stroke-[1.5] flex-shrink-0" />
+              <span className="text-[13px] font-sans whitespace-nowrap overflow-hidden transition-opacity duration-150 delay-100 opacity-100 tracking-tight">
+                Logout
+              </span>
+            </button>
+          ) : (
+            <div
+              className="relative flex items-center justify-center flex-shrink-0 w-[40px] max-w-[40px]"
+              onMouseEnter={(e) => handleMouseEnter(e, 'Logout')}
+              onMouseLeave={handleMouseLeave}
+              onFocus={(e) => handleMouseEnter(e, 'Logout')}
+              onBlur={handleMouseLeave}
+            >
+              <button
+                type="button"
+                onClick={handleLogout}
+                aria-label="Logout"
+                className="w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-all duration-150 relative focus:outline-none focus:ring-2 focus:ring-secondary bg-white/10 text-white/70 hover:text-red-300 hover:bg-red-500/20"
+              >
+                <LogOut className="w-[18px] h-[18px] stroke-[1.5]" />
+              </button>
+            </div>
+          )}
         </div>
       </aside>
+
+      {/* ──────────── Floating Portal Tooltip (Collapsed Mode) ──────────── */}
+      <SidebarTooltipPortal
+        visible={tooltipState.visible && !isExpanded}
+        text={tooltipState.text}
+        badge={tooltipState.badge}
+        targetRect={tooltipState.targetRect}
+      />
     </>
   );
 };

@@ -1,172 +1,210 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../common/Card';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Check } from 'lucide-react';
 
-interface ContactRow {
+interface VendorRow {
   id: string;
   name: string;
-  email: string;
+  category: string;
   share: string;
   count: string;
   dotType: 'block1' | 'block2' | 'block3' | 'hollow';
 }
 
-const contactsData: ContactRow[] = [
+const TIMEFRAME_DATA: Record<
+  string,
   {
-    id: 'c1',
-    name: 'Sarah Mitchell',
-    email: 'sarah@brights...',
-    share: '12%',
-    count: '1,240',
-    dotType: 'block1',
+    vendors: VendorRow[];
+    h1: number;
+    h2: number;
+    h3: number;
+    minH4: number;
+  }
+> = {
+  'Today': {
+    vendors: [
+      { id: 'v1', name: 'Fresh Mart Hub', category: 'Delhi · Grocery', share: '16%', count: '298', dotType: 'block1' },
+      { id: 'v2', name: 'Royal Kirana', category: 'Indore · FMCG', share: '10%', count: '186', dotType: 'block2' },
+      { id: 'v3', name: 'Sharma Dairy', category: 'Jabalpur · Dairy', share: '5%', count: '94', dotType: 'block3' },
+      { id: 'v4', name: 'Others', category: '312 stores', share: '69%', count: '1,282', dotType: 'hollow' },
+    ],
+    h1: 30,
+    h2: 20,
+    h3: 12,
+    minH4: 80,
   },
-  {
-    id: 'c2',
-    name: 'David Kim',
-    email: 'david.kim@email...',
-    share: '8%',
-    count: '850',
-    dotType: 'block2',
+  'This Week': {
+    vendors: [
+      { id: 'v1', name: 'Fresh Mart Hub', category: 'Delhi · Grocery', share: '12%', count: '1,240', dotType: 'block1' },
+      { id: 'v2', name: 'Royal Kirana', category: 'Indore · FMCG', share: '8%', count: '850', dotType: 'block2' },
+      { id: 'v3', name: 'Sharma Dairy', category: 'Jabalpur · Dairy', share: '4%', count: '425', dotType: 'block3' },
+      { id: 'v4', name: 'Others', category: '312 stores', share: '76%', count: '7,011', dotType: 'hollow' },
+    ],
+    h1: 26,
+    h2: 18,
+    h3: 11,
+    minH4: 85,
   },
-  {
-    id: 'c3',
-    name: 'Priya Patel',
-    email: 'priya@oakrealty.c...',
-    share: '4%',
-    count: '425',
-    dotType: 'block3',
+  'This Month': {
+    vendors: [
+      { id: 'v1', name: 'Fresh Mart Hub', category: 'Delhi · Grocery', share: '14%', count: '5,420', dotType: 'block1' },
+      { id: 'v2', name: 'Royal Kirana', category: 'Indore · FMCG', share: '9%', count: '3,480', dotType: 'block2' },
+      { id: 'v3', name: 'Sharma Dairy', category: 'Jabalpur · Dairy', share: '5%', count: '1,940', dotType: 'block3' },
+      { id: 'v4', name: 'Others', category: '312 stores', share: '72%', count: '27,880', dotType: 'hollow' },
+    ],
+    h1: 28,
+    h2: 19,
+    h3: 12,
+    minH4: 82,
   },
-  {
-    id: 'c4',
-    name: 'Others',
-    email: '',
-    share: '76%',
-    count: '7,011',
-    dotType: 'hollow',
-  },
-];
+};
+
+const TIMEFRAME_OPTIONS = ['Today', 'This Week', 'This Month'];
 
 export const TopOrdersCard: React.FC = () => {
   const navigate = useNavigate();
-  const [filter, setFilter] = useState('This Week');
+  const [filter, setFilter] = useState<'Today' | 'This Week' | 'This Month'>('This Week');
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  const currentData = TIMEFRAME_DATA[filter];
 
   return (
     <Card
-      onClick={() => navigate('/orders')}
-      title="Top Contacts"
+      onClick={() => navigate('/vendors')}
+      title="Top Vendors"
       action={
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1.5 text-[12px] text-black bg-white px-3 py-1 rounded-full cursor-pointer hover:bg-black/[0.03] border border-black/[0.08]"
-        >
-          <span>{filter}</span>
-          <ChevronDown className="w-3.5 h-3.5 text-black/55" />
+        <div ref={dropdownRef} className="relative select-none" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center gap-1.5 text-[12px] text-ink/80 bg-neutral px-3 py-1 rounded-full cursor-pointer hover:bg-neutral/80 border border-primary/10 transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
+            aria-expanded={isOpen}
+            aria-haspopup="listbox"
+          >
+            <span>{filter}</span>
+            <ChevronDown className={`w-3.5 h-3.5 text-ink/60 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {isOpen && (
+            <div className="absolute right-0 top-full mt-1.5 z-40 bg-white rounded-xl shadow-lg border border-primary/15 py-1 min-w-[125px] animate-fadeIn">
+              {TIMEFRAME_OPTIONS.map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => {
+                    setFilter(opt as any);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full px-3 py-1.5 text-left text-xs flex items-center justify-between transition-colors ${
+                    filter === opt
+                      ? 'bg-secondary/10 text-primary font-semibold'
+                      : 'text-ink/80 hover:bg-neutral'
+                  }`}
+                >
+                  <span>{opt}</span>
+                  {filter === opt && <Check className="w-3.5 h-3.5 text-secondary" />}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       }
-      className="min-h-[240px] flex flex-col justify-between"
+      className="min-h-[240px] flex flex-col justify-between cursor-pointer hover:border-secondary transition-all"
     >
-      {/* Card body: flex row, align-items: stretch, gap 16px, 16px margin from title */}
+      {/* Card body */}
       <div className="flex flex-row items-stretch gap-4 mt-4 select-none">
-        {/* LEFT: stacked bar column, width 36px, flex-shrink 0, display flex column, gap 6px */}
+        {/* LEFT: stacked bar column */}
         <div
           className="w-[36px] h-[160px] flex flex-col flex-shrink-0 select-none"
-          style={{ gap: '6px' }}
+          style={{ gap: '5px' }}
         >
-          {/* Block 1: flex 2.2, background PRIMARY #F5B800, radius 10px */}
+          {/* Block 1 */}
           <div
-            className="w-full bg-primary transition-all"
-            style={{
-              flex: 2.2,
-              minHeight: '12px',
-              borderRadius: '10px',
-            }}
-            title="Block 1 (Sarah Mitchell)"
+            className="w-full bg-primary transition-all duration-300 flex-shrink-0"
+            style={{ height: `${currentData.h1}px`, borderRadius: '10px' }}
+            title={`Top Vendor (${currentData.vendors[0].share})`}
           />
 
-          {/* Block 2: flex 1, background SECONDARY #FCE8A3, border 1px solid #F5B800, radius 8px */}
+          {/* Block 2 */}
           <div
-            className="w-full bg-secondary transition-all"
-            style={{
-              flex: 1,
-              minHeight: '12px',
-              borderRadius: '8px',
-              border: '1px solid #F5B800',
-            }}
-            title="Block 2 (David Kim)"
+            className="w-full bg-secondary transition-all duration-300 flex-shrink-0"
+            style={{ height: `${currentData.h2}px`, borderRadius: '8px' }}
+            title={`Second Vendor (${currentData.vendors[1].share})`}
           />
 
-          {/* Block 3: flex 0.8, background rgba(245,184,0,0.45), radius 8px */}
+          {/* Block 3 */}
           <div
-            className="w-full transition-all"
+            className="w-full transition-all duration-300 flex-shrink-0"
             style={{
-              flex: 0.8,
-              minHeight: '12px',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(245, 184, 0, 0.45)',
+              height: `${currentData.h3}px`,
+              borderRadius: '6px',
+              backgroundColor: 'rgba(82, 119, 129, 0.55)',
             }}
-            title="Block 3 (Priya Patel)"
+            title={`Third Vendor (${currentData.vendors[2].share})`}
           />
 
-          {/* Block 4: flex 4.5, class .hatch, radius 10px, no border */}
+          {/* Block 4: Others, Tallest hatched block matching reference */}
           <div
-            className="w-full hatch transition-all"
+            className="w-full hatch transition-all duration-300 flex-1"
             style={{
-              flex: 4.5,
-              minHeight: '12px',
-              borderRadius: '10px',
-              border: 'none',
+              minHeight: `${currentData.minH4}px`,
+              borderRadius: '11px',
+              border: '1px solid rgba(18,55,71,0.22)',
             }}
-            title="Block 4 (Others)"
+            title={`Others (${currentData.vendors[3].share})`}
           />
         </div>
 
-        {/* RIGHT: rows container, flex-1, 4 rows with equal height (each row height 40px) */}
+        {/* RIGHT: rows container */}
         <div className="flex-1 flex flex-col justify-between h-[160px] min-w-0">
-          {contactsData.map((row) => (
-            <div
-              key={row.id}
-              className="h-[40px] flex items-center gap-2.5 min-w-0"
-            >
-              {/* Row Dots (match blocks exactly) */}
+          {currentData.vendors.map((row) => (
+            <div key={row.id} className="h-[40px] flex items-center gap-2.5 min-w-0">
+              {/* Row Dots */}
               {row.dotType === 'block1' && (
                 <div className="w-[8px] h-[8px] rounded-full bg-primary flex-shrink-0" />
               )}
               {row.dotType === 'block2' && (
-                <div
-                  className="w-[8px] h-[8px] rounded-full bg-secondary flex-shrink-0"
-                  style={{ border: '1px solid #F5B800' }}
-                />
+                <div className="w-[8px] h-[8px] rounded-full bg-secondary flex-shrink-0" />
               )}
               {row.dotType === 'block3' && (
                 <div
                   className="w-[8px] h-[8px] rounded-full flex-shrink-0"
-                  style={{ backgroundColor: 'rgba(245, 184, 0, 0.45)' }}
+                  style={{ backgroundColor: 'rgba(82, 119, 129, 0.55)' }}
                 />
               )}
               {row.dotType === 'hollow' && (
                 <div className="w-[8px] h-[8px] rounded-full border-[1.5px] border-primary bg-transparent flex-shrink-0" />
               )}
 
-              {/* Text columns: sitting on one baseline */}
+              {/* Text columns */}
               <div className="flex-1 min-w-0 flex items-baseline gap-2.5">
-                {/* Name: Poppins 13px, black, no truncation */}
-                <span className="font-sans font-normal text-black text-[13px] whitespace-nowrap flex-shrink-0">
+                <span className="font-sans font-normal text-ink text-[13px] whitespace-nowrap flex-shrink-0">
                   {row.name}
                 </span>
 
-                {/* Email: Poppins 12px, black 45%, flex-1, ellipsis */}
-                <span className="font-sans text-[12px] text-black/45 truncate flex-1 min-w-0">
-                  {row.email}
+                <span className="font-sans text-[12px] text-ink/60 truncate flex-1 min-w-0">
+                  {row.category}
                 </span>
 
-                {/* Percent: 12px, black 55%, width 40px, right-aligned */}
-                <span className="font-sans text-[12px] text-black/55 w-[40px] text-right tabular-nums flex-shrink-0">
+                <span className="font-sans text-[12px] text-ink/60 w-[40px] text-right tabular-nums flex-shrink-0">
                   {row.share}
                 </span>
 
-                {/* Count: 13px, weight 500, width 56px, right-aligned, tabular-nums */}
-                <span className="font-sans font-medium text-black text-[13px] w-[56px] text-right tabular-nums flex-shrink-0">
+                <span className="font-sans font-medium text-ink text-[13px] w-[56px] text-right tabular-nums flex-shrink-0">
                   {row.count}
                 </span>
               </div>

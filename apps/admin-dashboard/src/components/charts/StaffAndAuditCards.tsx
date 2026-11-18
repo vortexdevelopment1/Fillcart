@@ -15,29 +15,29 @@ export const StaffCard: React.FC = () => {
     >
       <div className="flex items-center justify-between mb-4 mt-1">
         <div>
-          <span className="text-2xl font-semibold text-black">14 Admins</span>
-          <p className="text-xs text-black/55 mt-0.5">3 roles active across hubs</p>
+          <span className="text-2xl font-semibold text-ink">14 Admins</span>
+          <p className="text-xs text-ink/60 mt-0.5">3 roles active across hubs</p>
         </div>
-        <div className="w-10 h-10 rounded-2xl bg-secondary text-black flex items-center justify-center">
-          <ShieldCheck className="w-5 h-5 text-black" />
+        <div className="w-10 h-10 rounded-2xl bg-secondary text-white flex items-center justify-center">
+          <ShieldCheck className="w-5 h-5 text-white" />
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2 text-xs">
-        <span className="px-3 py-1 bg-white border border-black/[0.08] rounded-full text-black font-medium">
+        <span className="px-3 py-1 bg-white border border-primary/10 rounded-full text-ink font-medium">
           Superadmin (2)
         </span>
-        <span className="px-3 py-1 bg-white border border-black/[0.08] rounded-full text-black font-medium">
+        <span className="px-3 py-1 bg-white border border-primary/10 rounded-full text-ink font-medium">
           Verification Ops (8)
         </span>
-        <span className="px-3 py-1 bg-white border border-black/[0.08] rounded-full text-black font-medium">
+        <span className="px-3 py-1 bg-white border border-primary/10 rounded-full text-ink font-medium">
           Finance Manager (4)
         </span>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-black/[0.08] flex items-center justify-between text-xs text-black font-semibold group">
+      <div className="mt-4 pt-3 border-t border-primary/10 flex items-center justify-between text-xs text-ink font-semibold group">
         <span>Manage Permissions</span>
-        <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" />
+        <ArrowRight className="w-4 h-4 text-ink group-hover:translate-x-1 transition-transform" />
       </div>
     </Card>
   );
@@ -58,15 +58,15 @@ export const AuditLogsCard: React.FC = () => {
             <img
               src={log.adminAvatar}
               alt={log.adminName}
-              className="w-7 h-7 rounded-full object-cover ring-1 ring-black/[0.08] mt-0.5"
+              className="w-7 h-7 rounded-full object-cover ring-1 ring-primary/10 mt-0.5"
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-black truncate">{log.adminName}</span>
-                <span className="text-[10px] text-black/55">{log.timeAgo}</span>
+                <span className="font-semibold text-ink truncate">{log.adminName}</span>
+                <span className="text-[10px] text-ink/60">{log.timeAgo}</span>
               </div>
-              <p className="text-black/55 truncate text-[11px] mt-0.5">
-                <span className="text-black font-medium">{log.action}: </span>
+              <p className="text-ink/60 truncate text-[11px] mt-0.5">
+                <span className="text-ink font-medium">{log.action}: </span>
                 {log.target}
               </p>
             </div>
@@ -74,7 +74,7 @@ export const AuditLogsCard: React.FC = () => {
         ))}
       </div>
 
-      <div className="mt-4 pt-3 border-t border-black/[0.08] flex items-center justify-between text-xs text-black/55 group hover:text-black">
+      <div className="mt-4 pt-3 border-t border-primary/10 flex items-center justify-between text-xs text-ink/60 group hover:text-ink">
         <div className="flex items-center gap-1.5">
           <History className="w-3.5 h-3.5" />
           <span>View all security events</span>

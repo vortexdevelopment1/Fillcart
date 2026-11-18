@@ -10,7 +10,7 @@ interface SegmentedBarProps {
 export const SegmentedBar: React.FC<SegmentedBarProps> = ({
   totalTicks = 72,
   filledCount,
-  darkMarkerCount = 5,
+  darkMarkerCount = 4,
   className = '',
 }) => {
   return (
@@ -20,13 +20,18 @@ export const SegmentedBar: React.FC<SegmentedBarProps> = ({
     >
       {Array.from({ length: totalTicks }).map((_, idx) => {
         const isFilled = idx < filledCount;
-        let bg = 'rgba(0, 0, 0, 0.06)'; // #000000 at 6% opacity
+        const isLastFour = idx >= filledCount - 4 && isFilled;
+
+        let bg = '#F2F3F4'; // NEUTRAL for unfilled
+        let bgImage: string | undefined = undefined;
 
         if (isFilled) {
-          // Last 5 filled ticks = PRIMARY #F5B800 at 100%
-          // Earlier filled ticks = PRIMARY #F5B800 at 55% opacity
-          const isMarker = idx >= filledCount - darkMarkerCount;
-          bg = isMarker ? '#F5B800' : 'rgba(245, 184, 0, 0.55)';
+          if (isLastFour) {
+            bg = '#123747'; // Solid PRIMARY
+          } else {
+            bg = '#123747'; // PRIMARY with vertical hatch texture
+            bgImage = 'repeating-linear-gradient(90deg, rgba(82, 119, 129, 0.35) 0 1px, transparent 1px 2.5px)';
+          }
         }
 
         return (
@@ -36,6 +41,7 @@ export const SegmentedBar: React.FC<SegmentedBarProps> = ({
             style={{
               height: '22px',
               backgroundColor: bg,
+              backgroundImage: bgImage,
               borderRadius: '1px',
             }}
           />
