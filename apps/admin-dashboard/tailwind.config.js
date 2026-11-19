@@ -5,6 +5,14 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    screens: {
+      'xs': '480px',
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+    },
     colors: {
       primary: 'rgb(var(--primary-rgb) / <alpha-value>)',
       secondary: 'rgb(var(--secondary-rgb) / <alpha-value>)',
@@ -17,6 +25,9 @@ export default {
       current: 'currentColor',
     },
     extend: {
+      maxWidth: {
+        'content-2xl': '1760px',
+      },
       fontFamily: {
         sans: ['"Poppins"', 'sans-serif'],
         heading: ['"Arbutus Slab"', 'Georgia', 'serif'],

@@ -25,8 +25,8 @@ export const OnboardingTab: React.FC<OnboardingTabProps> = ({
         </h3>
         <div className="divide-y divide-primary/10">
           {/* Allow pharmacy vendors */}
-          <div className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
+          <div className="py-3.5 flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0 pr-2">
               <span className="text-[13px] font-medium text-ink block">
                 Allow Pharmacy Vendors & Medicine Sales
               </span>
@@ -35,19 +35,21 @@ export const OnboardingTab: React.FC<OnboardingTabProps> = ({
                 category is active. Turning this OFF hides the Pharmacy category and prescription items.
               </p>
             </div>
-            <ToggleSwitch
-              id="allowPharmacy"
-              checked={data.allowPharmacy}
-              onChange={(checked) => onChange({ allowPharmacy: checked })}
-              disabled={readOnly}
-              aria-label="Allow Pharmacy Vendors"
-            />
+            <div className="flex-shrink-0 mt-0.5">
+              <ToggleSwitch
+                id="allowPharmacy"
+                checked={data.allowPharmacy}
+                onChange={(checked) => onChange({ allowPharmacy: checked })}
+                disabled={readOnly}
+                aria-label="Allow Pharmacy Vendors"
+              />
+            </div>
           </div>
 
           {/* GST optional for vendors */}
-          <div className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
+          <div className="py-3.5 flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0 pr-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[13px] font-medium text-ink">
                   GST Optional for Micro-Vendors
                 </span>
@@ -62,13 +64,15 @@ export const OnboardingTab: React.FC<OnboardingTabProps> = ({
                 without GSTIN under state composite limits.
               </p>
             </div>
-            <ToggleSwitch
-              id="gstOptional"
-              checked={data.gstOptional}
-              onChange={(checked) => onChange({ gstOptional: checked })}
-              disabled={readOnly}
-              aria-label="GST Optional for Vendors"
-            />
+            <div className="flex-shrink-0 mt-0.5">
+              <ToggleSwitch
+                id="gstOptional"
+                checked={data.gstOptional}
+                onChange={(checked) => onChange({ gstOptional: checked })}
+                disabled={readOnly}
+                aria-label="GST Optional for Vendors"
+              />
+            </div>
           </div>
         </div>
 
@@ -124,9 +128,9 @@ export const OnboardingTab: React.FC<OnboardingTabProps> = ({
           </div>
 
           {/* Auto-activate after verification (toggle, default OFF) */}
-          <div className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
+          <div className="py-3.5 flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0 pr-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[13px] font-medium text-ink">
                   Auto-Activate Partner Account After Verification
                 </span>
@@ -141,13 +145,15 @@ export const OnboardingTab: React.FC<OnboardingTabProps> = ({
                 readiness before flipping partner to Active. When turned ON, account goes live automatically.
               </p>
             </div>
-            <ToggleSwitch
-              id="autoActivateAfterVerification"
-              checked={data.autoActivateAfterVerification}
-              onChange={(checked) => onChange({ autoActivateAfterVerification: checked })}
-              disabled={readOnly}
-              aria-label="Auto-Activate Partner After Verification"
-            />
+            <div className="flex-shrink-0 mt-0.5">
+              <ToggleSwitch
+                id="autoActivateAfterVerification"
+                checked={data.autoActivateAfterVerification}
+                onChange={(checked) => onChange({ autoActivateAfterVerification: checked })}
+                disabled={readOnly}
+                aria-label="Auto-Activate Partner After Verification"
+              />
+            </div>
           </div>
         </div>
       </section>

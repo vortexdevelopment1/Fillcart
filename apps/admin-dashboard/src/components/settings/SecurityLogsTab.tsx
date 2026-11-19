@@ -70,8 +70,8 @@ export const SecurityLogsTab: React.FC<SecurityLogsTabProps> = ({
         </h3>
         <div className="divide-y divide-primary/10">
           {/* Admin Login OTP */}
-          <div className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
+          <div className="py-3.5 flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0 pr-2">
               <span className="text-[13px] font-medium text-ink block">
                 Mandatory Two-Factor OTP on Staff Login
               </span>
@@ -79,13 +79,15 @@ export const SecurityLogsTab: React.FC<SecurityLogsTabProps> = ({
                 Enforces SMS / Authenticator 2FA for all administrative accounts during sign-in.
               </p>
             </div>
-            <ToggleSwitch
-              id="adminLoginOtp"
-              checked={data.adminLoginOtp}
-              onChange={(checked) => onChange({ adminLoginOtp: checked })}
-              disabled={readOnly}
-              aria-label="Toggle Admin Login OTP"
-            />
+            <div className="flex-shrink-0 mt-0.5">
+              <ToggleSwitch
+                id="adminLoginOtp"
+                checked={data.adminLoginOtp}
+                onChange={(checked) => onChange({ adminLoginOtp: checked })}
+                disabled={readOnly}
+                aria-label="Toggle Admin Login OTP"
+              />
+            </div>
           </div>
 
           {/* Access Token Expiry (min) */}

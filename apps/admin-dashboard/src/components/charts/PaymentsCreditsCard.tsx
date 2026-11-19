@@ -11,11 +11,12 @@ export const PaymentsCreditsCard: React.FC = () => {
     <div
       onClick={() => navigate('/payments')}
       className="
-        bg-white rounded-[24px] p-[14px_16px] border border-primary/10
+        bg-white rounded-[24px] p-3.5 sm:p-4 xl:p-[14px_16px] border border-primary/10
         shadow-[0_1px_2px_rgba(18,55,71,0.04),0_8px_24px_rgba(18,55,71,0.05)]
         hover:shadow-[0_2px_4px_rgba(18,55,71,0.06),0_12px_28px_rgba(18,55,71,0.08)]
         hover:border-secondary transition-all duration-200 relative cursor-pointer
-        flex flex-col justify-between h-full min-h-0 xl:flex-[16] select-none
+        flex flex-col justify-between overflow-hidden w-full max-w-full min-w-0
+        h-auto min-h-[96px] xs:min-h-[104px] xl:min-h-0 xl:h-full xl:flex-[16] select-none flex-shrink-0
       "
     >
       {/* 2x2 Grid of 4 Dots */}
@@ -36,13 +37,13 @@ export const PaymentsCreditsCard: React.FC = () => {
         </span>
       </div>
 
-      {/* Row 2: Amount (₹29,400) + Subtitle (12% margin) + Round button */}
-      <div className="flex items-baseline justify-between mt-auto">
-        <div className="flex items-baseline gap-2">
-          <div className="font-heading text-[24px] font-normal text-ink leading-none tracking-normal">
+      {/* Row 2: Amount (₹29,400) + Round button on one row, ~12% take rate under amount */}
+      <div className="flex items-center justify-between mt-auto pt-2">
+        <div>
+          <div className="font-heading text-[clamp(20px,5.5vw,24px)] xl:text-[24px] font-normal text-ink leading-none tracking-normal">
             ₹{dashboard.commissionToday.toLocaleString()}
           </div>
-          <div className="font-sans text-[10px] text-ink/60 font-normal leading-none">
+          <div className="font-sans text-[10px] text-ink/60 font-normal leading-none mt-1">
             ~12% take rate
           </div>
         </div>

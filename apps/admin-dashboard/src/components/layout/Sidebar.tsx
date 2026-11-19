@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   FileCheck2,
@@ -48,6 +48,12 @@ export const Sidebar: React.FC = () => {
   } = useSidebar();
   const { hasPermission, currentRole } = useApp();
   const { addToast } = useToast();
+
+  // On mobile (< 768px), sidebar is completely hidden when closed. When open (isMobileOpen),
+  // it is ALWAYS in full open panel mode (256px wide, expanded header, group titles and links).
+  // Single strap (collapsed mode) is NEVER shown on mobile.
+  // On tablet/desktop (>= 768px), isExpanded controls whether it's collapsed (56px) or expanded (256px).
+  const isPanelOpen = isExpanded || isMobileOpen;
 
   const handleLogout = () => {
     addToast(
@@ -187,7 +193,7 @@ export const Sidebar: React.FC = () => {
         ? location.pathname === '/'
         : location.pathname.startsWith(item.path);
 
-    if (isExpanded) {
+    if (isPanelOpen) {
       // ──────────── EXPANDED MODE ROW ────────────
       return (
         <NavLink
@@ -196,7 +202,7 @@ export const Sidebar: React.FC = () => {
           onClick={handleNavClick}
           aria-current={isActive ? 'page' : undefined}
           className={`
-            w-full h-[42px] rounded-full px-3.5 flex items-center gap-3 transition-all duration-150 select-none relative group focus:outline-none focus:ring-2 focus:ring-secondary
+            w-[calc(100%-8px)] mx-auto h-[40px] rounded-[14px] px-3 flex items-center gap-2.5 transition-all duration-150 select-none relative group focus:outline-none focus:ring-2 focus:ring-secondary
             ${
               isActive
                 ? 'bg-neutral text-primary font-medium shadow-xs'
@@ -206,9 +212,9 @@ export const Sidebar: React.FC = () => {
         >
           <Icon className="w-[18px] h-[18px] stroke-[1.5] flex-shrink-0" />
 
-          {/* Label with delay-fade animation so text never wraps during width transition */}
+          {/* Label with delay-fade animation */}
           <span
-            className="text-[12.5px] font-sans whitespace-nowrap overflow-hidden transition-opacity duration-150 delay-100 opacity-100 tracking-tight"
+            className="text-[12px] font-sans whitespace-nowrap overflow-hidden transition-opacity duration-150 delay-100 opacity-100 tracking-tight"
           >
             {item.name}
           </span>
@@ -223,11 +229,11 @@ export const Sidebar: React.FC = () => {
       );
     }
 
-    // ──────────── COLLAPSED MODE TILE (40px) ────────────
+    // ──────────── COLLAPSED MODE TILE (36px) ────────────
     return (
       <div
         key={item.id}
-        className="relative flex items-center justify-center flex-shrink-0 w-[40px] max-w-[40px]"
+        className="relative flex items-center justify-center flex-shrink-0 w-[40px]"
         onMouseEnter={(e) => handleMouseEnter(e, item.name, item.badge)}
         onMouseLeave={handleMouseLeave}
         onFocus={(e) => handleMouseEnter(e, item.name, item.badge)}
@@ -239,10 +245,10 @@ export const Sidebar: React.FC = () => {
           aria-label={item.name}
           aria-current={isActive ? 'page' : undefined}
           className={`
-            w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-all duration-150 relative focus:outline-none focus:ring-2 focus:ring-secondary
+            w-[36px] h-[36px] rounded-[14px] flex items-center justify-center transition-all duration-150 relative focus:outline-none focus:ring-2 focus:ring-secondary
             ${
               isActive
-                ? 'bg-white text-primary shadow-xs'
+                ? 'bg-white text-primary shadow-sm'
                 : 'bg-white/10 text-white/80 hover:bg-white/[0.18] hover:text-white'
             }
           `}
@@ -251,7 +257,7 @@ export const Sidebar: React.FC = () => {
 
           {/* 16px Circle Badge on Top-Right Corner */}
           {item.badge !== undefined && (
-            <span className="absolute -top-[2px] right-0 w-[16px] h-[16px] rounded-full bg-secondary text-white text-[9px] font-sans font-medium flex items-center justify-center leading-none shadow-sm pointer-events-none">
+            <span className="absolute -top-[2px] -right-[2px] w-[16px] h-[16px] rounded-full bg-secondary text-white text-[9px] font-sans font-medium flex items-center justify-center leading-none shadow-sm pointer-events-none">
               {item.badge}
             </span>
           )}
@@ -262,21 +268,6 @@ export const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* ──────────── Mobile Hamburger in Top Left (< 768px) ──────────── */}
-      <div className="md:hidden fixed top-3 left-3 z-50">
-        <button
-          onClick={toggleMobileOpen}
-          className="w-10 h-10 rounded-[14px] bg-primary text-white flex items-center justify-center shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-          aria-label={isMobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
-        >
-          {isMobileOpen ? (
-            <X className="w-5 h-5 text-white" />
-          ) : (
-            <Menu className="w-5 h-5 text-white" />
-          )}
-        </button>
-      </div>
-
       {/* ──────────── Overlay for Mobile / Tablet (< 1024px) ──────────── */}
       {(isMobileOpen || (isExpanded && typeof window !== 'undefined' && window.innerWidth < 1024)) && (
         <div
@@ -292,7 +283,7 @@ export const Sidebar: React.FC = () => {
       {/* ──────────── SIDEBAR CONTAINER ──────────── */}
       <aside
         style={{
-          width: isExpanded ? '244px' : '56px',
+          width: isPanelOpen ? '256px' : '56px',
           backgroundColor: '#123747',
           backgroundImage: 'none',
           transition:
@@ -303,19 +294,19 @@ export const Sidebar: React.FC = () => {
           fixed top-4 left-4 bottom-4 h-[calc(100vh-32px)]
           bg-primary text-white rounded-[24px] z-50 select-none
           flex flex-col overflow-y-hidden overflow-x-hidden shadow-2xl border border-white/[0.08]
-          ${isExpanded ? 'p-[14px_12px]' : 'py-[10px] px-[8px] items-center'}
+          ${isPanelOpen ? 'p-[14px_10px]' : 'pt-6 pb-3 px-[8px] items-center'}
           ${
             isMobileOpen
-              ? 'translate-x-0 w-[244px] p-[14px_12px]'
+              ? 'translate-x-0 w-[256px] p-[14px_10px]'
               : '-translate-x-[150%] md:translate-x-0'
           }
         `}
       >
         {/* ──────────── 1. HEADER ROW ──────────── */}
-        {isExpanded ? (
+        {isPanelOpen ? (
           <div className="h-[44px] flex items-center justify-between mb-3 px-1 flex-shrink-0">
             {/* Logo + App Name */}
-            <NavLink
+            <Link
               to="/"
               onClick={handleNavClick}
               className="flex items-center gap-2.5 focus:outline-none focus:ring-2 focus:ring-secondary rounded-lg"
@@ -353,13 +344,19 @@ export const Sidebar: React.FC = () => {
               <span className="font-sans text-[15px] font-medium text-white tracking-tight">
                 Fillkart
               </span>
-            </NavLink>
+            </Link>
 
             {/* Collapse Toggle Button (Far Right) */}
             <button
               type="button"
-              onClick={toggleExpanded}
-              aria-label="Collapse sidebar"
+              onClick={() => {
+                if (isMobileOpen) {
+                  closeMobile();
+                } else {
+                  toggleExpanded();
+                }
+              }}
+              aria-label={isMobileOpen ? 'Close sidebar' : 'Collapse sidebar'}
               aria-expanded={true}
               className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
             >
@@ -368,11 +365,11 @@ export const Sidebar: React.FC = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-[6px] flex-shrink-0 mb-[6px] w-[40px] overflow-x-hidden">
-            {/* Logo in Collapsed Mode */}
-            <NavLink
+            {/* Logo in Collapsed Mode: no active background */}
+            <Link
               to="/"
               onClick={handleNavClick}
-              className="w-[36px] h-[36px] rounded-full bg-secondary flex items-center justify-center flex-shrink-0 hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-secondary"
+              className="w-[36px] h-[36px] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
               title="Fillkart"
               aria-label="Fillkart Home"
             >
@@ -402,7 +399,7 @@ export const Sidebar: React.FC = () => {
                   fill="#FFFFFF"
                 />
               </svg>
-            </NavLink>
+            </Link>
 
             {/* Toggle Button Directly Below Logo in Collapsed Mode */}
             <div
@@ -417,7 +414,7 @@ export const Sidebar: React.FC = () => {
                 onClick={toggleExpanded}
                 aria-label="Expand sidebar"
                 aria-expanded={false}
-                className="w-[40px] h-[40px] rounded-[12px] bg-white/10 text-white/80 hover:bg-white/[0.18] hover:text-white flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-secondary"
+                className="w-[36px] h-[36px] rounded-[14px] bg-white/10 text-white/80 hover:bg-white/[0.18] hover:text-white flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-secondary"
               >
                 <PanelLeftOpen className="w-[18px] h-[18px] stroke-[1.5]" />
               </button>
@@ -434,18 +431,18 @@ export const Sidebar: React.FC = () => {
               if (e.currentTarget.scrollLeft !== 0) e.currentTarget.scrollLeft = 0;
             }}
             className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden no-scrollbar w-full flex flex-col ${
-              isExpanded ? 'gap-1.5 py-1' : 'py-0'
+              isPanelOpen ? 'gap-1.5 py-1' : 'py-0'
             }`}
           >
             {/* Group 1: MAIN */}
-            {isExpanded && (
+            {isPanelOpen && (
               <span className="text-[10px] font-sans uppercase tracking-wider text-white/40 px-3 pt-1">
                 Main
               </span>
             )}
             <div
               className={`flex flex-col ${
-                isExpanded ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
+                isPanelOpen ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
               }`}
             >
               {mainItems.map(renderNavItem)}
@@ -454,21 +451,21 @@ export const Sidebar: React.FC = () => {
             {/* Divider 1 */}
             <div
               className={`h-[1px] bg-white/[0.12] flex-shrink-0 ${
-                isExpanded ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
+                isPanelOpen ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
               }`}
             />
 
             {/* Group 2: USERS */}
             {userItems.length > 0 && (
               <>
-                {isExpanded && (
+                {isPanelOpen && (
                   <span className="text-[10px] font-sans uppercase tracking-wider text-white/40 px-3 pt-1">
                     Users
                   </span>
                 )}
                 <div
                   className={`flex flex-col ${
-                    isExpanded ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
+                    isPanelOpen ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
                   }`}
                 >
                   {userItems.map(renderNavItem)}
@@ -477,7 +474,7 @@ export const Sidebar: React.FC = () => {
                 {/* Divider between Users and Management */}
                 <div
                   className={`h-[1px] bg-white/[0.12] flex-shrink-0 ${
-                    isExpanded ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
+                    isPanelOpen ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
                   }`}
                 />
               </>
@@ -486,14 +483,14 @@ export const Sidebar: React.FC = () => {
             {/* Group 3: MANAGEMENT */}
             {managementItems.length > 0 && (
               <>
-                {isExpanded && (
+                {isPanelOpen && (
                   <span className="text-[10px] font-sans uppercase tracking-wider text-white/40 px-3 pt-1">
                     Management
                   </span>
                 )}
                 <div
                   className={`flex flex-col ${
-                    isExpanded ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
+                    isPanelOpen ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
                   }`}
                 >
                   {managementItems.map(renderNavItem)}
@@ -502,7 +499,7 @@ export const Sidebar: React.FC = () => {
                 {/* Divider between Management and Finance */}
                 <div
                   className={`h-[1px] bg-white/[0.12] flex-shrink-0 ${
-                    isExpanded ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
+                    isPanelOpen ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
                   }`}
                 />
               </>
@@ -511,14 +508,14 @@ export const Sidebar: React.FC = () => {
             {/* Group 4: FINANCE */}
             {financeItems.length > 0 && (
               <>
-                {isExpanded && (
+                {isPanelOpen && (
                   <span className="text-[10px] font-sans uppercase tracking-wider text-white/40 px-3 pt-1">
                     Finance
                   </span>
                 )}
                 <div
                   className={`flex flex-col ${
-                    isExpanded ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
+                    isPanelOpen ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
                   }`}
                 >
                   {financeItems.map(renderNavItem)}
@@ -527,7 +524,7 @@ export const Sidebar: React.FC = () => {
                 {/* Divider between Finance and System */}
                 <div
                   className={`h-[1px] bg-white/[0.12] flex-shrink-0 ${
-                    isExpanded ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
+                    isPanelOpen ? 'w-full my-1.5' : 'w-[24px] self-center my-[4px]'
                   }`}
                 />
               </>
@@ -536,14 +533,14 @@ export const Sidebar: React.FC = () => {
             {/* Group 5: SYSTEM */}
             {systemItems.length > 0 && (
               <>
-                {isExpanded && (
+                {isPanelOpen && (
                   <span className="text-[10px] font-sans uppercase tracking-wider text-white/40 px-3 pt-1">
                     System
                   </span>
                 )}
                 <div
                   className={`flex flex-col ${
-                    isExpanded ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
+                    isPanelOpen ? 'gap-1 w-full' : 'items-center gap-[6px] w-full'
                   }`}
                 >
                   {systemItems.map(renderNavItem)}
@@ -556,20 +553,20 @@ export const Sidebar: React.FC = () => {
         {/* ──────────── 3. PINNED SETTINGS & LOGOUT AT BOTTOM ──────────── */}
         <div
           className={`mt-auto flex-shrink-0 border-t border-white/[0.12] overflow-x-hidden flex flex-col ${
-            isExpanded ? 'w-full pt-2 gap-1' : 'w-full items-center pt-[4px] gap-[6px]'
+            isPanelOpen ? 'w-full pt-2 gap-1' : 'w-full items-center pt-[4px] gap-[6px]'
           }`}
         >
           {showSettings && renderNavItem(settingsItem)}
 
-          {isExpanded ? (
+          {isPanelOpen ? (
             <button
               type="button"
               onClick={handleLogout}
-              className="h-[42px] px-3.5 rounded-full flex items-center gap-3 transition-all duration-150 relative text-left w-full focus:outline-none focus:ring-2 focus:ring-secondary text-white/70 hover:text-red-300 hover:bg-red-500/15"
+              className="w-[calc(100%-8px)] mx-auto h-[40px] px-3 rounded-[14px] flex items-center gap-2.5 transition-all duration-150 relative text-left focus:outline-none focus:ring-2 focus:ring-secondary text-white/70 hover:text-red-300 hover:bg-red-500/15"
               aria-label="Logout"
             >
               <LogOut className="w-[18px] h-[18px] stroke-[1.5] flex-shrink-0" />
-              <span className="text-[13px] font-sans whitespace-nowrap overflow-hidden transition-opacity duration-150 delay-100 opacity-100 tracking-tight">
+              <span className="text-[12px] font-sans whitespace-nowrap overflow-hidden transition-opacity duration-150 delay-100 opacity-100 tracking-tight">
                 Logout
               </span>
             </button>
@@ -585,7 +582,7 @@ export const Sidebar: React.FC = () => {
                 type="button"
                 onClick={handleLogout}
                 aria-label="Logout"
-                className="w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-all duration-150 relative focus:outline-none focus:ring-2 focus:ring-secondary bg-white/10 text-white/70 hover:text-red-300 hover:bg-red-500/20"
+                className="w-[36px] h-[36px] rounded-[14px] flex items-center justify-center transition-all duration-150 relative focus:outline-none focus:ring-2 focus:ring-secondary bg-white/10 text-white/70 hover:text-red-300 hover:bg-red-500/20"
               >
                 <LogOut className="w-[18px] h-[18px] stroke-[1.5]" />
               </button>
@@ -596,7 +593,7 @@ export const Sidebar: React.FC = () => {
 
       {/* ──────────── Floating Portal Tooltip (Collapsed Mode) ──────────── */}
       <SidebarTooltipPortal
-        visible={tooltipState.visible && !isExpanded}
+        visible={tooltipState.visible && !isPanelOpen}
         text={tooltipState.text}
         badge={tooltipState.badge}
         targetRect={tooltipState.targetRect}

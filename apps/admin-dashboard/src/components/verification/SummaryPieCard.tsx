@@ -110,19 +110,17 @@ export const SummaryPieCard: React.FC<SummaryPieCardProps> = ({
       </div>
 
       {/* Main Grid:
-          Desktop (>=900px): grid-template-columns: auto auto 1fr; column-gap: 32px; align-items: center;
-          Mobile (<900px): stacked (total + pie in row 1, legend below in row 2)
+          Desktop (>=900px): auto auto 1fr;
+          Tablet (640-899px): auto auto (total + pie), legend below
+          Mobile (<640px): fully stacked total, pie, legend
       */}
-      <div className="grid grid-cols-[auto_auto] min-[900px]:grid-cols-[auto_auto_1fr] gap-y-6 gap-x-6 min-[900px]:gap-x-[32px] items-center w-full">
-        {/* Column 1 - Total block:
-            "Total Submissions" 15px, count 48px (Arbutus Slab), "applications received" 12px muted.
-            Vertical divider after it: border-right 1px solid primary 10%, padding-right 32px.
-        */}
-        <div className="flex flex-col items-start border-r border-primary/10 pr-6 min-[900px]:pr-[32px] flex-shrink-0">
+      <div className="flex flex-col sm:grid sm:grid-cols-[auto_auto] min-[900px]:grid-cols-[auto_auto_1fr] gap-6 min-[900px]:gap-[32px] items-center w-full">
+        {/* Column 1 - Total block */}
+        <div className="flex flex-col items-center sm:items-start sm:border-r border-primary/10 sm:pr-6 min-[900px]:pr-[32px] flex-shrink-0">
           <span className="font-sans text-[15px] font-normal text-ink leading-tight">
             Total Submissions
           </span>
-          <span className="font-heading text-[48px] text-ink font-normal leading-none my-1 tracking-tight">
+          <span className="font-heading text-[38px] sm:text-[48px] text-ink font-normal leading-none my-1 tracking-tight">
             {total}
           </span>
           <span className="font-sans text-[12px] text-ink/55 leading-none">
@@ -130,31 +128,28 @@ export const SummaryPieCard: React.FC<SummaryPieCardProps> = ({
           </span>
         </div>
 
-        {/* Column 2 - Pie: SVG 128x128 (same pie, same colors, white separators) */}
+        {/* Column 2 - Pie: SVG 128x128 */}
         <div className="flex items-center justify-center flex-shrink-0">
           <svg
             width="128"
             height="128"
             viewBox="-1.02 -1.02 2.04 2.04"
-            className="w-[128px] h-[128px] drop-shadow-sm select-none"
+            className="w-[110px] h-[110px] sm:w-[128px] sm:h-[128px] drop-shadow-sm select-none"
             aria-label={`Pie chart of submissions: ${pendingPct}% pending, ${approvedPct}% approved, ${rejectedPct}% rejected`}
           >
             {renderPieSlices()}
           </svg>
         </div>
 
-        {/* Column 3 - Legend (fills the rest of the width, width 100%):
-            3 rows, row gap 14px. Each row is a grid:
-            grid-template-columns: 14px 80px 1fr 44px 64px; column-gap: 12px; align-items: center;
-        */}
-        <div className="col-span-2 min-[900px]:col-span-1 min-[900px]:col-start-3 w-full flex flex-col gap-[14px]">
+        {/* Column 3 - Legend */}
+        <div className="w-full sm:col-span-2 min-[900px]:col-span-1 min-[900px]:col-start-3 flex flex-col gap-[14px]">
           {slicesData.map((slice, i) => {
             const pct = percentages[i];
 
             return (
               <div
                 key={slice.name}
-                className="grid grid-cols-[14px_80px_1fr_44px_64px] gap-x-3 items-center w-full text-xs font-sans"
+                className="grid grid-cols-[14px_65px_1fr_36px_50px] sm:grid-cols-[14px_80px_1fr_44px_64px] gap-x-2 sm:gap-x-3 items-center w-full text-xs font-sans"
               >
                 {/* 1) Swatch 14px (radius 4px, inset 1px border black 12%) */}
                 <div

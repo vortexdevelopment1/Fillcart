@@ -168,8 +168,8 @@ export const OrdersPage: React.FC = () => {
 
   return (
     <div className="pb-12 w-full">
-      {/* BELOW 1280px: 4 stat cards move ABOVE the page content as a 2x2 grid */}
-      <div className="grid grid-cols-2 gap-3.5 min-[1280px]:hidden mb-[14px]">
+      {/* BELOW 1280px: 4 stat cards move ABOVE the page content as a 2x2 grid (<640px: 1 col) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 min-[1280px]:hidden mb-[14px]">
         {renderStatCards()}
       </div>
 

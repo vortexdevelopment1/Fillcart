@@ -210,8 +210,8 @@ export const ProductsPage: React.FC = () => {
   return (
     <div className="w-full flex flex-col pb-8">
       {/* ──────────────── 1. TOOLBAR ROW ────────────────
-          Between page header and Row 1 cards: flex, justify-between, height 40px, margin-bottom 14px */}
-      <div className="flex items-center justify-between gap-3 h-[40px] mb-[14px] flex-shrink-0">
+          Between page header and Row 1 cards: flex, justify-between, flex-wrap, margin-bottom 14px */}
+      <div className="flex items-center justify-between gap-3 flex-wrap min-h-[40px] mb-[14px] flex-shrink-0">
         {/* Left: pill tabs [Products | Categories] (active = PRIMARY, container black 5% bg) */}
         <div className="h-[36px] p-0.5 rounded-full bg-neutral flex items-center gap-1">
           <button
@@ -238,8 +238,8 @@ export const ProductsPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Right: "Product report" (outline pill), "Export" (outline pill with upload icon), "+ Add Category" (outline pill), "+ Add Product" (BLACK pill, white text). All buttons 36px high, 12px text. */}
-        <div className="flex items-center gap-2.5 flex-shrink-0">
+        {/* Right: "Product report", "Export", "+ Add Category", "+ Add Product". */}
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Product Report Button */}
           <button
             type="button"

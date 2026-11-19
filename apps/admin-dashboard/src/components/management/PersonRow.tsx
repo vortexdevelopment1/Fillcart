@@ -161,7 +161,7 @@ export const PersonRow: React.FC<PersonRowProps> = ({
         </div>
 
         {/* Col 8: "View" button */}
-        <div className="flex justify-end">
+        <div className="flex justify-end xs:flex hidden">
           <button
             type="button"
             onClick={onView}
@@ -281,6 +281,74 @@ export const PersonRow: React.FC<PersonRowProps> = ({
               </button>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* ──────────── LINE 2 FOR < 1280px (CHIPS) ──────────── */}
+      <div className="flex min-[1280px]:hidden flex-wrap items-center gap-2 mt-2 pt-2 border-t border-primary/5 text-[11px] font-sans">
+        {/* Category / Vehicle */}
+        <span className="px-2 py-0.5 rounded-full bg-neutral text-ink/80 font-normal">
+          {isVendor
+            ? vendor?.businessCategory
+            : `${rider?.vehicleType} ${rider?.vehicleNumber !== '-' ? `(${rider?.vehicleNumber})` : ''}`}
+        </span>
+
+        {/* City */}
+        <span className="px-2 py-0.5 rounded-full bg-neutral text-ink/70">
+          {item.city}
+        </span>
+
+        {/* Items / Availability */}
+        {isVendor ? (
+          <span className="px-2 py-0.5 rounded-full bg-neutral text-ink/75">
+            {vendor?.productsCount} items
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral text-ink">
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                rider?.availability === 'Online'
+                  ? 'bg-primary'
+                  : rider?.availability === 'On delivery'
+                  ? 'bg-primary'
+                  : 'bg-neutral'
+              }`}
+            />
+            {rider?.availability}
+          </span>
+        )}
+
+        {/* Verification Status */}
+        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${verBadgeClass}`}>
+          {item.verificationStatus}
+        </span>
+
+        {/* Account Status */}
+        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${accBadgeClass}`}>
+          {item.status}
+        </span>
+
+        {/* Orders / Rating */}
+        {isVendor ? (
+          <span className="px-2 py-0.5 rounded-full bg-neutral text-ink/80 font-medium">
+            {vendor?.ordersCount.toLocaleString()} orders
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral text-ink font-medium">
+            <Star className="w-3 h-3 fill-ink text-ink" />
+            {rider?.rating.toFixed(1)}
+          </span>
+        )}
+
+        {/* Full-width View Button on < 480px */}
+        <div className="w-full xs:hidden pt-1.5">
+          <button
+            type="button"
+            onClick={onView}
+            className="w-full h-[32px] rounded-full text-xs font-sans bg-white border border-primary/15 text-ink hover:bg-neutral focus:ring-2 focus:ring-primary focus:outline-none transition-colors"
+          >
+            View details
+          </button>
         </div>
       </div>
     </div>

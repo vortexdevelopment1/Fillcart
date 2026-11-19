@@ -49,14 +49,14 @@ export const PaginationControl: React.FC<PaginationControlProps> = ({
   const pages = getPageNumbers();
 
   return (
-    <div className="flex items-center justify-between pt-3 mt-auto border-t border-primary/10 flex-wrap gap-3 flex-shrink-0 select-none">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-3 mt-auto border-t border-primary/10 gap-3 flex-shrink-0 select-none">
       {/* Left: Showing x-y of N */}
       <span className="text-[11px] font-sans text-primary/60 leading-none">
         Showing {startItem}-{endItem} of {totalItems.toLocaleString()} {itemLabel}
       </span>
 
       {/* Right: Controls */}
-      <div className="flex items-center gap-1.5 focus:outline-none" aria-label="Pagination">
+      <div className="flex items-center flex-wrap gap-1.5 focus:outline-none" aria-label="Pagination">
         {/* Page size select */}
         <div className="relative mr-1">
           <select
@@ -75,14 +75,14 @@ export const PaginationControl: React.FC<PaginationControlProps> = ({
           <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-primary/60 pointer-events-none" />
         </div>
 
-        {/* « First Button */}
+        {/* « First Button (hidden below 480px) */}
         <button
           type="button"
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
           title="First page"
           aria-label="First page"
-          className="w-8 h-8 rounded-full flex items-center justify-center bg-white border border-primary/10 text-[12px] font-sans text-primary hover:bg-neutral focus:ring-2 focus:ring-secondary focus:outline-none transition-colors disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-white"
+          className="hidden xs:flex w-8 h-8 rounded-full items-center justify-center bg-white border border-primary/10 text-[12px] font-sans text-primary hover:bg-neutral focus:ring-2 focus:ring-secondary focus:outline-none transition-colors disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-white"
         >
           <ChevronsLeft className="w-4 h-4" />
         </button>
@@ -143,14 +143,14 @@ export const PaginationControl: React.FC<PaginationControlProps> = ({
           <ChevronRight className="w-4 h-4" />
         </button>
 
-        {/* » Last Button */}
+        {/* » Last Button (hidden below 480px) */}
         <button
           type="button"
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage === totalPages || totalPages === 0}
           title="Last page"
           aria-label="Last page"
-          className="w-8 h-8 rounded-full flex items-center justify-center bg-white border border-primary/10 text-[12px] font-sans text-primary hover:bg-neutral focus:ring-2 focus:ring-secondary focus:outline-none transition-colors disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-white"
+          className="hidden xs:flex w-8 h-8 rounded-full items-center justify-center bg-white border border-primary/10 text-[12px] font-sans text-primary hover:bg-neutral focus:ring-2 focus:ring-secondary focus:outline-none transition-colors disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-white"
         >
           <ChevronsRight className="w-4 h-4" />
         </button>

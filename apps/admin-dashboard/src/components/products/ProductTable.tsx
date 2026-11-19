@@ -296,10 +296,10 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         ref={tableContainerRef}
         className="w-full overflow-x-auto overflow-y-auto flex-1 min-h-[300px]"
       >
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-left border-collapse min-w-[840px]">
           <thead className="sticky top-0 bg-white z-10 shadow-[0_1px_0_rgba(18,55,71,0.08)]">
             <tr className="border-b border-primary/10 text-[11px] font-sans font-normal text-primary/60 bg-white">
-              <th className="py-2.5 px-3 font-normal bg-white">Item</th>
+              <th className="py-2.5 px-3 font-normal bg-white sticky left-0 z-20 shadow-[1px_0_0_rgba(18,55,71,0.08)]">Item</th>
               <th className="py-2.5 px-2.5 font-normal bg-white">Brand</th>
               <th className="py-2.5 px-2.5 font-normal bg-white">Category</th>
               <th className="py-2.5 px-2.5 font-normal bg-white">Vendor</th>

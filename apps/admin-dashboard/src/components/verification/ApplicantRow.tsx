@@ -75,8 +75,8 @@ export const ApplicantRow: React.FC<ApplicantRowProps> = ({ applicant, onReview 
           <StatusBadge status={applicant.status} />
         </div>
 
-        {/* Col 6: "Review" button (pill, 34px) */}
-        <div className="flex justify-end">
+        {/* Col 6: "Review" button */}
+        <div className="flex justify-end xs:flex hidden">
           <button
             type="button"
             onClick={() => onReview(applicant)}
@@ -88,6 +88,33 @@ export const ApplicantRow: React.FC<ApplicantRowProps> = ({ applicant, onReview 
             aria-label={`Review documents for ${applicant.name}`}
           >
             Review
+          </button>
+        </div>
+      </div>
+
+      {/* ──────────── LINE 2 FOR < 768px (CHIPS) ──────────── */}
+      <div className="flex md:hidden flex-wrap items-center gap-2 mt-2 pt-2 border-t border-primary/5 text-[11px] font-sans">
+        <TypeBadge type={applicant.type} />
+        <StatusBadge status={applicant.status} />
+        <span className="text-[11px] font-sans text-ink/60">
+          {applicant.submittedAt}
+        </span>
+        <span className="px-2 py-0.5 rounded-full bg-neutral text-ink/75 font-sans">
+          {approvedDocsCount}/{applicableDocs.length} approved
+        </span>
+
+        {/* Full-width Review button on < 480px */}
+        <div className="w-full xs:hidden pt-1.5">
+          <button
+            type="button"
+            onClick={() => onReview(applicant)}
+            className={`w-full h-[34px] rounded-full text-xs font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary ${
+              isPending
+                ? 'bg-primary text-white hover:opacity-90 active:scale-95'
+                : 'bg-white border border-primary/25 text-primary hover:bg-neutral active:scale-95'
+            }`}
+          >
+            Review Documents
           </button>
         </div>
       </div>

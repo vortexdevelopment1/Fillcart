@@ -78,22 +78,33 @@ const YEAR_OPTIONS = ['This Year', 'Last Year'] as const;
 
 export const PlatformActivityCard: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedMonth, setSelectedMonth] = useState('Sep');
+  const [activeTooltipMonth, setActiveTooltipMonth] = useState<string | null>(null);
   const [filter, setFilter] = useState<'This Year' | 'Last Year'>('This Year');
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const tooltipTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleBarInteraction = (month: string) => {
+    setActiveTooltipMonth(month);
+    if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setActiveTooltipMonth(null);
+    }, 2500);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
+      setActiveTooltipMonth(null);
     };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
+    };
+  }, []);
 
   const activeMonthlyData = filter === 'This Year' ? DATA_THIS_YEAR : DATA_LAST_YEAR;
 
@@ -101,18 +112,18 @@ export const PlatformActivityCard: React.FC = () => {
     <Card
       onClick={() => navigate('/orders')}
       title={
-        <div className="flex items-center gap-4">
-          <h3 className="text-[16px] font-normal text-ink tracking-[0px]">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4">
+          <h3 className="text-[15px] sm:text-[16px] font-normal text-ink tracking-[0px] whitespace-nowrap">
             Orders by Month
           </h3>
-          <div className="flex items-center gap-[14px]">
+          <div className="flex items-center gap-3 sm:gap-[14px] flex-wrap">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full border-[1.5px] border-primary bg-transparent inline-block flex-shrink-0" />
-              <span className="font-sans text-[11px] text-ink/60 leading-none">In progress</span>
+              <span className="font-sans text-[11px] text-ink/60 leading-none whitespace-nowrap">In progress</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-primary inline-block flex-shrink-0" />
-              <span className="font-sans text-[11px] text-ink/60 leading-none">Delivered</span>
+              <span className="font-sans text-[11px] text-ink/60 leading-none whitespace-nowrap">Delivered</span>
             </div>
           </div>
         </div>
@@ -122,7 +133,7 @@ export const PlatformActivityCard: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-1.5 text-[12px] text-ink/80 bg-neutral px-3 py-1 rounded-full cursor-pointer hover:bg-neutral/80 border border-primary/[0.08] transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
+            className="flex items-center gap-1.5 text-[12px] text-ink/80 bg-neutral px-3 py-1 rounded-full cursor-pointer hover:bg-neutral/80 border border-primary/[0.08] transition-colors focus:outline-none focus:ring-2 focus:ring-secondary min-w-[88px] whitespace-nowrap"
             aria-expanded={isOpen}
             aria-haspopup="listbox"
           >
@@ -154,12 +165,13 @@ export const PlatformActivityCard: React.FC = () => {
           )}
         </div>
       }
-      className="h-full flex-1 min-h-[220px] flex flex-col justify-between cursor-pointer hover:border-secondary transition-all"
+      className="h-auto md:h-full flex-1 min-h-[240px] md:min-h-[220px] xl:min-h-0 flex flex-col justify-between cursor-pointer hover:border-secondary transition-all w-full max-w-full min-w-0 overflow-hidden"
     >
-      <div className="flex-1 min-h-0 w-full pt-7 pb-0 flex flex-col justify-end">
-        <div className="flex-1 min-h-0 w-full grid grid-cols-12 gap-1 md:gap-2 items-end">
+      <div className="flex-1 min-h-[140px] xs:min-h-[155px] md:min-h-[170px] xl:h-full w-full pt-8 sm:pt-7 pb-0 flex flex-col justify-end overflow-x-auto sm:overflow-x-visible no-scrollbar relative">
+        <div className="flex-1 min-h-[125px] xs:min-h-[140px] w-full min-w-[340px] sm:min-w-0 grid grid-cols-12 gap-[clamp(3px,1.2vw,8px)] md:gap-2 items-end">
           {activeMonthlyData.map((item) => {
-            const isSelected = item.month === selectedMonth;
+            const isTooltipActive = activeTooltipMonth === item.month;
+            const isSep = item.month === 'Sep';
             const hatchHeight = HATCH_HEIGHTS[item.month] ?? 28;
 
             return (
@@ -167,41 +179,43 @@ export const PlatformActivityCard: React.FC = () => {
                 key={item.month}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setSelectedMonth(item.month);
+                  handleBarInteraction(item.month);
                 }}
-                className="flex flex-col items-center justify-end h-full min-h-0 cursor-pointer relative"
+                onMouseEnter={() => setActiveTooltipMonth(item.month)}
+                onMouseLeave={() => setActiveTooltipMonth(null)}
+                className="flex flex-col items-center justify-end h-full min-h-0 cursor-pointer relative group"
               >
                 <div
-                  className="w-[34px] max-w-[70%] flex flex-col justify-end transition-all duration-300 relative"
+                  className="w-[clamp(8px,2.8vw,18px)] sm:w-[clamp(10px,3.8vw,20px)] xl:w-[34px] max-w-full xl:max-w-[70%] flex flex-col justify-end transition-all duration-300 relative"
                   style={{
                     height: `${item.totalHeight}%`,
                     gap: '6px',
                   }}
                 >
-                  {/* Floating Tooltip */}
-                  {isSelected && (
-                    <div className="absolute -top-[74px] left-1/2 -translate-x-1/2 z-30 bg-primary text-white text-[11px] font-sans p-[10px_12px] rounded-[12px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none flex flex-col gap-1 leading-[1.5]">
-                      <div className="text-[11px] leading-tight text-white">
+                  {/* Floating Tooltip: small, tap-to-show, auto-hide */}
+                  {isTooltipActive && (
+                    <div className="absolute -top-[52px] sm:-top-[74px] left-1/2 -translate-x-1/2 z-30 bg-primary text-white p-[6px_8px] sm:p-[10px_12px] rounded-[10px] sm:rounded-[12px] shadow-xl whitespace-nowrap border border-white/10 pointer-events-none flex flex-col gap-0.5 sm:gap-1 leading-[1.3] max-w-[120px] sm:max-w-none">
+                      <div className="text-[10px] sm:text-[11px] leading-tight text-white">
                         <span className="font-medium text-white">{item.total.toLocaleString()}</span>{' '}
                         <span className="font-normal text-white/90">Total</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-white/90 text-[11px] leading-none font-normal">
-                        <span className="w-2 h-2 rounded-full border-[1.5px] border-white bg-transparent inline-block flex-shrink-0" />
+                      <div className="flex items-center gap-1 sm:gap-1.5 text-white/90 text-[9px] sm:text-[11px] leading-none font-normal">
+                        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full border-[1.5px] border-white bg-transparent inline-block flex-shrink-0" />
                         <span>{item.open} In progress</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-white/90 text-[11px] leading-none font-normal">
-                        <span className="w-2 h-2 rounded-full bg-white inline-block flex-shrink-0" />
+                      <div className="flex items-center gap-1 sm:gap-1.5 text-white/90 text-[9px] sm:text-[11px] leading-none font-normal">
+                        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white inline-block flex-shrink-0" />
                         <span>{item.closed} Delivered</span>
                       </div>
+                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rotate-45" />
                     </div>
                   )}
 
                   {/* 1. Hatch Block */}
                   <div
-                    className="w-full flex-shrink-0"
+                    className="w-full flex-shrink-0 rounded-[8px] xl:rounded-[10px]"
                     style={{
                       height: `${hatchHeight}px`,
-                      borderRadius: '10px',
                       backgroundColor: '#FFFFFF',
                       backgroundImage:
                         'repeating-linear-gradient(45deg, var(--primary, #123747) 0 1px, transparent 1px 2.5px)',
@@ -211,18 +225,17 @@ export const PlatformActivityCard: React.FC = () => {
 
                   {/* 2. Gradient Bar */}
                   <div
-                    className="w-full flex-1 min-h-[14px]"
+                    className="w-full flex-1 min-h-[14px] rounded-[10px] xl:rounded-[14px]"
                     style={{
-                      borderRadius: '14px',
                       background: 'linear-gradient(180deg, #527781 0%, #123747 100%)',
                     }}
                   />
                 </div>
 
-                {/* X-axis Label */}
+                {/* X-axis Label (Sep keeps font-medium) */}
                 <span
-                  className={`mt-2 text-[11px] tracking-tight font-sans transition-colors ${
-                    isSelected ? 'font-medium text-ink' : 'font-normal text-ink/60'
+                  className={`mt-2 text-[10px] sm:text-[11px] tracking-tight font-sans transition-colors leading-none ${
+                    isSep ? 'font-medium text-ink' : 'font-normal text-ink/60'
                   }`}
                 >
                   {item.month}

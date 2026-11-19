@@ -335,7 +335,7 @@ export const SettlementsPage: React.FC = () => {
       {/* 1. Tabs & Filters Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Tabs: Vendors | Riders */}
-        <div className="p-1 rounded-full bg-neutral border border-primary/10 flex items-center gap-1">
+        <div className="p-1 rounded-full bg-neutral border border-primary/10 flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full min-w-0">
           {(['Vendors', 'Riders'] as const).map((tab) => (
             <button
               key={tab}
@@ -343,7 +343,7 @@ export const SettlementsPage: React.FC = () => {
                 setActiveTab(tab);
                 setSelectedIds([]);
               }}
-              className={`px-4 py-1.5 rounded-full font-sans text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-[clamp(10px,2.5vw,16px)] py-[clamp(5px,1.5vw,6px)] rounded-full font-sans text-[clamp(11px,2.8vw,12px)] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 flex items-center gap-1.5 ${
                 activeTab === tab
                   ? 'bg-primary text-white shadow-sm'
                   : 'text-ink/70 hover:text-ink hover:bg-white/60'

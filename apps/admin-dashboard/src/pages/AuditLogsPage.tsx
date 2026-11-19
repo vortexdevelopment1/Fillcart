@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AuditLogEntry, AuditAction, ApiLogEntry, initialApiLogs } from '../data/auditData';
@@ -77,6 +77,18 @@ export const AuditLogsPage: React.FC = () => {
   }, [searchParams, allowedTabs]);
 
   const [activeTab, setActiveTab] = useState<AuditTab>(initialTab);
+  const activeTabRef = useRef<HTMLButtonElement | null>(null);
+
+  // Auto-scroll active tab into view on small screens
+  useEffect(() => {
+    if (activeTabRef.current && window.innerWidth < 1024) {
+      activeTabRef.current.scrollIntoView({
+        inline: 'center',
+        block: 'nearest',
+        behavior: 'smooth',
+      });
+    }
+  }, [activeTab]);
 
   // Sync tab if URL param changes
   useEffect(() => {
@@ -313,24 +325,28 @@ export const AuditLogsPage: React.FC = () => {
       {/* 0. Top Bar: Tabs + Retention Note Badge */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Navigation Tabs in exact required order */}
-        <div className="p-1 rounded-full bg-neutral border border-primary/10 flex items-center gap-1 overflow-x-auto max-w-full">
-          {allowedTabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveTab(tab);
-                setSearchParams({ tab });
-                setCurrentPage(1);
-              }}
-              className={`px-3.5 py-1.5 rounded-full font-sans text-xs font-medium transition-all whitespace-nowrap ${
-                activeTab === tab
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-ink/70 hover:text-ink hover:bg-white/60'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
+        <div className="p-1 rounded-full bg-neutral border border-primary/10 flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full w-full sm:w-auto min-w-0 scroll-smooth [scroll-snap-type:x_proximity]">
+          {allowedTabs.map((tab) => {
+            const isActive = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                ref={isActive ? activeTabRef : null}
+                onClick={() => {
+                  setActiveTab(tab);
+                  setSearchParams({ tab });
+                  setCurrentPage(1);
+                }}
+                className={`px-[clamp(10px,2.5vw,14px)] py-[clamp(5px,1.5vw,6px)] rounded-full font-sans text-[clamp(11px,2.8vw,12px)] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 scroll-snap-align-center ${
+                  isActive
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-ink/70 hover:text-ink hover:bg-white/60'
+                }`}
+              >
+                {tab}
+              </button>
+            );
+          })}
         </div>
 
         {/* Retention info pill */}

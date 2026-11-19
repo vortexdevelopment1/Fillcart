@@ -33,7 +33,7 @@ export const Lightbox: React.FC<LightboxProps> = ({ isOpen, docName, onClose }) 
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-[420px] h-[520px] max-w-full rounded-[24px] bg-white relative p-6 flex flex-col items-center justify-between shadow-[0_20px_50px_rgba(18, 55, 71, 0.35)]"
+        className="w-[min(92vw,420px)] h-[min(70dvh,520px)] max-h-[85dvh] rounded-[24px] bg-white relative p-4 sm:p-6 flex flex-col items-center justify-between shadow-[0_20px_50px_rgba(18, 55, 71, 0.35)]"
       >
         {/* Header with Title & Close button */}
         <div className="w-full flex items-center justify-between">

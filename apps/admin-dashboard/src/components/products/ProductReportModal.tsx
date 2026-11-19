@@ -54,7 +54,7 @@ export const ProductReportModal: React.FC<ProductReportModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl bg-white rounded-[24px] shadow-2xl border border-primary/10 overflow-hidden flex flex-col max-h-[85vh]"
+        className="w-full max-w-2xl bg-white rounded-[24px] shadow-2xl border border-primary/10 overflow-hidden flex flex-col max-h-[85dvh]"
       >
         {/* Header */}
         <div className="p-[20px_24px] border-b border-primary/10 flex items-center justify-between flex-shrink-0">

@@ -317,12 +317,12 @@ export const CouponsPage: React.FC = () => {
       {/* 2. Filter & Search Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Status Filters */}
-        <div className="p-1 rounded-full bg-neutral border border-primary/10 flex items-center gap-1">
+        <div className="p-1 rounded-full bg-neutral border border-primary/10 flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full min-w-0">
           {(['All', 'Active', 'Expired', 'Disabled'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setStatusFilter(tab)}
-              className={`px-3.5 py-1.5 rounded-full font-sans text-xs font-medium transition-all whitespace-nowrap ${
+              className={`px-[clamp(10px,2.5vw,14px)] py-[clamp(5px,1.5vw,6px)] rounded-full font-sans text-[clamp(11px,2.8vw,12px)] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                 statusFilter === tab
                   ? 'bg-primary text-white shadow-sm'
                   : 'text-ink/70 hover:text-ink hover:bg-white/60'

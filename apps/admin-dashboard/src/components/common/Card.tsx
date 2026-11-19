@@ -25,7 +25,7 @@ export const Card: React.FC<CardProps> = ({
     <div
       onClick={onClick}
       className={`
-        bg-white rounded-[20px] p-5 border border-primary/10
+        bg-white rounded-[20px] p-4 sm:p-5 border border-primary/10 min-w-0 max-w-full overflow-hidden
         shadow-[0_1px_2px_rgba(18,55,71,0.04),0_8px_24px_rgba(18,55,71,0.06)] relative
         transition-all duration-200 flex flex-col justify-between
         ${hoverable ? 'hover:shadow-[0_2px_4px_rgba(18,55,71,0.06),0_12px_28px_rgba(18,55,71,0.08)] hover:border-secondary' : ''}
@@ -49,8 +49,8 @@ export const Card: React.FC<CardProps> = ({
       )}
 
       {(title || action) && (
-        <div className="flex items-center justify-between mb-0 pr-6">
-          <div>
+        <div className="flex items-start sm:items-center justify-between gap-2 mb-0 pr-6 w-full min-w-0">
+          <div className="min-w-0">
             {typeof title === 'string' ? (
               <h3 className="font-sans text-[15px] font-normal text-ink tracking-[0px] leading-tight">
                 {title}
@@ -60,7 +60,7 @@ export const Card: React.FC<CardProps> = ({
             )}
             {subtitle && <p className="font-sans text-[12px] text-ink/60 mt-0.5">{subtitle}</p>}
           </div>
-          {action && <div className="flex items-center gap-2">{action}</div>}
+          {action && <div className="flex items-center gap-2 flex-shrink-0">{action}</div>}
         </div>
       )}
 

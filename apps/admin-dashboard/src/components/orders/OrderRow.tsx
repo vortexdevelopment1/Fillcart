@@ -107,7 +107,7 @@ export const OrderRow: React.FC<OrderRowProps> = ({ order, onView }) => {
         </div>
 
         {/* Col 6: View Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-end xs:flex hidden">
           <button
             onClick={() => onView(order)}
             className="h-[32px] px-3.5 rounded-full bg-white border border-primary/20 text-primary hover:bg-primary hover:text-white font-sans text-xs font-medium transition-all shadow-2xs flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -115,6 +115,48 @@ export const OrderRow: React.FC<OrderRowProps> = ({ order, onView }) => {
           >
             <Eye className="w-3.5 h-3.5" />
             <span>View</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ──────────── LINE 2 FOR < 1280px (CHIPS) ──────────── */}
+      <div className="flex min-[1280px]:hidden flex-wrap items-center gap-2 mt-2 pt-2 border-t border-primary/5 text-[11px] font-sans">
+        {/* Amount */}
+        <span className="font-heading font-medium text-ink px-2 py-0.5 rounded-full bg-neutral">
+          ₹{order.totalAmount.toLocaleString()} ({order.items.length} items)
+        </span>
+
+        {/* Customer */}
+        <span className="px-2 py-0.5 rounded-full bg-neutral text-ink/80">
+          Cust: <strong className="font-medium text-ink">{order.customer.name}</strong>
+        </span>
+
+        {/* Vendor */}
+        <span className="px-2 py-0.5 rounded-full bg-neutral text-ink/80">
+          From: <strong className="font-medium text-primary">{order.vendor.name}</strong>
+        </span>
+
+        {/* Rider */}
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral text-ink/75">
+          <Bike className="w-3 h-3 text-secondary" />
+          {order.rider ? (
+            <span>{order.rider.name} ({order.rider.vehicleType})</span>
+          ) : order.status === 'Cancelled' ? (
+            <span className="italic">No rider needed</span>
+          ) : (
+            <span className="text-secondary font-medium">Unassigned</span>
+          )}
+        </span>
+
+        {/* Full-width View on < 480px */}
+        <div className="w-full xs:hidden pt-1.5">
+          <button
+            onClick={() => onView(order)}
+            className="w-full h-[32px] rounded-full bg-white border border-primary/20 text-primary hover:bg-primary hover:text-white font-sans text-xs font-medium transition-all shadow-2xs flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-secondary"
+            aria-label={`View details of order ${order.orderNumber}`}
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>View Order</span>
           </button>
         </div>
       </div>

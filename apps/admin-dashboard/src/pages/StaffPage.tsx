@@ -320,7 +320,7 @@ export const StaffPage: React.FC = () => {
           </div>
 
           {/* Pill Tabs for Roles */}
-          <div className="flex flex-wrap items-center gap-1.5 pb-2">
+          <div className="flex items-center gap-1.5 pb-2 overflow-x-auto no-scrollbar max-w-full min-w-0">
             {availableRoleNames.map((role) => (
               <button
                 key={role}
@@ -331,7 +331,7 @@ export const StaffPage: React.FC = () => {
                   }
                   setActiveRoleTab(role);
                 }}
-                className={`px-3.5 py-1.5 rounded-full font-sans text-xs font-medium transition-all ${
+                className={`px-[clamp(10px,2.5vw,14px)] py-[clamp(5px,1.5vw,6px)] rounded-full font-sans text-[clamp(11px,2.8vw,12px)] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                   activeRoleTab === role
                     ? 'bg-primary text-white shadow-sm'
                     : 'bg-neutral text-ink/75 hover:bg-neutral/80'
@@ -349,7 +349,7 @@ export const StaffPage: React.FC = () => {
                 }
                 setActiveRoleTab('External Roles');
               }}
-              className={`px-3.5 py-1.5 rounded-full font-sans text-xs font-medium transition-all ${
+              className={`px-[clamp(10px,2.5vw,14px)] py-[clamp(5px,1.5vw,6px)] rounded-full font-sans text-[clamp(11px,2.8vw,12px)] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                 activeRoleTab === 'External Roles'
                   ? 'bg-secondary text-white shadow-sm'
                   : 'bg-secondary/15 text-primary hover:bg-secondary/25'
@@ -360,7 +360,7 @@ export const StaffPage: React.FC = () => {
 
             <button
               onClick={handleCreateNewRole}
-              className="px-3 py-1.5 rounded-full border border-dashed border-primary/30 text-primary font-sans text-xs font-medium hover:bg-neutral flex items-center gap-1 transition-colors"
+              className="px-3 py-1.5 rounded-full border border-dashed border-primary/30 text-primary font-sans text-xs font-medium hover:bg-neutral flex items-center gap-1 transition-colors whitespace-nowrap flex-shrink-0"
             >
               <Plus className="w-3 h-3" />
               <span>New Role</span>

@@ -22,11 +22,12 @@ export const BasicReportsDarkCard: React.FC = () => {
     <div
       onClick={() => navigate('/reports')}
       className="
-        bg-ink text-white rounded-[24px] p-4
+        bg-ink text-white rounded-[24px] p-3.5 sm:p-4 pb-2.5 sm:pb-3 xl:pb-4
         shadow-[0_1px_2px_rgba(18,55,71,0.04),0_8px_24px_rgba(18,55,71,0.05)]
         hover:shadow-[0_2px_4px_rgba(18,55,71,0.06),0_12px_28px_rgba(18,55,71,0.08)]
         transition-all duration-300 relative cursor-pointer border border-white/10
-        flex flex-col justify-between overflow-hidden h-full min-h-0 xl:flex-[32] select-none
+        flex flex-col justify-between overflow-hidden w-full max-w-full min-w-0
+        h-auto min-h-[175px] xs:min-h-[190px] xl:min-h-0 xl:h-full xl:flex-[32] select-none flex-shrink-0
       "
     >
       {/* 2x2 Grid of 4 Dots */}
@@ -53,10 +54,10 @@ export const BasicReportsDarkCard: React.FC = () => {
 
       {/* Numbers */}
       <div className="mt-2 mb-1 flex-shrink-0">
-        <div className="font-heading text-[28px] font-normal text-white tracking-normal leading-none">
+        <div className="font-heading text-[clamp(1.5rem,6.5vw,2rem)] xl:text-[28px] font-normal text-white tracking-normal leading-none">
           ₹{dashboard.revenueToday.toLocaleString()}
         </div>
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex flex-wrap items-center gap-2 mt-1">
           <span className="font-sans text-[10px] text-white/60">
             {dashboard.activeUsers.toLocaleString()} active users
           </span>
@@ -67,8 +68,8 @@ export const BasicReportsDarkCard: React.FC = () => {
         </div>
       </div>
 
-      {/* Recharts Area Chart */}
-      <div className="h-[75px] w-[calc(100%+32px)] -mx-4 -mb-4 flex-shrink-0">
+      {/* Recharts Area Chart: height 80-90px on mobile with padding-bottom, 75px on desktop */}
+      <div className="h-[80px] xs:h-[90px] md:h-[105px] xl:h-[75px] w-[calc(100%+28px)] sm:w-[calc(100%+32px)] -mx-3.5 sm:-mx-4 -mb-2.5 sm:-mb-3 xl:-mb-4 pb-1 xl:pb-0 flex-shrink-0 overflow-hidden">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={revenuePoints} margin={{ top: 12, right: 0, left: 0, bottom: 0 }}>
             <defs>

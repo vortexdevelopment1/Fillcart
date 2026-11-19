@@ -90,7 +90,7 @@ export const ReviewDrawer: React.FC<ReviewDrawerProps> = ({
         {/* ──────────── 2. POPUP BOX (centered, wider horizontal proportions) ──────────── */}
         <div
           onClick={(e) => e.stopPropagation()}
-          className="w-[calc(100vw-24px)] min-[700px]:w-[min(780px,calc(100vw-32px))] max-h-[calc(100vh-24px)] min-[700px]:max-h-[min(680px,calc(100vh-48px))] bg-white rounded-[20px] min-[700px]:rounded-[24px] shadow-[0_24px_60px_rgba(18, 55, 71, 0.25)] flex flex-col overflow-hidden relative select-none"
+          className="w-[calc(100vw-24px)] min-[700px]:w-[min(780px,calc(100vw-32px))] max-h-[calc(100dvh-24px)] min-[700px]:max-h-[min(680px,calc(100dvh-48px))] bg-white rounded-[20px] min-[700px]:rounded-[24px] shadow-[0_24px_60px_rgba(18, 55, 71, 0.25)] flex flex-col overflow-hidden relative select-none"
           style={{
             animation: 'popupOpen 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards',
           }}
@@ -280,26 +280,26 @@ export const ReviewDrawer: React.FC<ReviewDrawerProps> = ({
             </div>
           </div>
 
-          {/* Sticky Footer Actions: One row, padding 14px 24px */}
-          <div className="p-[14px_24px] bg-white border-t border-primary/10 flex items-center gap-2.5 flex-shrink-0 flex-nowrap">
+          {/* Sticky Footer Actions */}
+          <div className="p-3 sm:p-[14px_24px] bg-white border-t border-primary/10 flex flex-col min-[600px]:flex-row items-center gap-2 sm:gap-2.5 flex-shrink-0">
             <button
               type="button"
               onClick={() => onApproveAll(applicant.id)}
-              className="flex-1 py-2.5 px-3 rounded-full text-xs font-sans bg-primary text-white font-medium hover:opacity-90 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-secondary whitespace-nowrap text-center shadow-xs"
+              className="w-full min-[600px]:flex-1 py-2 sm:py-2.5 px-3 rounded-full text-xs font-sans bg-primary text-white font-medium hover:opacity-90 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-secondary whitespace-nowrap text-center shadow-xs"
             >
               Approve all
             </button>
             <button
               type="button"
               onClick={() => onRequestReupload(applicant.id)}
-              className="flex-1 py-2.5 px-3 rounded-full text-xs font-sans bg-white border border-primary/25 text-primary hover:bg-neutral active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-secondary whitespace-nowrap text-center"
+              className="w-full min-[600px]:flex-1 py-2 sm:py-2.5 px-3 rounded-full text-xs font-sans bg-white border border-primary/25 text-primary hover:bg-neutral active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-secondary whitespace-nowrap text-center"
             >
               Request re-upload
             </button>
             <button
               type="button"
               onClick={() => onRejectApplication(applicant.id)}
-              className="flex-1 py-2.5 px-3 rounded-full text-xs font-sans bg-primary text-white hover:opacity-90 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-secondary whitespace-nowrap text-center"
+              className="w-full min-[600px]:flex-1 py-2 sm:py-2.5 px-3 rounded-full text-xs font-sans bg-primary text-white hover:opacity-90 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-secondary whitespace-nowrap text-center"
             >
               Reject application
             </button>

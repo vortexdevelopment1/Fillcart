@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { HatchBar } from '../components/common/HatchBar';
 import {
   Download,
@@ -62,6 +62,17 @@ export const ReportsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ReportTab>('Sales');
   const [period, setPeriod] = useState<PeriodType>('30d');
   const [hoveredBar, setHoveredBar] = useState<MonthlyBarData | null>(null);
+  const activeTabRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (activeTabRef.current && window.innerWidth < 1024) {
+      activeTabRef.current.scrollIntoView({
+        inline: 'center',
+        block: 'nearest',
+        behavior: 'smooth',
+      });
+    }
+  }, [activeTab]);
 
   // Period multipliers for realistic smooth transitions
   const multiplier = period === '7d' ? 0.25 : period === '30d' ? 1.0 : 12.0;
@@ -234,20 +245,24 @@ export const ReportsPage: React.FC = () => {
       {/* 1. Header Toolbar: Tabs + Period Pills + Exports */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Report Sub-Tabs: 8 tabs from doc 1.9 */}
-        <div className="p-1 rounded-full bg-neutral border border-primary/10 flex items-center gap-1 overflow-x-auto max-w-full">
-          {REPORT_TABS_CONFIG.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setActiveTab(t.id)}
-              className={`px-3.5 py-1.5 rounded-full font-sans text-xs font-medium transition-all whitespace-nowrap ${
-                activeTab === t.id
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-ink/70 hover:text-ink hover:bg-white/60'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div className="p-1 rounded-full bg-neutral border border-primary/10 flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full w-full sm:w-auto min-w-0 scroll-smooth [scroll-snap-type:x_proximity]">
+          {REPORT_TABS_CONFIG.map((t) => {
+            const isActive = activeTab === t.id;
+            return (
+              <button
+                key={t.id}
+                ref={isActive ? activeTabRef : null}
+                onClick={() => setActiveTab(t.id)}
+                className={`px-[clamp(10px,2.5vw,14px)] py-[clamp(5px,1.5vw,6px)] rounded-full font-sans text-[clamp(11px,2.8vw,12px)] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 scroll-snap-align-center ${
+                  isActive
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-ink/70 hover:text-ink hover:bg-white/60'
+                }`}
+              >
+                {t.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Right: Period Switcher + Export Buttons */}
@@ -788,7 +803,7 @@ export const ReportsPage: React.FC = () => {
       {(activeTab === 'Sales' || activeTab === 'Orders') && (
         <div className="grid grid-cols-1 min-[1280px]:grid-cols-[1fr_360px] gap-5 items-start">
           {/* Left: Orders by Month Bar Chart */}
-          <div className="p-5 rounded-[24px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] space-y-4">
+          <div className="p-4 sm:p-5 rounded-[24px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] space-y-4 overflow-hidden min-w-0 max-w-full">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-heading text-lg font-normal text-ink">Orders by Month</h3>
@@ -805,8 +820,8 @@ export const ReportsPage: React.FC = () => {
             </div>
 
             {/* 12-Column Bar Chart */}
-            <div className="pt-8 pb-2">
-              <div className="h-[220px] grid grid-cols-12 gap-2 items-end">
+            <div className="pt-6 sm:pt-8 pb-2 overflow-x-auto sm:overflow-x-visible no-scrollbar">
+              <div className="h-[150px] xs:h-[180px] sm:h-[220px] grid grid-cols-12 gap-1 sm:gap-2 items-end min-w-[320px] sm:min-w-0">
                 {MONTHLY_ORDERS.map((item) => (
                   <div
                     key={item.month}
@@ -816,7 +831,7 @@ export const ReportsPage: React.FC = () => {
                   >
                     {/* Floating Hatch Block */}
                     <div
-                      className="w-[34px] h-[22px] rounded-[10px] flex-shrink-0 transition-transform group-hover:-translate-y-1"
+                      className="w-[clamp(8px,2.8vw,18px)] sm:w-[clamp(10px,3.5vw,22px)] lg:w-[34px] max-w-full h-[18px] sm:h-[22px] rounded-[5px] sm:rounded-[8px] lg:rounded-[10px] flex-shrink-0 transition-transform group-hover:-translate-y-1"
                       style={{
                         backgroundColor: '#FFFFFF',
                         backgroundImage:
@@ -826,11 +841,11 @@ export const ReportsPage: React.FC = () => {
                     />
 
                     {/* 6px Gap */}
-                    <div className="h-[6px] w-full flex-shrink-0" />
+                    <div className="h-[4px] sm:h-[6px] w-full flex-shrink-0" />
 
                     {/* Vertical Gradient Bar */}
                     <div
-                      className="w-[34px] rounded-[14px] transition-all duration-300 group-hover:brightness-110"
+                      className="w-[clamp(8px,2.8vw,18px)] sm:w-[clamp(10px,3.5vw,22px)] lg:w-[34px] max-w-full rounded-[8px] sm:rounded-[14px] transition-all duration-300 group-hover:brightness-110"
                       style={{
                         height: `${item.heightPct}%`,
                         background: 'linear-gradient(180deg, #527781 0%, #123747 100%)',
@@ -839,7 +854,7 @@ export const ReportsPage: React.FC = () => {
 
                     {/* Month Label */}
                     <span
-                      className={`font-sans text-[11px] mt-2 block transition-colors ${
+                      className={`font-sans text-[clamp(8px,2.2vw,10px)] sm:text-[11px] mt-1.5 sm:mt-2 block transition-colors leading-none ${
                         item.isPeak ? 'font-medium text-primary' : 'font-normal text-ink/65'
                       }`}
                     >
@@ -852,7 +867,7 @@ export const ReportsPage: React.FC = () => {
           </div>
 
           {/* Right: Orders by Status Donut Chart */}
-          <div className="p-5 rounded-[24px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] space-y-4">
+          <div className="p-4 sm:p-5 rounded-[24px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] space-y-4 overflow-hidden min-w-0 max-w-full">
             <div>
               <h3 className="font-heading text-lg font-normal text-ink">Orders by Status</h3>
               <p className="font-sans text-xs text-ink/60">Fulfillment lifecycle breakdown</p>

@@ -251,20 +251,20 @@ export const OrdersActivityCard: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-secondary text-white rounded-[22px] p-[12px_20px] relative shadow-[0_8px_24px_rgba(18,55,71,0.06)] h-auto select-none">
+    <div className="w-full bg-secondary text-white rounded-[22px] p-3.5 sm:p-[12px_20px] relative shadow-[0_8px_24px_rgba(18,55,71,0.06)] h-auto select-none overflow-hidden min-w-0 max-w-full">
       {/* 2-Column Grid on desktop (>=900px): 190px 1fr, gap 20px; Single column on <900px */}
       <div className="flex flex-col min-[900px]:grid min-[900px]:grid-cols-[190px_minmax(0,1fr)] gap-3 min-[900px]:gap-[20px] items-stretch">
         {/* ──────────── 1. LEFT COLUMN (Orders title at top, 1,284 + orders centered vertically, Week/Month at bottom) ──────────── */}
-        <div className="flex flex-row items-center justify-between min-[900px]:flex-col min-[900px]:justify-between h-auto min-[900px]:h-full w-full min-[900px]:w-[190px] min-[900px]:max-w-[190px] py-0.5">
+        <div className="flex flex-row items-center justify-between min-[900px]:flex-col min-[900px]:justify-between h-auto min-[900px]:h-full w-full min-[900px]:w-[190px] min-[900px]:max-w-[190px] py-0.5 flex-wrap min-[500px]:flex-nowrap gap-2 min-[900px]:gap-0">
           {/* Top Title */}
-          <div className="w-full">
+          <div className="w-auto min-[900px]:w-full">
             <span className="font-sans text-[13px] text-white/80 font-normal leading-tight">
               Orders
             </span>
           </div>
 
           {/* Numbers block centered vertically with badge positioned below the number */}
-          <div className="flex flex-col items-start my-auto w-full py-0.5">
+          <div className="flex flex-col items-start my-auto w-auto min-[900px]:w-full py-0.5">
             <span className="font-heading text-[28px] min-[900px]:text-[34px] text-white font-normal leading-none tracking-tight">
               {timeTab === 'Week' ? '1,284' : '5,420'}
             </span>
@@ -325,8 +325,8 @@ export const OrdersActivityCard: React.FC = () => {
           </div>
 
           {/* Light Panel: background rgba(255,255,255,0.55), radius 12px, padding 6px, width 100% */}
-          <div className="w-full bg-white/[0.55] rounded-[12px] p-[6px] shadow-xs">
-            <div className="flex items-end gap-1.5 w-full">
+          <div className="w-full bg-white/[0.55] rounded-[12px] p-[6px] shadow-xs overflow-x-auto min-[900px]:overflow-x-visible no-scrollbar">
+            <div className="flex items-end gap-1.5 w-full min-w-[340px] min-[900px]:min-w-0">
               {/* Y-Axis level indicators for the 7 rows */}
               <div className="flex flex-col justify-between h-[89px] text-[8px] font-sans text-primary/70 font-semibold select-none flex-shrink-0 text-right w-[20px] py-[0.5px]">
                 <span>180</span>

@@ -24,7 +24,7 @@ export const VerificationToolbar: React.FC<VerificationToolbarProps> = ({
   return (
     <div className="w-full flex items-center justify-between gap-4 flex-wrap select-none pt-1">
       {/* Left: Pill Tabs [All | Riders | Vendors] in soft black-5% container */}
-      <div className="inline-flex items-center p-1 rounded-full bg-neutral gap-1">
+      <div className="inline-flex items-center p-1 rounded-full bg-neutral gap-1 overflow-x-auto no-scrollbar max-w-full min-w-0">
         {tabs.map((tab) => {
           const isActive = activeTab === tab;
           return (
@@ -32,7 +32,7 @@ export const VerificationToolbar: React.FC<VerificationToolbarProps> = ({
               key={tab}
               type="button"
               onClick={() => onTabChange(tab)}
-              className={`px-4 py-1.5 rounded-full text-xs font-sans transition-all focus:outline-none focus:ring-2 focus:ring-secondary ${
+              className={`px-[clamp(10px,2.5vw,16px)] py-[clamp(5px,1.5vw,6px)] rounded-full text-[clamp(11px,2.8vw,12px)] sm:text-xs font-sans transition-all whitespace-nowrap flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-secondary ${
                 isActive
                   ? 'bg-primary text-white font-medium shadow-sm'
                   : 'text-ink/60 hover:text-ink font-normal'

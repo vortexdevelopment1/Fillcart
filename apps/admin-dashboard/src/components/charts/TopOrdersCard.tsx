@@ -123,13 +123,13 @@ export const TopOrdersCard: React.FC = () => {
           )}
         </div>
       }
-      className="min-h-[240px] flex flex-col justify-between cursor-pointer hover:border-secondary transition-all"
+      className="h-auto min-h-[220px] xs:min-h-[240px] flex flex-col justify-between cursor-pointer hover:border-secondary transition-all w-full max-w-full min-w-0 overflow-hidden"
     >
       {/* Card body */}
-      <div className="flex flex-row items-stretch gap-4 mt-4 select-none">
+      <div className="flex flex-row items-stretch gap-3 xs:gap-4 mt-3 xs:mt-4 select-none">
         {/* LEFT: stacked bar column */}
         <div
-          className="w-[36px] h-[160px] flex flex-col flex-shrink-0 select-none"
+          className="w-[32px] xs:w-[36px] h-[150px] xs:h-[160px] flex flex-col flex-shrink-0 select-none"
           style={{ gap: '5px' }}
         >
           {/* Block 1 */}
@@ -170,9 +170,9 @@ export const TopOrdersCard: React.FC = () => {
         </div>
 
         {/* RIGHT: rows container */}
-        <div className="flex-1 flex flex-col justify-between h-[160px] min-w-0">
+        <div className="flex-1 flex flex-col justify-between min-h-[140px] sm:h-[160px] min-w-0 gap-1">
           {currentData.vendors.map((row) => (
-            <div key={row.id} className="h-[40px] flex items-center gap-2.5 min-w-0">
+            <div key={row.id} className="min-h-[34px] sm:h-[40px] flex items-center gap-2 sm:gap-2.5 min-w-0 py-0.5 sm:py-0">
               {/* Row Dots */}
               {row.dotType === 'block1' && (
                 <div className="w-[8px] h-[8px] rounded-full bg-primary flex-shrink-0" />
@@ -190,23 +190,25 @@ export const TopOrdersCard: React.FC = () => {
                 <div className="w-[8px] h-[8px] rounded-full border-[1.5px] border-primary bg-transparent flex-shrink-0" />
               )}
 
-              {/* Text columns */}
-              <div className="flex-1 min-w-0 flex items-baseline gap-2.5">
-                <span className="font-sans font-normal text-ink text-[13px] whitespace-nowrap flex-shrink-0">
-                  {row.name}
-                </span>
+              {/* Text columns: on desktop (>=sm) single row identical to before; on mobile (<sm) clean 2-line layout so no text cuts off */}
+              <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-baseline justify-between sm:justify-start gap-0.5 sm:gap-2.5">
+                <div className="flex items-baseline gap-1.5 min-w-0 flex-1">
+                  <span className="font-sans font-normal text-ink text-[12px] sm:text-[13px] whitespace-nowrap flex-shrink-0">
+                    {row.name}
+                  </span>
+                  <span className="font-sans text-[11px] sm:text-[12px] text-ink/60 truncate flex-1 min-w-0">
+                    {row.category}
+                  </span>
+                </div>
 
-                <span className="font-sans text-[12px] text-ink/60 truncate flex-1 min-w-0">
-                  {row.category}
-                </span>
-
-                <span className="font-sans text-[12px] text-ink/60 w-[40px] text-right tabular-nums flex-shrink-0">
-                  {row.share}
-                </span>
-
-                <span className="font-sans font-medium text-ink text-[13px] w-[56px] text-right tabular-nums flex-shrink-0">
-                  {row.count}
-                </span>
+                <div className="flex items-baseline justify-end gap-2 sm:gap-2.5 flex-shrink-0">
+                  <span className="font-sans text-[11px] sm:text-[12px] text-ink/60 sm:w-[40px] text-right tabular-nums">
+                    {row.share}
+                  </span>
+                  <span className="font-sans font-medium text-ink text-[12px] sm:text-[13px] sm:w-[56px] text-right tabular-nums">
+                    {row.count}
+                  </span>
+                </div>
               </div>
             </div>
           ))}

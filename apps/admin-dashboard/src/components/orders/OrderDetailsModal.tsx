@@ -112,7 +112,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="bg-white rounded-[24px] max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-primary/10 relative p-5 md:p-7 select-none">
+        <div className="bg-white rounded-[24px] max-w-3xl w-full max-h-[90dvh] overflow-y-auto shadow-2xl border border-primary/10 relative p-5 md:p-7 select-none">
           {/* Header */}
           <div className="flex items-center justify-between pb-4 border-b border-primary/10">
             <div>

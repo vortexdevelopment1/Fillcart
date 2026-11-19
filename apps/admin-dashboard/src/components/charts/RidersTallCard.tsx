@@ -27,11 +27,11 @@ export const RidersTallCard: React.FC = () => {
     <div
       onClick={() => navigate('/riders')}
       className="
-        rounded-[24px] p-[16px_16px_14px] text-white relative cursor-pointer
+        rounded-[24px] p-3.5 xs:p-4 xl:p-[16px_16px_14px] text-white relative cursor-pointer
         shadow-[0_1px_2px_rgba(18,55,71,0.04),0_8px_24px_rgba(18,55,71,0.05)]
         hover:shadow-[0_2px_4px_rgba(18,55,71,0.06),0_12px_28px_rgba(18,55,71,0.08)]
         transition-all duration-300 flex flex-col justify-between overflow-hidden
-        border border-white/20 bg-primary h-full min-h-0 xl:flex-[52] select-none
+        border border-white/20 bg-primary h-auto xl:h-full min-h-[190px] xs:min-h-[220px] md:min-h-[250px] xl:min-h-0 xl:flex-[52] select-none flex-shrink-0 w-full max-w-full min-w-0
       "
     >
       {/* 2 Smooth SVG wave lines */}
@@ -66,18 +66,18 @@ export const RidersTallCard: React.FC = () => {
       {/* Top Header & Stats */}
       <div className="relative z-10 flex-shrink-0">
         <h3 className="font-sans text-[13px] font-normal text-white leading-tight">Riders</h3>
-        <div className="font-heading text-[28px] font-normal tracking-normal text-white mt-1 mb-1.5 leading-none">
+        <div className="font-heading text-[clamp(1.6rem,6vw,2.2rem)] xl:text-[28px] font-normal tracking-normal text-white mt-1 mb-1.5 leading-none">
           {dashboard.riders.toLocaleString()}
         </div>
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-[3px] rounded-full bg-white/20 font-sans text-[10px] font-normal text-white leading-none">
+        <div className="inline-flex flex-wrap items-center gap-1.5 px-2.5 py-[3px] rounded-full bg-white/20 font-sans text-[10px] font-normal text-white leading-none max-w-full">
           <span>{dashboard.activeDeliveries} on delivery</span>
-          <TrendingUp className="w-2.5 h-2.5 text-white inline" />
+          <TrendingUp className="w-2.5 h-2.5 text-white inline flex-shrink-0" />
           <span>+18%</span>
         </div>
       </div>
 
-      {/* 7 Bars Area */}
-      <div className="relative z-10 h-[62%] w-full flex items-end justify-between gap-1.5 mt-auto">
+      {/* 7 Bars Area: responsive height on mobile, h-[62%] on desktop */}
+      <div className="relative z-10 flex-1 xl:flex-none h-[115px] xs:h-[135px] md:h-[160px] xl:h-[62%] min-h-[110px] xl:min-h-0 w-full flex items-end justify-between gap-1.5 mt-auto pt-3 xl:pt-0 pb-0.5">
         {riderBars.map((bar, idx) => (
           <div key={idx} className="flex-1 flex flex-col items-center h-full min-h-0 justify-end">
             {bar.isHatched && (
@@ -85,7 +85,7 @@ export const RidersTallCard: React.FC = () => {
             )}
 
             <div
-              className={`w-full max-w-[30px] min-w-[20px] rounded-full overflow-hidden transition-all duration-300 flex-shrink-0 ${
+              className={`w-full max-w-[24px] xs:max-w-[28px] min-w-[8px] xl:max-w-[30px] xl:min-w-[20px] rounded-full overflow-hidden transition-all duration-300 flex-shrink-0 ${
                 bar.isHatched
                   ? 'hatch-white border border-white/70 shadow-xs'
                   : 'bg-white'
@@ -96,7 +96,7 @@ export const RidersTallCard: React.FC = () => {
               }}
             />
 
-            <span className="font-sans text-[10px] font-normal text-white/85 mt-1.5 block leading-none select-none">
+            <span className="font-sans text-[clamp(9px,2.6vw,11px)] xl:text-[10px] font-normal text-white/85 mt-1.5 block leading-none select-none text-center">
               {bar.label}
             </span>
           </div>

@@ -16,7 +16,7 @@ export const HomePage: React.FC = () => {
   const isMaintenance = settings?.general?.maintenanceMode;
 
   return (
-    <div className="w-full h-full min-h-0 flex flex-col">
+    <div className="w-full h-auto xl:h-full min-h-0 flex flex-col">
       {/* PRIMARY Maintenance Mode Banner */}
       {isMaintenance && (
         <div className="w-full bg-primary text-white px-5 py-3 rounded-2xl mb-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm border border-white/10 flex-shrink-0 animate-fadeIn">
@@ -46,44 +46,45 @@ export const HomePage: React.FC = () => {
         </div>
       )}
 
-      <div className="w-full flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_clamp(260px,24%,330px)] gap-4">
-      {/* ──────────────── LEFT COLUMN ────────────────
-          Nested grid: 2 equal columns, 3 rows (auto, auto, 1fr)
-          Row 3 (Platform Activity) takes all remaining vertical space */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 grid-rows-[auto_auto_1fr] gap-4 h-full min-h-0">
-        {/* Row 1, Col 1: Pending Verifications (Delivery Rate) */}
-        <PendingVerificationsCard />
+      <div className="w-full flex-1 min-h-0 min-w-0 flex flex-col xl:grid xl:grid-cols-[minmax(0,1fr)_clamp(260px,24%,330px)] gap-3.5 md:gap-4 items-stretch h-auto xl:h-full">
+        {/* ──────────────── LEFT COLUMN ────────────────
+            Desktop (>=1280px): 2 equal columns, 3 rows (auto, auto, 1fr)
+            Tablet (768-1279px): 2 columns
+            Mobile (<768px): 1 column in-flow blocks */}
+        <div className="flex flex-col md:grid md:grid-cols-2 md:grid-rows-[auto_auto_auto] xl:grid-rows-[auto_auto_1fr] gap-3.5 md:gap-4 h-auto xl:h-full min-h-0 min-w-0 items-stretch">
+          {/* Row 1, Col 1: Pending Verifications (Total Users) */}
+          <PendingVerificationsCard />
 
-        {/* Row 1, Col 2: Vendors (Campaigns) */}
-        <VendorsCard />
+          {/* Row 1, Col 2: Vendors (Orders Today) */}
+          <VendorsCard />
 
-        {/* Row 2, Col 1: Top Contacts (Orders by Store) */}
-        <TopOrdersCard />
+          {/* Row 2, Col 1: Top Contacts (Top Vendors) */}
+          <TopOrdersCard />
 
-        {/* Row 2, Col 2: Products & Categories Donut */}
-        <ProductsDonutCard />
+          {/* Row 2, Col 2: Products & Categories Donut (Revenue split) */}
+          <ProductsDonutCard />
 
-        {/* Row 3, Col-Span 2: Platform Activity bar chart (ONLY under the left 2 columns) */}
-        <div className="col-span-1 sm:col-span-2 h-full min-h-[240px] xl:min-h-0 flex flex-col">
-          <PlatformActivityCard />
+          {/* Row 3, Col-Span 2: Platform Activity bar chart (Orders by Month) */}
+          <div className="col-span-1 md:col-span-2 h-auto xl:h-full min-h-[240px] xl:min-h-0 min-w-0 flex flex-col">
+            <PlatformActivityCard />
+          </div>
+        </div>
+
+        {/* ──────────────── RIGHT COLUMN ────────────────
+            Desktop (>=1280px): Flex column, height 100%, gap 16px.
+            Tablet (768-1279px): 3-card horizontal grid row.
+            Mobile (<768px): Stacks in one column (Riders, Commission, Revenue). */}
+        <div className="flex flex-col md:grid md:grid-cols-3 xl:flex xl:flex-col gap-3.5 md:gap-4 h-auto xl:h-full min-h-0 min-w-0 items-stretch">
+          {/* Riders gradient card */}
+          <RidersTallCard />
+
+          {/* Payments & Statements card (Commission) */}
+          <PaymentsCreditsCard />
+
+          {/* Basic Reports dark card (Revenue) */}
+          <BasicReportsDarkCard />
         </div>
       </div>
-
-      {/* ──────────────── RIGHT COLUMN ────────────────
-          Desktop (>=1280px): Flex column, height 100%, gap 16px.
-          Tablet (768-1279px): 3-card horizontal grid row.
-          Mobile (<768px): Stacks in one column. */}
-      <div className="grid grid-cols-1 md:grid-cols-3 xl:flex xl:flex-col gap-4 h-full min-h-0">
-        {/* Riders gradient card: flex 1.4 */}
-        <RidersTallCard />
-
-        {/* Payments & Statements card: compact ~110px */}
-        <PaymentsCreditsCard />
-
-        {/* Basic Reports dark card: flex 1 */}
-        <BasicReportsDarkCard />
-      </div>
     </div>
-  </div>
   );
 };

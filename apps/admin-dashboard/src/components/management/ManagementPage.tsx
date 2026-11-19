@@ -233,7 +233,7 @@ export const ManagementPage: React.FC<{ config: ManagementPageConfig }> = ({ con
   }, [applicants, viewItem, isVendor]);
 
   return (
-    <div className="w-full flex flex-col gap-4 pb-12 pt-1.5">
+    <div className="w-full flex flex-col gap-4 pb-12 pt-3">
       {/* ──────────── Top Actions Bar (Title/Subtitle handled by global Header) ──────────── */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">

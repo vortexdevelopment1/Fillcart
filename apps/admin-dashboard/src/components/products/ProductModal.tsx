@@ -137,7 +137,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-[calc(100vw-24px)] min-[780px]:w-[min(780px,calc(100vw-32px))] max-h-[calc(100vh-48px)] bg-white rounded-[24px] shadow-[0_24px_60px_rgba(18, 55, 71, 0.25)] flex flex-col overflow-hidden relative select-none animate-fade-in"
+        className="w-[calc(100vw-24px)] min-[780px]:w-[min(780px,calc(100vw-32px))] max-h-[calc(100dvh-48px)] bg-white rounded-[24px] shadow-[0_24px_60px_rgba(18, 55, 71, 0.25)] flex flex-col overflow-hidden relative select-none animate-fade-in"
       >
         {/* Modal Header */}
         <div className="p-[20px_24px] border-b border-primary/10 flex items-center justify-between flex-shrink-0 bg-white">

@@ -620,7 +620,7 @@ export const SettingsPage: React.FC = () => {
   return (
     <div className="w-full h-full flex flex-col min-h-0 relative pb-16">
       {/* ──────────────── LAYOUT: LEFT TABS (HORIZONTAL <1000px) + RIGHT SETTINGS CARD ──────────────── */}
-      <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-5 items-start">
+      <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 sm:gap-5 items-start w-full max-w-full min-w-0">
         {/* Left / Top Tabs */}
         <SettingsTabs
           activeTab={activeTab}
@@ -630,7 +630,7 @@ export const SettingsPage: React.FC = () => {
         />
 
         {/* Right Settings Card */}
-        <div className="flex-1 w-full min-h-0 bg-white rounded-2xl border border-primary/10 shadow-sm p-5 sm:p-7 overflow-y-auto">
+        <div className="flex-1 w-full max-w-full min-w-0 min-h-0 bg-white rounded-2xl border border-primary/10 shadow-sm p-4 sm:p-5 md:p-7 overflow-y-auto">
           {activeTab === 'general' && (
             <GeneralTab
               data={formData.general}

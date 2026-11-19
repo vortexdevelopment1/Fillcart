@@ -21,8 +21,8 @@ export const ProductRow: React.FC<ProductRowProps> = ({
 }) => {
   return (
     <tr className="border-b border-primary/10 hover:bg-neutral/40 transition-colors select-none h-[44px]">
-      {/* 1. Item Column: initials tile + name (matches reference) */}
-      <td className="py-1 px-3 min-w-[200px]">
+      {/* 1. Item Column: initials tile + name (matches reference, sticky first column) */}
+      <td className="py-1 px-3 min-w-[200px] sticky left-0 bg-white z-10 shadow-[1px_0_0_rgba(18,55,71,0.08)]">
         <div className="flex items-center gap-2.5">
           <div className="w-[36px] h-[36px] rounded-[12px] bg-neutral text-primary font-sans text-xs flex items-center justify-center font-medium flex-shrink-0 select-none">
             {(product.brand || product.name || 'PR').substring(0, 2).toUpperCase()}

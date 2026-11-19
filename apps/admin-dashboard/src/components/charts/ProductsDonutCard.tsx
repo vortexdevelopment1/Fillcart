@@ -117,16 +117,16 @@ export const ProductsDonutCard: React.FC = () => {
           )}
         </div>
       }
-      className="h-[210px] flex flex-col justify-between cursor-pointer hover:border-secondary transition-all"
+      className="h-auto min-h-[200px] xs:min-h-[210px] flex flex-col justify-between cursor-pointer hover:border-secondary transition-all w-full max-w-full min-w-0 overflow-hidden"
     >
-      <div className="flex items-center my-auto h-full pt-1 pb-1">
+      <div className="flex flex-col min-[420px]:flex-row items-center my-auto h-full pt-1 pb-1 min-w-0">
         {/* DONUT WRAPPER (120px x 120px, mr-24px) */}
-        <div className="w-[120px] h-[120px] mr-[24px] flex-shrink-0 relative flex items-center justify-center select-none">
+        <div className="w-[110px] h-[110px] xs:w-[120px] xs:h-[120px] min-[420px]:mr-[24px] mb-3 min-[420px]:mb-0 flex-shrink-0 relative flex items-center justify-center select-none">
           <svg
             width="120"
             height="120"
             viewBox="0 0 120 120"
-            className="w-[120px] h-[120px] transform -rotate-90"
+            className="w-full h-full transform -rotate-90"
           >
             {/* Segment 1: Revenue, INK #000000 (right arc: ~78%) */}
             <circle
@@ -170,22 +170,22 @@ export const ProductsDonutCard: React.FC = () => {
 
           {/* Three White Pill Badges ON the Ring with 1px INK border */}
           <div
-            className="absolute bg-white text-ink text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-ink pointer-events-none leading-none z-10 shadow-sm"
-            style={{ top: '22%', left: '21%', transform: 'translate(-50%, -50%)' }}
+            className="absolute bg-white text-ink text-[9px] xs:text-[10px] font-normal px-[5px] py-[1px] xs:px-[6px] xs:py-[1.5px] rounded-full border border-ink pointer-events-none leading-none z-10 shadow-sm whitespace-nowrap"
+            style={{ top: '22%', left: '22%', transform: 'translate(-50%, -50%)' }}
           >
             {activeData.refPct}%
           </div>
 
           <div
-            className="absolute bg-white text-ink text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-ink pointer-events-none leading-none z-10 shadow-sm"
-            style={{ top: '50%', left: '90%', transform: 'translate(-50%, -50%)' }}
+            className="absolute bg-white text-ink text-[9px] xs:text-[10px] font-normal px-[5px] py-[1px] xs:px-[6px] xs:py-[1.5px] rounded-full border border-ink pointer-events-none leading-none z-10 shadow-sm whitespace-nowrap"
+            style={{ top: '50%', left: '80%', transform: 'translate(-50%, -50%)' }}
           >
             {activeData.revPct}%
           </div>
 
           <div
-            className="absolute bg-white text-ink text-[10px] font-normal px-[6px] py-[1.5px] rounded-full border border-ink pointer-events-none leading-none z-10 shadow-sm"
-            style={{ top: '80%', left: '23%', transform: 'translate(-50%, -50%)' }}
+            className="absolute bg-white text-ink text-[9px] xs:text-[10px] font-normal px-[5px] py-[1px] xs:px-[6px] xs:py-[1.5px] rounded-full border border-ink pointer-events-none leading-none z-10 shadow-sm whitespace-nowrap"
+            style={{ top: '78%', left: '24%', transform: 'translate(-50%, -50%)' }}
           >
             {activeData.commPct}%
           </div>

@@ -95,7 +95,7 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
       aria-labelledby="template-editor-title"
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/60 backdrop-blur-xs animate-fadeIn"
     >
-      <div className="bg-white rounded-2xl w-full max-w-xl shadow-2xl border border-primary/10 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-white rounded-2xl w-full max-w-xl shadow-2xl border border-primary/10 overflow-hidden flex flex-col max-h-[90dvh]">
         {/* Header */}
         <div className="px-6 py-4 border-b border-primary/10 flex items-center justify-between bg-neutral/30">
           <div>
