@@ -25,42 +25,42 @@ export const Card: React.FC<CardProps> = ({
     <div
       onClick={onClick}
       className={`
-        bg-white rounded-[20px] p-5 border border-black/[0.06]
-        shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.05)] relative
+        bg-white rounded-[20px] p-4 sm:p-5 border border-primary/10 min-w-0 max-w-full overflow-hidden
+        shadow-[0_1px_2px_rgba(18,55,71,0.04),0_8px_24px_rgba(18,55,71,0.06)] relative
         transition-all duration-200 flex flex-col justify-between
-        ${hoverable ? 'hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_12px_28px_rgba(0,0,0,0.08)] hover:border-black/[0.12]' : ''}
+        ${hoverable ? 'hover:shadow-[0_2px_4px_rgba(18,55,71,0.06),0_12px_28px_rgba(18,55,71,0.08)] hover:border-secondary' : ''}
         ${onClick ? 'cursor-pointer' : ''}
         ${className}
       `}
     >
-      {/* 2x2 Grid of 4 Dots Drag Handle (top-right at 20px/20px, #000000 at 25% opacity) */}
+      {/* 2x2 Grid of 4 Dots Drag Handle (top-right, PRIMARY at 25% opacity) */}
       {showDragHandle && (
         <div
           className="absolute top-5 right-5 p-0 select-none pointer-events-none"
           aria-hidden="true"
         >
           <div className="grid grid-cols-2 gap-[3px]">
-            <div className="w-[3px] h-[3px] rounded-full bg-black/25" />
-            <div className="w-[3px] h-[3px] rounded-full bg-black/25" />
-            <div className="w-[3px] h-[3px] rounded-full bg-black/25" />
-            <div className="w-[3px] h-[3px] rounded-full bg-black/25" />
+            <div className="w-[3px] h-[3px] rounded-full bg-ink/25" />
+            <div className="w-[3px] h-[3px] rounded-full bg-ink/25" />
+            <div className="w-[3px] h-[3px] rounded-full bg-ink/25" />
+            <div className="w-[3px] h-[3px] rounded-full bg-ink/25" />
           </div>
         </div>
       )}
 
       {(title || action) && (
-        <div className="flex items-center justify-between mb-0 pr-6">
-          <div>
+        <div className="flex items-start sm:items-center justify-between gap-2 mb-0 pr-6 w-full min-w-0">
+          <div className="min-w-0">
             {typeof title === 'string' ? (
-              <h3 className="font-sans text-[15px] font-normal text-black tracking-[0px] leading-tight">
+              <h3 className="font-sans text-[15px] font-normal text-ink tracking-[0px] leading-tight">
                 {title}
               </h3>
             ) : (
               title
             )}
-            {subtitle && <p className="font-sans text-[12px] text-black/55 mt-0.5">{subtitle}</p>}
+            {subtitle && <p className="font-sans text-[12px] text-ink/60 mt-0.5">{subtitle}</p>}
           </div>
-          {action && <div className="flex items-center gap-2">{action}</div>}
+          {action && <div className="flex items-center gap-2 flex-shrink-0">{action}</div>}
         </div>
       )}
 

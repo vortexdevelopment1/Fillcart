@@ -34,32 +34,32 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className="pointer-events-auto flex items-start gap-3 p-4 bg-white border border-black/[0.08] rounded-[16px] shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300"
+            className="pointer-events-auto flex items-start gap-3 p-4 bg-white border border-primary/10 rounded-[16px] shadow-[0_8px_24px_rgba(18,55,71,0.08)] transition-all duration-300"
           >
             {toast.type === 'success' && (
-              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 text-black">
-                <CheckCircle2 className="w-5 h-5 text-black" />
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 text-white">
+                <CheckCircle2 className="w-5 h-5 text-ink" />
               </div>
             )}
             {toast.type === 'error' && (
-              <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center flex-shrink-0">
                 <AlertCircle className="w-5 h-5 text-white" />
               </div>
             )}
             {toast.type === 'info' && (
-              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 text-black">
-                <Info className="w-5 h-5 text-black" />
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 text-white">
+                <Info className="w-5 h-5 text-ink" />
               </div>
             )}
             <div className="flex-1">
-              <h4 className="text-sm font-semibold text-black">{toast.title}</h4>
-              <p className="text-xs text-black/55 mt-0.5 leading-relaxed">{toast.message}</p>
+              <h4 className="text-sm font-semibold text-ink">{toast.title}</h4>
+              <p className="text-xs text-ink/55 mt-0.5 leading-relaxed">{toast.message}</p>
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-black/55 hover:text-black p-1 transition-colors"
+              className="text-ink/55 hover:text-ink p-1 transition-colors"
             >
-              <X className="w-4 h-4 text-black" />
+              <X className="w-4 h-4 text-ink" />
             </button>
           </div>
         ))}
