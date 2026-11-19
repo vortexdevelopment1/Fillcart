@@ -1,6 +1,134 @@
-import React, { useState } from 'react';
-import { VerificationDocument } from '../../data/verification';
-import { Eye, Check, X, ShieldAlert, Phone, User, HeartHandshake } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { VerificationDocument, DocumentStatus } from '../../data/verification';
+import { Eye, Check, X, ShieldAlert, Phone, User, HeartHandshake, ChevronDown } from 'lucide-react';
+
+interface ChangeStatusControlProps {
+  status: DocumentStatus;
+  documentId: string;
+  documentName: string;
+  onApprove: (docId: string) => void;
+  onStartReject: () => void;
+}
+
+const ChangeStatusControl: React.FC<ChangeStatusControlProps> = ({
+  status,
+  documentId,
+  documentName,
+  onApprove,
+  onStartReject,
+}) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on click outside
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen]);
+
+  // Close menu on Escape
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMenuOpen]);
+
+  const isApproved = status?.toLowerCase() === 'approved';
+  const isRejected = status?.toLowerCase() === 'rejected';
+
+  // 1. Status = Approved: HIDE Approve & Reject. Show subtle "Change status" control.
+  if (isApproved) {
+    return (
+      <div className="relative inline-flex items-center" ref={menuRef}>
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+          aria-label={`Change status for ${documentName}`}
+          aria-haspopup="menu"
+          aria-expanded={isMenuOpen}
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-sans text-ink/65 hover:text-ink hover:bg-neutral transition-colors border border-primary/20 focus:outline-none focus:ring-2 focus:ring-secondary min-h-[36px] sm:min-h-0 cursor-pointer"
+        >
+          <span>Change status</span>
+          <ChevronDown
+            className={`w-3 h-3 text-ink/50 transition-transform duration-150 ${
+              isMenuOpen ? 'rotate-180' : ''
+            }`}
+          />
+        </button>
+
+        {isMenuOpen && (
+          <div
+            role="menu"
+            aria-label={`Status options for ${documentName}`}
+            className="absolute right-0 bottom-full mb-1.5 z-30 bg-white rounded-xl shadow-card-hover border border-primary/15 py-1 min-w-[130px] animate-in fade-in duration-150"
+          >
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setIsMenuOpen(false);
+                onStartReject();
+              }}
+              className="w-full text-left px-3 py-1.5 text-[11px] font-sans text-[#DC2626] hover:bg-[#FEE2E2]/60 flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <X className="w-3 h-3 stroke-[2]" />
+              <span>Reject</span>
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // 2. Status = Rejected: HIDE Reject. Show original Approve button only.
+  if (isRejected) {
+    return (
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => onApprove(documentId)}
+          className="px-3 py-1 rounded-full text-[11px] font-sans bg-primary text-white hover:opacity-90 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-secondary cursor-pointer shadow-xs min-h-[36px] sm:min-h-0"
+          aria-label={`Approve ${documentName}`}
+        >
+          Approve
+        </button>
+      </div>
+    );
+  }
+
+  // 3. Status = Pending / Not yet reviewed / Not approved or rejected yet: Show original Approve and Reject buttons
+  return (
+    <div className="flex items-center gap-1.5">
+      <button
+        type="button"
+        onClick={() => onApprove(documentId)}
+        className="px-3 py-1 rounded-full text-[11px] font-sans bg-primary text-white hover:opacity-90 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-secondary cursor-pointer shadow-xs min-h-[36px] sm:min-h-0"
+        aria-label={`Approve ${documentName}`}
+      >
+        Approve
+      </button>
+      <button
+        type="button"
+        onClick={onStartReject}
+        className="px-3 py-1 rounded-full text-[11px] font-sans bg-white border border-primary text-primary hover:bg-black/[0.04] transition-all focus:outline-none focus:ring-2 focus:ring-secondary active:scale-95 cursor-pointer min-h-[36px] sm:min-h-0"
+        aria-label={`Reject ${documentName}`}
+      >
+        Reject
+      </button>
+    </div>
+  );
+};
 
 interface DocumentCardProps {
   document: VerificationDocument;
@@ -133,28 +261,13 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
               )}
             </div>
 
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => onApprove(document.id)}
-                className={`px-3 py-1 rounded-full text-[11px] font-sans transition-all focus:outline-none focus:ring-2 focus:ring-secondary ${
-                  document.status === 'Approved'
-                    ? 'bg-neutral text-primary/45 cursor-default'
-                    : 'bg-primary text-white hover:opacity-90 active:scale-95'
-                }`}
-                aria-label={`Approve ${document.name}`}
-              >
-                Approve
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsRejecting(true)}
-                className="px-3 py-1 rounded-full text-[11px] font-sans bg-white border border-primary text-primary hover:bg-black/[0.04] transition-all focus:outline-none focus:ring-2 focus:ring-secondary active:scale-95"
-                aria-label={`Reject ${document.name}`}
-              >
-                Reject
-              </button>
-            </div>
+            <ChangeStatusControl
+              status={document.status}
+              documentId={document.id}
+              documentName={document.name}
+              onApprove={onApprove}
+              onStartReject={() => setIsRejecting(true)}
+            />
           </div>
         </div>
 
@@ -293,28 +406,15 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
         )}
       </div>
 
-      {/* Action Buttons: Approve (PRIMARY) and Reject (outline) */}
+      {/* Action Buttons: Status-aware actions */}
       <div className="flex items-center justify-end gap-1.5 mt-3 pt-2 border-t border-black/[0.05]">
-        <button
-          type="button"
-          onClick={() => onApprove(document.id)}
-          className={`px-3 py-1 rounded-full text-[11px] font-sans transition-all focus:outline-none focus:ring-2 focus:ring-secondary ${
-            document.status === 'Approved'
-              ? 'bg-primary text-white opacity-80 cursor-default'
-              : 'bg-primary text-white hover:opacity-90 active:scale-95'
-          }`}
-          aria-label={`Approve ${document.name}`}
-        >
-          Approve
-        </button>
-        <button
-          type="button"
-          onClick={() => setIsRejecting(true)}
-          className="px-3 py-1 rounded-full text-[11px] font-sans bg-white border border-primary text-primary hover:bg-black/[0.04] transition-all focus:outline-none focus:ring-2 focus:ring-secondary active:scale-95"
-          aria-label={`Reject ${document.name}`}
-        >
-          Reject
-        </button>
+        <ChangeStatusControl
+          status={document.status}
+          documentId={document.id}
+          documentName={document.name}
+          onApprove={onApprove}
+          onStartReject={() => setIsRejecting(true)}
+        />
       </div>
 
       {/* Inline Reject Form */}

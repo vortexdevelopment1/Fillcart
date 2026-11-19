@@ -84,8 +84,6 @@ const createInitialApplicants = (): Applicant[] => {
         ? 'Approved'
         : isRejected && idx === 0
         ? 'Rejected'
-        : !isRejected && idx < 2
-        ? 'Approved'
         : 'Pending') as DocumentStatus,
       rejectReason: isRejected && idx === 0 ? 'Document verification failed' : undefined,
     }));
@@ -127,8 +125,6 @@ const createInitialApplicants = (): Applicant[] => {
           ? 'Approved'
           : isRejected && idx === 3
           ? 'Rejected'
-          : !isRejected && idx < 3
-          ? 'Approved'
           : 'Pending') as DocumentStatus,
         rejectReason: isRejected && idx === 3 ? 'VAHAN check failed' : undefined,
       };
@@ -262,7 +258,12 @@ export const VerificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const updatedDocs = app.documents.map((doc) => {
           if (doc.id === docId) {
             docName = doc.name;
-            return { ...doc, status: 'Approved' as DocumentStatus };
+            return {
+              ...doc,
+              status: 'Approved' as DocumentStatus,
+              rejectReason: undefined,
+              rejectRemarks: undefined,
+            };
           }
           return doc;
         });
@@ -355,7 +356,12 @@ export const VerificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         const updatedDocs = app.documents.map((doc) => {
           if (doc.isNotApplicable) return doc;
-          return { ...doc, status: 'Approved' as DocumentStatus };
+          return {
+            ...doc,
+            status: 'Approved' as DocumentStatus,
+            rejectReason: undefined,
+            rejectRemarks: undefined,
+          };
         });
 
         const updatedApp = {
