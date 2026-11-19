@@ -291,7 +291,8 @@ export const Sidebar: React.FC = () => {
           overflowX: 'hidden',
         }}
         className={`
-          fixed top-4 left-4 bottom-4 h-[calc(100vh-32px)]
+          fixed top-3 left-3 bottom-3 h-[calc(100dvh-24px)] max-h-[calc(100dvh-24px)]
+          md:top-4 md:left-4 md:bottom-4 md:h-[calc(100vh-32px)] md:max-h-none
           bg-primary text-white rounded-[24px] z-50 select-none
           flex flex-col overflow-y-hidden overflow-x-hidden shadow-2xl border border-white/[0.08]
           ${isPanelOpen ? 'p-[14px_10px]' : 'pt-6 pb-3 px-[8px] items-center'}
@@ -426,7 +427,13 @@ export const Sidebar: React.FC = () => {
         <div className="relative flex-1 min-h-0 w-full flex flex-col overflow-hidden overflow-x-hidden">
           <nav
             aria-label="Main"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', overflowX: 'hidden' }}
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              overflowX: 'hidden',
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehaviorY: 'contain',
+            }}
             onScroll={(e) => {
               if (e.currentTarget.scrollLeft !== 0) e.currentTarget.scrollLeft = 0;
             }}
@@ -547,12 +554,28 @@ export const Sidebar: React.FC = () => {
                 </div>
               </>
             )}
+            {/* Mobile-only Settings & Logout (inside scrollable nav so it can never be cut off) */}
+            <div className="md:hidden mt-auto pt-2 border-t border-white/[0.12] flex flex-col gap-1 w-full flex-shrink-0 pb-3">
+              {showSettings && renderNavItem(settingsItem)}
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-[calc(100%-8px)] mx-auto h-[40px] px-3 rounded-[14px] flex items-center gap-2.5 transition-all duration-150 relative text-left focus:outline-none focus:ring-2 focus:ring-secondary text-white/70 hover:text-red-300 hover:bg-red-500/15"
+                aria-label="Logout"
+              >
+                <LogOut className="w-[18px] h-[18px] stroke-[1.5] flex-shrink-0" />
+                <span className="text-[12px] font-sans whitespace-nowrap overflow-hidden transition-opacity duration-150 delay-100 opacity-100 tracking-tight">
+                  Logout
+                </span>
+              </button>
+            </div>
           </nav>
         </div>
 
-        {/* ──────────── 3. PINNED SETTINGS & LOGOUT AT BOTTOM ──────────── */}
+        {/* ──────────── 3. PINNED SETTINGS & LOGOUT AT BOTTOM (Desktop / Tablet >=md) ──────────── */}
         <div
-          className={`mt-auto flex-shrink-0 border-t border-white/[0.12] overflow-x-hidden flex flex-col ${
+          className={`hidden md:flex mt-auto flex-shrink-0 border-t border-white/[0.12] overflow-x-hidden flex-col ${
             isPanelOpen ? 'w-full pt-2 gap-1' : 'w-full items-center pt-[4px] gap-[6px]'
           }`}
         >
