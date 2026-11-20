@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import {
   StaffMember,
@@ -49,6 +49,35 @@ export const StaffPage: React.FC = () => {
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
   const [isEditStaffOpen, setIsEditStaffOpen] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+
+  // Tabs scroll & overflow detection
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkTabsScroll = () => {
+    const el = tabsContainerRef.current;
+    if (el) {
+      const hasOverflow = el.scrollWidth > el.clientWidth + 2;
+      const isAtEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 6;
+      setCanScrollRight(hasOverflow && !isAtEnd);
+    }
+  };
+
+  useEffect(() => {
+    checkTabsScroll();
+    window.addEventListener('resize', checkTabsScroll);
+    return () => window.removeEventListener('resize', checkTabsScroll);
+  }, [roles]);
+
+  const handleTabClick = (e: React.MouseEvent<HTMLButtonElement>, role: string) => {
+    if (hasUnsavedChanges) {
+      const ok = window.confirm('You have unsaved changes. Switch tab anyway?');
+      if (!ok) return;
+    }
+    setActiveRoleTab(role);
+    e.currentTarget.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    setTimeout(checkTabsScroll, 300);
+  };
 
   // Sync local permissions when tab switches or roles change
   useEffect(() => {
@@ -162,7 +191,7 @@ export const StaffPage: React.FC = () => {
   const availableRoleNames = Object.keys(roles);
 
   return (
-    <div className="space-y-5 pb-12">
+    <div className="space-y-5 pb-12 w-full max-w-full min-w-0">
       {/* Toast Notification */}
       {notification && (
         <div className="p-3 rounded-2xl bg-primary text-white font-sans text-xs font-medium fixed bottom-6 right-6 z-50 shadow-lg animate-in fade-in slide-in-from-bottom-2">
@@ -171,9 +200,9 @@ export const StaffPage: React.FC = () => {
       )}
 
       {/* Two Column Responsive Layout: Left Staff List, Right Role Permissions */}
-      <div className="grid grid-cols-1 min-[1280px]:grid-cols-[1fr_1.1fr] gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-5 items-start w-full max-w-full min-w-0">
         {/* ─── LEFT COLUMN: STAFF LIST ─── */}
-        <div className="space-y-4">
+        <div className="space-y-4 w-full max-w-full min-w-0">
           <div className="p-4 rounded-[24px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] flex items-center justify-between">
             <div>
               <h2 className="font-heading text-lg font-normal text-ink">Ops Team Staff ({staff.length})</h2>
@@ -302,17 +331,17 @@ export const StaffPage: React.FC = () => {
         </div>
 
         {/* ─── RIGHT COLUMN: ROLE PERMISSIONS MATRIX ─── */}
-        <div className="p-5 rounded-[24px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-primary/10">
-            <div>
-              <h2 className="font-heading text-lg font-normal text-ink">Role Permissions Matrix</h2>
-              <p className="font-sans text-xs text-ink/60">
+        <div className="p-4 sm:p-5 rounded-[24px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] space-y-4 w-full max-w-full min-w-0">
+          <div className="flex items-center justify-between pb-3 border-b border-primary/10 gap-2 flex-wrap sm:flex-nowrap">
+            <div className="min-w-0">
+              <h2 className="font-heading text-lg font-normal text-ink truncate">Role Permissions Matrix</h2>
+              <p className="font-sans text-xs text-ink/60 truncate">
                 Granular action policies across 9 core modules
               </p>
             </div>
 
             {isSuperAdminTab && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-sans font-medium bg-neutral text-primary border border-primary/20">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-sans font-medium bg-neutral text-primary border border-primary/20 flex-shrink-0">
                 <Lock className="w-3 h-3 text-primary" />
                 <span>Locked Role</span>
               </span>
@@ -320,51 +349,56 @@ export const StaffPage: React.FC = () => {
           </div>
 
           {/* Pill Tabs for Roles */}
-          <div className="flex items-center gap-1.5 pb-2 overflow-x-auto no-scrollbar max-w-full min-w-0">
-            {availableRoleNames.map((role) => (
+          <div className="relative w-full max-w-full min-w-0">
+            <div
+              ref={tabsContainerRef}
+              onScroll={checkTabsScroll}
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch',
+                maskImage: canScrollRight
+                  ? 'linear-gradient(to right, black calc(100% - 36px), transparent 100%)'
+                  : 'none',
+                WebkitMaskImage: canScrollRight
+                  ? 'linear-gradient(to right, black calc(100% - 36px), transparent 100%)'
+                  : 'none',
+              }}
+              className="flex items-center gap-1.5 pb-2 overflow-x-auto no-scrollbar max-w-full min-w-0 flex-nowrap"
+            >
+              {availableRoleNames.map((role) => (
+                <button
+                  key={role}
+                  onClick={(e) => handleTabClick(e, role)}
+                  className={`px-[clamp(10px,2.5vw,14px)] py-[clamp(5px,1.5vw,6px)] rounded-full font-sans text-[clamp(11px,2.8vw,12px)] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+                    activeRoleTab === role
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'bg-neutral text-ink/75 hover:bg-neutral/80'
+                  }`}
+                >
+                  {role}
+                </button>
+              ))}
+
               <button
-                key={role}
-                onClick={() => {
-                  if (hasUnsavedChanges) {
-                    const ok = window.confirm('You have unsaved changes. Switch tab anyway?');
-                    if (!ok) return;
-                  }
-                  setActiveRoleTab(role);
-                }}
+                onClick={(e) => handleTabClick(e, 'External Roles')}
                 className={`px-[clamp(10px,2.5vw,14px)] py-[clamp(5px,1.5vw,6px)] rounded-full font-sans text-[clamp(11px,2.8vw,12px)] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
-                  activeRoleTab === role
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'bg-neutral text-ink/75 hover:bg-neutral/80'
+                  activeRoleTab === 'External Roles'
+                    ? 'bg-secondary text-white shadow-sm'
+                    : 'bg-secondary/15 text-primary hover:bg-secondary/25'
                 }`}
               >
-                {role}
+                External Roles
               </button>
-            ))}
 
-            <button
-              onClick={() => {
-                if (hasUnsavedChanges) {
-                  const ok = window.confirm('You have unsaved changes. Switch tab anyway?');
-                  if (!ok) return;
-                }
-                setActiveRoleTab('External Roles');
-              }}
-              className={`px-[clamp(10px,2.5vw,14px)] py-[clamp(5px,1.5vw,6px)] rounded-full font-sans text-[clamp(11px,2.8vw,12px)] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
-                activeRoleTab === 'External Roles'
-                  ? 'bg-secondary text-white shadow-sm'
-                  : 'bg-secondary/15 text-primary hover:bg-secondary/25'
-              }`}
-            >
-              External Roles
-            </button>
-
-            <button
-              onClick={handleCreateNewRole}
-              className="px-3 py-1.5 rounded-full border border-dashed border-primary/30 text-primary font-sans text-xs font-medium hover:bg-neutral flex items-center gap-1 transition-colors whitespace-nowrap flex-shrink-0"
-            >
-              <Plus className="w-3 h-3" />
-              <span>New Role</span>
-            </button>
+              <button
+                onClick={handleCreateNewRole}
+                className="px-3 py-1.5 rounded-full border border-dashed border-primary/30 text-primary font-sans text-xs font-medium hover:bg-neutral flex items-center gap-1 transition-colors whitespace-nowrap flex-shrink-0"
+              >
+                <Plus className="w-3 h-3" />
+                <span>New Role</span>
+              </button>
+            </div>
           </div>
 
           {/* Unsaved Changes Warning Bar */}
@@ -392,12 +426,12 @@ export const StaffPage: React.FC = () => {
           )}
 
           {activeRoleTab === 'External Roles' ? (
-            <div className="space-y-3">
+            <div className="space-y-3 min-w-0 max-w-full">
               <div className="p-3.5 rounded-[16px] bg-neutral border border-primary/10 text-xs font-sans text-primary">
                 External roles govern access scopes for client applications (Merchant Portal, Merchant POS, Rider App, Customer Web).
                 These role policies are fixed by platform protocol and are enforced via JWT claims.
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 min-w-0 max-w-full">
                 {EXTERNAL_ROLES_DEFINITIONS.map((ext) => (
                   <div
                     key={ext.name}
@@ -429,14 +463,19 @@ export const StaffPage: React.FC = () => {
             </div>
           ) : (
             /* 9 Modules x 5 Actions Matrix Table */
-            <div className="border border-primary/10 rounded-2xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+            <div className="border border-primary/10 rounded-2xl overflow-hidden w-full max-w-full min-w-0">
+              <div
+                className="overflow-x-auto w-full max-w-full"
+                style={{ WebkitOverflowScrolling: 'touch' }}
+              >
+                <table className="w-full text-left border-collapse table-auto min-w-[460px]">
                   <thead>
                     <tr className="bg-neutral/60 border-b border-primary/10 font-sans text-[11px] font-medium text-ink/75">
-                      <th className="py-2.5 px-3">Module ({MODULE_NAMES.length})</th>
+                      <th className="py-2.5 px-3 sticky left-0 z-20 bg-[#f4f5f6] min-w-[130px] sm:min-w-[140px] whitespace-nowrap shadow-[1px_0_0_0_rgba(18,55,71,0.08)]">
+                        Module ({MODULE_NAMES.length})
+                      </th>
                       {ACTION_NAMES.map((action) => (
-                        <th key={action} className="py-2.5 px-3 text-center">
+                        <th key={action} className="py-2.5 px-2 text-center w-[15%] min-w-[50px] whitespace-nowrap">
                           {action}
                         </th>
                       ))}
@@ -453,15 +492,15 @@ export const StaffPage: React.FC = () => {
                       };
 
                       return (
-                        <tr key={module} className="hover:bg-neutral/30 transition-colors">
-                          <td className="py-2 px-3 font-medium text-ink whitespace-nowrap">
+                        <tr key={module} className="hover:bg-neutral/30 transition-colors group">
+                          <td className="py-2 px-3 font-medium text-ink whitespace-nowrap sticky left-0 z-10 bg-white group-hover:bg-[#f5f6f7] transition-colors shadow-[1px_0_0_0_rgba(18,55,71,0.08)]">
                             {module}
                           </td>
                           {ACTION_NAMES.map((action) => {
                             const isChecked = Boolean(modPerms[action]);
 
                             return (
-                              <td key={action} className="py-2 px-3 text-center">
+                              <td key={action} className="py-2 px-2 text-center w-[15%] min-w-[50px]">
                                 {/* Custom 22px Checkbox: checked = PRIMARY + white tick */}
                                 <button
                                   type="button"

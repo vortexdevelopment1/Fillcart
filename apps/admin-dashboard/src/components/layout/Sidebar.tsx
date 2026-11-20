@@ -25,6 +25,7 @@ import { useApp } from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
 import { ModuleName } from '../../data/staffData';
 import { SidebarTooltipPortal } from './SidebarTooltipPortal';
+import { lockSettings } from '../../services/settingsAccess';
 
 interface NavItemConfig {
   id: string;
@@ -56,6 +57,7 @@ export const Sidebar: React.FC = () => {
   const isPanelOpen = isExpanded || isMobileOpen;
 
   const handleLogout = () => {
+    lockSettings();
     addToast(
       'info',
       'Admin Logout',

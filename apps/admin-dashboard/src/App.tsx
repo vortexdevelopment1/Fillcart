@@ -14,6 +14,7 @@ import { ReportsPage } from './pages/ReportsPage';
 import { StaffPage } from './pages/StaffPage';
 import { AuditLogsPage } from './pages/AuditLogsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { SettingsGuard } from './components/settings/SettingsGuard';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { NoAccessState } from './components/common/NoAccessState';
 import { useApp } from './context/AppContext';
@@ -153,8 +154,15 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* 10. System Settings */}
-        <Route path="/settings" element={<SettingsPage />} />
+        {/* 10. System Settings (Password Protected via SettingsGuard) */}
+        <Route
+          path="/settings"
+          element={
+            <SettingsGuard>
+              <SettingsPage />
+            </SettingsGuard>
+          }
+        />
 
         {/* Fallback to Home */}
         <Route path="*" element={<Navigate to="/" replace />} />

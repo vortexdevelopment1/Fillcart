@@ -6,6 +6,7 @@ import {
   Landmark,
   BellRing,
   ShieldAlert,
+  Lock,
 } from 'lucide-react';
 import { SettingsTabId } from '../../types/settings';
 
@@ -29,6 +30,7 @@ interface SettingsTabsProps {
   onTabChange: (tabId: SettingsTabId) => void;
   allowedTabs: SettingsTabId[];
   dirtyTabs?: SettingsTabId[];
+  onLockAndExit?: () => void;
 }
 
 export const SettingsTabs: React.FC<SettingsTabsProps> = ({
@@ -36,6 +38,7 @@ export const SettingsTabs: React.FC<SettingsTabsProps> = ({
   onTabChange,
   allowedTabs,
   dirtyTabs = [],
+  onLockAndExit,
 }) => {
   const visibleTabs = ALL_TABS.filter((tab) => allowedTabs.includes(tab.id));
   const activeTabRef = useRef<HTMLButtonElement | null>(null);
@@ -113,6 +116,20 @@ export const SettingsTabs: React.FC<SettingsTabsProps> = ({
           </button>
         );
       })}
+
+      {onLockAndExit && (
+        <div className="hidden lg:block pt-3 border-t border-primary/10 mt-2">
+          <button
+            type="button"
+            onClick={onLockAndExit}
+            className="w-full h-10 px-4 py-2.5 rounded-full flex items-center gap-2.5 text-left text-[13px] font-medium text-ink/70 hover:bg-neutral hover:text-ink border border-primary/15 transition-all focus:outline-none focus:ring-2 focus:ring-secondary cursor-pointer"
+            title="Lock settings and exit"
+          >
+            <Lock className="w-4 h-4 text-primary/60 flex-shrink-0" />
+            <span className="whitespace-nowrap">Lock & Exit</span>
+          </button>
+        </div>
+      )}
     </nav>
   );
 };

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Lock } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { NoAccessState } from '../components/common/NoAccessState';
 import { settingsService } from '../services/settingsService';
+import { lockSettings } from '../services/settingsAccess';
 import { SystemSettings, SettingsTabId } from '../types/settings';
 import { SettingsTabs } from '../components/settings/SettingsTabs';
 import { GeneralTab } from '../components/settings/GeneralTab';
@@ -19,6 +21,7 @@ import { UnsavedPromptModal } from '../components/settings/UnsavedPromptModal';
 export const SettingsPage: React.FC = () => {
   const { currentRole, hasPermission, settings: storeSettings, updateSettings: updateStoreSettings, logAudit } = useApp();
   const { addToast } = useToast();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // RBAC Permission Check
@@ -515,6 +518,19 @@ export const SettingsPage: React.FC = () => {
     addToast('info', 'Changes Discarded', 'Platform settings restored to active production configuration.');
   };
 
+  const handleLockAndExit = useCallback(() => {
+    if (isDirty) {
+      const confirmExit = window.confirm(
+        'You have unsaved changes in Settings. Exiting now will discard these changes. Do you want to lock and exit?'
+      );
+      if (!confirmExit) return;
+    }
+
+    lockSettings();
+    addToast('info', 'Settings Locked', 'Settings session ended and secured.');
+    navigate('/');
+  }, [isDirty, addToast, navigate]);
+
   // Validate form fields
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
@@ -619,6 +635,34 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <div className="w-full h-full flex flex-col min-h-0 relative pb-16">
+      {/* ──────────────── TOP SECURITY & EXIT BAR ──────────────── */}
+      <div className="flex items-center justify-between gap-3 mb-4 flex-wrap bg-white px-4 py-2.5 sm:px-5 sm:py-3 rounded-[20px] border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)]">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-full bg-neutral flex items-center justify-center text-primary flex-shrink-0 border border-primary/15">
+            <Lock className="w-4 h-4 text-primary" strokeWidth={1.8} />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-ink leading-tight">Security Session Active</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Session active" />
+            </div>
+            <p className="text-[11px] text-ink/60 hidden sm:block leading-tight">
+              Protected configuration mode • Auto-locks after 10m
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleLockAndExit}
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full border border-primary/20 bg-neutral hover:bg-[#123747] text-ink hover:text-white text-xs font-medium transition-all shadow-xs focus:outline-none focus:ring-2 focus:ring-secondary ml-auto cursor-pointer group"
+          title="Exit settings and lock immediately"
+        >
+          <Lock className="w-3.5 h-3.5 text-primary group-hover:text-white transition-colors" />
+          <span>Exit & Lock Settings</span>
+        </button>
+      </div>
+
       {/* ──────────────── LAYOUT: LEFT TABS (HORIZONTAL <1000px) + RIGHT SETTINGS CARD ──────────────── */}
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 sm:gap-5 items-start w-full max-w-full min-w-0">
         {/* Left / Top Tabs */}
@@ -627,6 +671,7 @@ export const SettingsPage: React.FC = () => {
           onTabChange={handleTabChange}
           allowedTabs={allowedTabs}
           dirtyTabs={dirtyTabs}
+          onLockAndExit={handleLockAndExit}
         />
 
         {/* Right Settings Card */}

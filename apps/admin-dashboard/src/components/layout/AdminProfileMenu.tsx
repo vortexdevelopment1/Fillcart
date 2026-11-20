@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { useApp } from '../../context/AppContext';
+import { lockSettings } from '../../services/settingsAccess';
 
 export interface AdminProfileContentProps {
   onClose: () => void;
@@ -89,6 +90,7 @@ export const AdminProfileContent: React.FC<AdminProfileContentProps> = ({
 
   const handleLogout = () => {
     // TODO: Connect production SSO/JWT logout API to invalidate session tokens
+    lockSettings();
     addToast(
       'info',
       'Admin Logout',

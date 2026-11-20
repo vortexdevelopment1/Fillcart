@@ -1,6 +1,7 @@
 import { ApiResponse, mockDelay } from './apiClient';
 import { SystemSettings } from '../types/settings';
 import { initialSettings } from '../data/settingsData';
+import { isSettingsUnlocked, lockSettings } from './settingsAccess';
 
 // Backend note: "assignment mode, allow pharmacy, auto-activate" are not in the original API document; they are new keys under PUT /settings.
 
@@ -18,6 +19,12 @@ export const settingsService = {
 
   // PUT /api/v1/admin/settings
   updateSettings: async (settings: SystemSettings): Promise<ApiResponse<SystemSettings>> => {
+    // If unlock session has expired, lock settings to prompt verification modal
+    if (!isSettingsUnlocked()) {
+      lockSettings();
+      throw new Error('Settings session expired. Please verify your password to continue.');
+    }
+
     await mockDelay(300);
     currentSettingsCache = { ...settings };
     return {
