@@ -5,6 +5,7 @@ import { OrderRow } from '../components/orders/OrderRow';
 import { OrderDetailsModal } from '../components/orders/OrderDetailsModal';
 import { OrdersActivityCard } from '../components/charts/OrdersActivityCard';
 import { HatchBar } from '../components/common/HatchBar';
+import { CustomSelect } from '../components/common/CustomSelect';
 import {
   Search,
   Filter,
@@ -217,7 +218,7 @@ export const OrdersPage: React.FC = () => {
               {/* Status Filter */}
               <div className="flex items-center gap-1.5">
                 <Filter className="w-3.5 h-3.5 text-ink/50" />
-                <select
+                <CustomSelect
                   value={selectedStatus}
                   onChange={(e) => {
                     setSelectedStatus(e.target.value);
@@ -231,7 +232,7 @@ export const OrdersPage: React.FC = () => {
                   <option value="Out for delivery">Out for delivery</option>
                   <option value="Delivered">Delivered</option>
                   <option value="Cancelled">Cancelled</option>
-                </select>
+                </CustomSelect>
               </div>
             </div>
 
@@ -353,7 +354,7 @@ export const OrdersPage: React.FC = () => {
                   </button>
                 </div>
 
-                <select
+                <CustomSelect
                   value={pageSize}
                   onChange={(e) => {
                     setPageSize(Number(e.target.value));
@@ -364,7 +365,7 @@ export const OrdersPage: React.FC = () => {
                   <option value={8}>8 / page</option>
                   <option value={16}>16 / page</option>
                   <option value={24}>24 / page</option>
-                </select>
+                </CustomSelect>
               </div>
             </div>
           )}

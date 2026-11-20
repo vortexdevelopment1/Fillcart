@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 import { VerificationStatus } from '../../data/verification';
+import { CustomSelect } from '../common/CustomSelect';
 
 interface VerificationToolbarProps {
   activeTab: 'All' | 'Riders' | 'Vendors';
@@ -60,21 +61,18 @@ export const VerificationToolbar: React.FC<VerificationToolbarProps> = ({
         </div>
 
         {/* Status select dropdown */}
-        <div className="relative">
-          <select
-            value={statusFilter}
-            onChange={(e) => onStatusChange(e.target.value as 'All' | VerificationStatus)}
-            className="h-[36px] pl-3.5 pr-8 text-xs font-sans bg-white border border-black/[0.08] rounded-full text-ink cursor-pointer appearance-none focus:outline-none focus:ring-2 focus:ring-secondary shadow-sm"
-            aria-label="Filter by verification status"
-          >
-            <option value="All">All</option>
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Reupload">Re-upload asked</option>
-          </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink/55 pointer-events-none" />
-        </div>
+        <CustomSelect
+          value={statusFilter}
+          onChange={(e) => onStatusChange(e.target.value as 'All' | VerificationStatus)}
+          className="h-[36px] px-3.5 text-xs font-sans bg-white border border-black/[0.08] rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary shadow-sm"
+          aria-label="Filter by verification status"
+        >
+          <option value="All">All status</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Reupload">Re-upload asked</option>
+        </CustomSelect>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AuditLogEntry, AuditAction, ApiLogEntry, initialApiLogs } from '../data/auditData';
+import { CustomSelect } from '../components/common/CustomSelect';
 import {
   History,
   Search,
@@ -405,7 +406,7 @@ export const AuditLogsPage: React.FC = () => {
           {isApiTab ? (
             <>
               {/* HTTP Method Filter */}
-              <select
+              <CustomSelect
                 value={selectedMethod}
                 onChange={(e) => {
                   setSelectedMethod(e.target.value);
@@ -419,10 +420,10 @@ export const AuditLogsPage: React.FC = () => {
                 <option value="PATCH">PATCH</option>
                 <option value="PUT">PUT</option>
                 <option value="DELETE">DELETE</option>
-              </select>
+              </CustomSelect>
 
               {/* Status Code Filter */}
-              <select
+              <CustomSelect
                 value={selectedStatusCode}
                 onChange={(e) => {
                   setSelectedStatusCode(e.target.value);
@@ -434,13 +435,13 @@ export const AuditLogsPage: React.FC = () => {
                 <option value="2xx">2xx Success</option>
                 <option value="4xx">4xx Client Error</option>
                 <option value="5xx">5xx Server Error</option>
-              </select>
+              </CustomSelect>
             </>
           ) : (
             <>
               {/* Module Filter (hidden/locked if Finance Admin) */}
               {currentRole !== 'Finance Admin' && (
-                <select
+                <CustomSelect
                   value={selectedModule}
                   onChange={(e) => {
                     setSelectedModule(e.target.value);
@@ -454,11 +455,11 @@ export const AuditLogsPage: React.FC = () => {
                       {m}
                     </option>
                   ))}
-                </select>
+                </CustomSelect>
               )}
 
               {/* Action Filter */}
-              <select
+              <CustomSelect
                 value={selectedAction}
                 onChange={(e) => {
                   setSelectedAction(e.target.value);
@@ -474,10 +475,10 @@ export const AuditLogsPage: React.FC = () => {
                     </option>
                   )
                 )}
-              </select>
+              </CustomSelect>
 
               {/* Admin Filter */}
-              <select
+              <CustomSelect
                 value={selectedAdmin}
                 onChange={(e) => {
                   setSelectedAdmin(e.target.value);
@@ -491,7 +492,7 @@ export const AuditLogsPage: React.FC = () => {
                     {adm}
                   </option>
                 ))}
-              </select>
+              </CustomSelect>
             </>
           )}
 

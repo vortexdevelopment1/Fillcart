@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Category } from '../../data/products';
+import { CustomSelect } from '../common/CustomSelect';
 import {
   Plus,
   Pencil,
@@ -91,18 +92,15 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
           </div>
 
           {/* Status filter */}
-          <div className="relative">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as 'All' | 'Active' | 'Inactive')}
-              className="h-[34px] pl-3 pr-7 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer appearance-none focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
-            >
-              <option value="All">All Status</option>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink/55 pointer-events-none" />
-          </div>
+          <CustomSelect
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as 'All' | 'Active' | 'Inactive')}
+            className="h-[34px] px-3 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
+          >
+            <option value="All">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </CustomSelect>
         </div>
       </div>
 

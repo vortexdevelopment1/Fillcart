@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { Product, Category } from '../../data/products';
 import { ProductRow } from './ProductRow';
+import { CustomSelect } from '../common/CustomSelect';
 import {
   Search,
   ChevronDown,
@@ -242,43 +243,37 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           </div>
 
           {/* Brand Select */}
-          <div className="relative">
-            <select
-              value={selectedBrand}
-              onChange={(e) => {
-                setSelectedBrand(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="h-[30px] pl-2.5 pr-6 text-[11px] font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer appearance-none focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
-            >
-              {BRAND_OPTIONS.map((b) => (
-                <option key={b} value={b}>
-                  {b}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-primary/60 pointer-events-none" />
-          </div>
+          <CustomSelect
+            value={selectedBrand}
+            onChange={(e) => {
+              setSelectedBrand(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="h-[30px] px-2.5 text-[11px] font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
+          >
+            {BRAND_OPTIONS.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </CustomSelect>
 
           {/* Category Select */}
-          <div className="relative">
-            <select
-              value={selectedCategory}
-              onChange={(e) => {
-                setSelectedCategory(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="h-[30px] pl-2.5 pr-6 text-[11px] font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer appearance-none focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
-            >
-              <option value="All">All Categories</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.name}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-primary/60 pointer-events-none" />
-          </div>
+          <CustomSelect
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="h-[30px] px-2.5 text-[11px] font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
+          >
+            <option value="All">All Categories</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </CustomSelect>
 
           {/* Filters icon button */}
           <button
@@ -351,21 +346,20 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           aria-label="Pagination Navigation"
         >
           {/* Page size select (small pill, 12px) */}
-          <div className="relative mr-1">
-            <select
+          <div className="mr-1">
+            <CustomSelect
               value={pageSize}
               onChange={(e) => {
                 setPageSize(Number(e.target.value));
                 setCurrentPage(1);
               }}
               aria-label="Products per page"
-              className="h-[32px] pl-3 pr-7 text-[12px] font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer appearance-none focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
+              className="h-[32px] px-3 text-[12px] font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
             >
               <option value={8}>8 / page</option>
               <option value={16}>16 / page</option>
               <option value={24}>24 / page</option>
-            </select>
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-primary/60 pointer-events-none" />
+            </CustomSelect>
           </div>
 
           {/* « First Button */}

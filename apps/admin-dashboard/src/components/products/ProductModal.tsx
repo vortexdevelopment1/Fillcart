@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Product, Category } from '../../data/products';
+import { CustomSelect } from '../common/CustomSelect';
 import { X, Image as ImageIcon } from 'lucide-react';
 
 interface ProductModalProps {
@@ -179,7 +180,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             {/* 2. Category Select */}
             <div>
               <label className="block text-ink/70 mb-1">Category *</label>
-              <select
+              <CustomSelect
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full h-[38px] px-3 rounded-lg border border-black/[0.12] bg-white focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -189,13 +190,13 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                     {c.name}
                   </option>
                 ))}
-              </select>
+              </CustomSelect>
             </div>
 
             {/* 3. Vendor Select */}
             <div>
               <label className="block text-ink/70 mb-1">Vendor *</label>
-              <select
+              <CustomSelect
                 value={vendor}
                 onChange={(e) => setVendor(e.target.value)}
                 className="w-full h-[38px] px-3 rounded-lg border border-black/[0.12] bg-white focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -205,7 +206,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                     {v}
                   </option>
                 ))}
-              </select>
+              </CustomSelect>
             </div>
 
             {/* 4. SKU */}
@@ -223,7 +224,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             {/* 5. Brand */}
             <div>
               <label className="block text-ink/70 mb-1">Brand Name *</label>
-              <select
+              <CustomSelect
                 value={brand || AVAILABLE_BRANDS[0]}
                 onChange={(e) => setBrand(e.target.value)}
                 className="w-full h-[38px] px-3 rounded-lg border border-black/[0.12] bg-white focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -233,13 +234,13 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                     {b}
                   </option>
                 ))}
-              </select>
+              </CustomSelect>
             </div>
 
             {/* 6. Measurement Unit */}
             <div>
               <label className="block text-ink/70 mb-1">Measurement Unit</label>
-              <select
+              <CustomSelect
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
                 className="w-full h-[38px] px-3 rounded-lg border border-black/[0.12] bg-white focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -252,7 +253,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                 <option value="1 Pack">1 Pack</option>
                 <option value="12-Pack">12-Pack</option>
                 <option value="1 Piece">1 Piece</option>
-              </select>
+              </CustomSelect>
             </div>
 
             {/* 7. MRP */}
@@ -284,7 +285,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             {/* 9. Status Select */}
             <div className="sm:col-span-2">
               <label className="block text-ink/70 mb-1">Catalogue Status</label>
-              <select
+              <CustomSelect
                 value={status}
                 onChange={(e) => setStatus(e.target.value as Product['status'])}
                 className="w-full h-[38px] px-3 rounded-lg border border-black/[0.12] bg-white focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -292,7 +293,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                 <option value="Active">Active</option>
                 <option value="Pending approval">Pending approval</option>
                 <option value="Inactive">Inactive</option>
-              </select>
+              </CustomSelect>
             </div>
 
             {/* 10. Description (Full width) */}

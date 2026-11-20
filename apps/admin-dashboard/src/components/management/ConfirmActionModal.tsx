@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CustomSelect } from '../common/CustomSelect';
 import { X, AlertTriangle } from 'lucide-react';
 
 export type ActionType = 'suspend' | 'reactivate' | 'set_inactive' | 'set_active';
@@ -141,7 +142,7 @@ export const ConfirmActionModal: React.FC<ConfirmActionModalProps> = ({
                 <label className="text-ink/80 font-medium block mb-1">
                   Reason for Suspension *
                 </label>
-                <select
+                <CustomSelect
                   value={suspendReason}
                   onChange={(e) => setSuspendReason(e.target.value)}
                   className="w-full px-3 py-2 rounded-[10px] border border-primary/15 bg-white text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -151,7 +152,7 @@ export const ConfirmActionModal: React.FC<ConfirmActionModalProps> = ({
                       {r}
                     </option>
                   ))}
-                </select>
+                </CustomSelect>
               </div>
 
               <div>
@@ -184,7 +185,7 @@ export const ConfirmActionModal: React.FC<ConfirmActionModalProps> = ({
                 <label className="text-ink/80 font-medium block mb-1">
                   Reason (Optional)
                 </label>
-                <select
+                <CustomSelect
                   value={inactiveReason}
                   onChange={(e) => setInactiveReason(e.target.value)}
                   className="w-full px-3 py-2 rounded-[10px] border border-primary/15 bg-white text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -194,7 +195,7 @@ export const ConfirmActionModal: React.FC<ConfirmActionModalProps> = ({
                       {r}
                     </option>
                   ))}
-                </select>
+                </CustomSelect>
               </div>
               <div>
                 <label className="text-ink/80 font-medium block mb-1">

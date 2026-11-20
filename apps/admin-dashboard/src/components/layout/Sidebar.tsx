@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -152,9 +152,9 @@ export const Sidebar: React.FC = () => {
     currentRole === 'Finance Admin' ||
     currentRole === 'Marketing Admin';
 
-  // Handle tooltip on mouseEnter / focus for collapsed mode
+  // Handle tooltip on mouseEnter for collapsed mode
   const handleMouseEnter = (
-    e: React.MouseEvent<HTMLElement> | React.FocusEvent<HTMLElement>,
+    e: React.MouseEvent<HTMLElement>,
     name: string,
     badge?: number | string
   ) => {
@@ -169,15 +169,41 @@ export const Sidebar: React.FC = () => {
         badge,
         targetRect: rect,
       });
-    }, 80);
+    }, 60);
   };
 
   const handleMouseLeave = () => {
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-    setTooltipState((prev) => ({ ...prev, visible: false }));
+    setTooltipState((prev) => (prev.visible ? { ...prev, visible: false } : prev));
   };
 
+  // Automatically dismiss tooltip on route change, expand toggle, scroll, resize, or pointerdown
+  useEffect(() => {
+    handleMouseLeave();
+  }, [location.pathname, isExpanded]);
+
+  useEffect(() => {
+    if (!tooltipState.visible) return;
+
+    const dismissTooltip = () => {
+      handleMouseLeave();
+    };
+
+    window.addEventListener('scroll', dismissTooltip, true);
+    window.addEventListener('pointerdown', dismissTooltip);
+    window.addEventListener('resize', dismissTooltip);
+    window.addEventListener('wheel', dismissTooltip, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', dismissTooltip, true);
+      window.removeEventListener('pointerdown', dismissTooltip);
+      window.removeEventListener('resize', dismissTooltip);
+      window.removeEventListener('wheel', dismissTooltip);
+    };
+  }, [tooltipState.visible]);
+
   const handleNavClick = () => {
+    handleMouseLeave();
     closeMobile();
     // On tablet (< 1024px), close expanded overlay on navigation
     if (typeof window !== 'undefined' && window.innerWidth < 1024 && isExpanded) {
@@ -236,12 +262,14 @@ export const Sidebar: React.FC = () => {
         className="relative flex items-center justify-center flex-shrink-0 w-[40px]"
         onMouseEnter={(e) => handleMouseEnter(e, item.name, item.badge)}
         onMouseLeave={handleMouseLeave}
-        onFocus={(e) => handleMouseEnter(e, item.name, item.badge)}
-        onBlur={handleMouseLeave}
       >
         <NavLink
           to={item.path}
-          onClick={handleNavClick}
+          onClick={(e) => {
+            handleMouseLeave();
+            (e.currentTarget as HTMLElement).blur();
+            handleNavClick();
+          }}
           aria-label={item.name}
           aria-current={isActive ? 'page' : undefined}
           className={`
@@ -282,6 +310,7 @@ export const Sidebar: React.FC = () => {
 
       {/* ──────────── SIDEBAR CONTAINER ──────────── */}
       <aside
+        onMouseLeave={handleMouseLeave}
         style={{
           width: isPanelOpen ? '256px' : '56px',
           backgroundColor: '#123747',
@@ -406,13 +435,15 @@ export const Sidebar: React.FC = () => {
             <div
               onMouseEnter={(e) => handleMouseEnter(e, 'Expand sidebar')}
               onMouseLeave={handleMouseLeave}
-              onFocus={(e) => handleMouseEnter(e, 'Expand sidebar')}
-              onBlur={handleMouseLeave}
               className="flex items-center justify-center w-[40px]"
             >
               <button
                 type="button"
-                onClick={toggleExpanded}
+                onClick={(e) => {
+                  handleMouseLeave();
+                  (e.currentTarget as HTMLElement).blur();
+                  toggleExpanded();
+                }}
                 aria-label="Expand sidebar"
                 aria-expanded={false}
                 className="w-[36px] h-[36px] rounded-[14px] bg-white/10 text-white/80 hover:bg-white/[0.18] hover:text-white flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -598,12 +629,14 @@ export const Sidebar: React.FC = () => {
               className="relative flex items-center justify-center flex-shrink-0 w-[40px] max-w-[40px]"
               onMouseEnter={(e) => handleMouseEnter(e, 'Logout')}
               onMouseLeave={handleMouseLeave}
-              onFocus={(e) => handleMouseEnter(e, 'Logout')}
-              onBlur={handleMouseLeave}
             >
               <button
                 type="button"
-                onClick={handleLogout}
+                onClick={(e) => {
+                  handleMouseLeave();
+                  (e.currentTarget as HTMLElement).blur();
+                  handleLogout();
+                }}
                 aria-label="Logout"
                 className="w-[36px] h-[36px] rounded-[14px] flex items-center justify-center transition-all duration-150 relative focus:outline-none focus:ring-2 focus:ring-secondary bg-white/10 text-white/70 hover:text-red-300 hover:bg-red-500/20"
               >

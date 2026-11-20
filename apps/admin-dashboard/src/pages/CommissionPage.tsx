@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
+import { CustomSelect } from '../components/common/CustomSelect';
 import {
   Percent,
   CheckCircle2,
@@ -568,7 +569,7 @@ export const CommissionPage: React.FC = () => {
 
                 <div>
                   <label className="block text-ink/75 font-medium mb-1">Scope</label>
-                  <select
+                  <CustomSelect
                     value={newOverride.category}
                     onChange={(e) => setNewOverride({ ...newOverride, category: e.target.value })}
                     className="w-full px-3 py-1.5 rounded-xl border border-primary/20 text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -579,7 +580,7 @@ export const CommissionPage: React.FC = () => {
                         {c.category}
                       </option>
                     ))}
-                  </select>
+                  </CustomSelect>
                 </div>
 
                 <div>

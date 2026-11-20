@@ -12,7 +12,7 @@ export const StatCardSuspended: React.FC<StatCardSuspendedProps> = ({
   items,
 }) => {
   return (
-    <div className="h-[130px] rounded-[22px] p-[14px_16px] bg-white text-ink flex flex-col justify-between overflow-hidden select-none relative shadow-sm border border-primary/10">
+    <div className="h-[130px] rounded-[22px] p-[14px_16px] bg-white text-ink flex flex-col justify-between overflow-hidden select-none relative shadow-sm border border-primary/10 cursor-pointer hover:border-secondary transition-all">
       {/* Top Title */}
       <div className="flex items-center justify-between">
         <span className="text-[13px] font-sans text-primary/60 font-normal leading-tight">

@@ -19,19 +19,18 @@
 }
 
 @layer base {
-  html {
-    overflow-x: hidden;
-    max-width: 100%;
+  html, body, #root {
     height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
     -webkit-text-size-adjust: 100%;
   }
   body {
     font-family: "Poppins", sans-serif;
     background-color: var(--background);
     color: var(--ink);
-    overflow-x: hidden;
-    max-width: 100%;
-    min-height: 100dvh;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
     padding-left: env(safe-area-inset-left, 0px);
@@ -103,6 +102,20 @@
   background: rgba(18, 55, 71, 0.25);
 }
 
+.custom-themed-dropdown-list::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-themed-dropdown-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-themed-dropdown-list::-webkit-scrollbar-thumb {
+  background: rgba(82, 119, 129, 0.25);
+  border-radius: 9999px;
+}
+.custom-themed-dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(82, 119, 129, 0.45);
+}
+
 @keyframes popupOpen {
   from {
     opacity: 0;
@@ -111,6 +124,17 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

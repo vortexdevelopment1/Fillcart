@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, FileSpreadsheet } from 'lucide-react';
+import { CustomSelect } from '../common/CustomSelect';
 
 interface GenerateStatementModalProps {
   isOpen: boolean;
@@ -50,7 +51,7 @@ export const GenerateStatementModal: React.FC<GenerateStatementModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-sans text-xs font-medium text-ink mb-1.5">Month</label>
-              <select
+              <CustomSelect
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -62,19 +63,19 @@ export const GenerateStatementModal: React.FC<GenerateStatementModalProps> = ({
                     </option>
                   )
                 )}
-              </select>
+              </CustomSelect>
             </div>
 
             <div>
               <label className="block font-sans text-xs font-medium text-ink mb-1.5">Year</label>
-              <select
+              <CustomSelect
                 value={year}
                 onChange={(e) => setYear(Number(e.target.value))}
                 className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
               >
                 <option value={2026}>2026</option>
                 <option value={2025}>2025</option>
-              </select>
+              </CustomSelect>
             </div>
           </div>
 

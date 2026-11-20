@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
 import { HatchBar } from '../components/common/HatchBar';
+import { CustomSelect } from '../components/common/CustomSelect';
 import {
   Ticket,
   Plus,
@@ -492,14 +493,14 @@ export const CouponsPage: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-ink/75 font-medium mb-1">Discount Type</label>
-                    <select
+                    <CustomSelect
                       value={formType}
                       onChange={(e) => setFormType(e.target.value as any)}
                       className="w-full px-3 py-1.5 rounded-xl border border-primary/20 text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
                     >
                       <option value="Percentage">Percentage (%)</option>
                       <option value="Flat">Flat Cash (₹)</option>
-                    </select>
+                    </CustomSelect>
                   </div>
 
                   <div>
@@ -559,7 +560,7 @@ export const CouponsPage: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-ink/75 font-medium mb-1">Target Audience</label>
-                    <select
+                    <CustomSelect
                       value={formApplicableFor}
                       onChange={(e) => setFormApplicableFor(e.target.value as any)}
                       className="w-full px-3 py-1.5 rounded-xl border border-primary/20 text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -567,12 +568,12 @@ export const CouponsPage: React.FC = () => {
                       <option value="All Customers">All Customers</option>
                       <option value="New Customers Only">New Customers Only (1st Order)</option>
                       <option value="VIP Customers">VIP / Repeat Customers</option>
-                    </select>
+                    </CustomSelect>
                   </div>
 
                   <div>
                     <label className="block text-ink/75 font-medium mb-1">Uses Per Customer</label>
-                    <select
+                    <CustomSelect
                       value={formPerUserLimit}
                       onChange={(e) => setFormPerUserLimit(Number(e.target.value))}
                       className="w-full px-3 py-1.5 rounded-xl border border-primary/20 text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -582,7 +583,7 @@ export const CouponsPage: React.FC = () => {
                       <option value={3}>3 Times Per Customer</option>
                       <option value={5}>5 Times Per Customer</option>
                       <option value={999}>Unlimited Times</option>
-                    </select>
+                    </CustomSelect>
                   </div>
                 </div>
 

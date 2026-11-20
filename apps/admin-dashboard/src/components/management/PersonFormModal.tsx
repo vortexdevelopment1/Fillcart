@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CustomSelect } from '../common/CustomSelect';
 import { X } from 'lucide-react';
 import { ManagementVendor, ManagementRider } from '../../data/mockManagementData';
 
@@ -292,7 +293,7 @@ export const PersonFormModal: React.FC<PersonFormModalProps> = ({
 
                 <div>
                   <label className="text-ink/75 font-medium block mb-1">Business Category *</label>
-                  <select
+                  <CustomSelect
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-3 py-2 rounded-[10px] border border-primary/15 focus:outline-none focus:ring-2 focus:ring-secondary text-ink bg-white"
@@ -302,7 +303,7 @@ export const PersonFormModal: React.FC<PersonFormModalProps> = ({
                         {c}
                       </option>
                     ))}
-                  </select>
+                  </CustomSelect>
                 </div>
 
                 <div>
@@ -375,7 +376,7 @@ export const PersonFormModal: React.FC<PersonFormModalProps> = ({
 
                 <div>
                   <label className="text-ink/75 font-medium block mb-1">Vehicle Type *</label>
-                  <select
+                  <CustomSelect
                     value={vehicleType}
                     onChange={(e) =>
                       setVehicleType(e.target.value as typeof VEHICLE_TYPES[number])
@@ -387,7 +388,7 @@ export const PersonFormModal: React.FC<PersonFormModalProps> = ({
                         {v}
                       </option>
                     ))}
-                  </select>
+                  </CustomSelect>
                 </div>
 
                 <div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { CustomSelect } from './CustomSelect';
 import {
   ChevronLeft,
   ChevronRight,
@@ -58,21 +59,20 @@ export const PaginationControl: React.FC<PaginationControlProps> = ({
       {/* Right: Controls */}
       <div className="flex items-center flex-wrap gap-1.5 focus:outline-none" aria-label="Pagination">
         {/* Page size select */}
-        <div className="relative mr-1">
-          <select
+        <div className="mr-1">
+          <CustomSelect
             value={pageSize}
             onChange={(e) => {
               onPageSizeChange(Number(e.target.value));
               onPageChange(1);
             }}
             aria-label={`${itemLabel} per page`}
-            className="h-[32px] pl-3 pr-7 text-[12px] font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer appearance-none focus:outline-none focus:ring-2 focus:ring-secondary shadow-xs"
+            className="h-[32px] px-3 text-[12px] font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary shadow-xs"
           >
             <option value={8}>8 / page</option>
             <option value={16}>16 / page</option>
             <option value={24}>24 / page</option>
-          </select>
-          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-primary/60 pointer-events-none" />
+          </CustomSelect>
         </div>
 
         {/* « First Button (hidden below 480px) */}

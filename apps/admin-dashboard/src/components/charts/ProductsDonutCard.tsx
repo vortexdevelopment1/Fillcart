@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../common/Card';
+import { CustomSelect } from '../common/CustomSelect';
 import { ChevronDown, TrendingUp, TrendingDown, Check } from 'lucide-react';
 
 const REVENUE_TIMEFRAME_OPTIONS = ['Today', 'This Week', 'This Month', 'This Year'] as const;
@@ -59,20 +60,6 @@ const REVENUE_DATA: Record<
 export const ProductsDonutCard: React.FC = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<RevenueTimeframe>('This Month');
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
 
   const activeData = REVENUE_DATA[filter];
 
@@ -81,40 +68,18 @@ export const ProductsDonutCard: React.FC = () => {
       onClick={() => navigate('/payments')}
       title="Revenue split"
       action={
-        <div ref={dropdownRef} className="relative select-none" onClick={(e) => e.stopPropagation()}>
-          <button
-            type="button"
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-1.5 text-[12px] text-ink/80 bg-neutral px-3 py-1 rounded-full cursor-pointer hover:bg-neutral/80 border border-primary/[0.08] transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
-            aria-expanded={isOpen}
-            aria-haspopup="listbox"
+        <div className="select-none" onClick={(e) => e.stopPropagation()}>
+          <CustomSelect
+            value={filter}
+            onChange={(e) => setFilter(e.target.value as any)}
+            className="h-[28px] px-3 text-[12px] text-ink/80 bg-neutral rounded-full cursor-pointer hover:bg-neutral/80 border border-primary/[0.08] transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
           >
-            <span>{filter}</span>
-            <ChevronDown className={`w-3.5 h-3.5 text-ink/60 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          {isOpen && (
-            <div className="absolute right-0 top-full mt-1.5 z-40 bg-white rounded-xl shadow-lg border border-primary/15 py-1 min-w-[125px] animate-fadeIn">
-              {REVENUE_TIMEFRAME_OPTIONS.map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => {
-                    setFilter(opt);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full px-3 py-1.5 text-left text-xs flex items-center justify-between transition-colors ${
-                    filter === opt
-                      ? 'bg-secondary/10 text-primary font-semibold'
-                      : 'text-ink/80 hover:bg-neutral'
-                  }`}
-                >
-                  <span>{opt}</span>
-                  {filter === opt && <Check className="w-3.5 h-3.5 text-secondary" />}
-                </button>
-              ))}
-            </div>
-          )}
+            {REVENUE_TIMEFRAME_OPTIONS.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </CustomSelect>
         </div>
       }
       className="h-auto min-h-[200px] xs:min-h-[210px] flex flex-col justify-between cursor-pointer hover:border-secondary transition-all w-full max-w-full min-w-0 overflow-hidden"

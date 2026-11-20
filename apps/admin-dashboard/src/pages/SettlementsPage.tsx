@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
+import { CustomSelect } from '../components/common/CustomSelect';
 import {
   HandCoins,
   CheckCircle2,
@@ -370,7 +371,7 @@ export const SettlementsPage: React.FC = () => {
           </div>
 
           {/* Status Filter */}
-          <select
+          <CustomSelect
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
             className="px-3 py-1.5 rounded-full border border-primary/15 bg-white font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -379,7 +380,7 @@ export const SettlementsPage: React.FC = () => {
             <option value="Pending">Pending</option>
             <option value="Processed">Processed</option>
             <option value="Failed">Failed</option>
-          </select>
+          </CustomSelect>
         </div>
       </div>
 

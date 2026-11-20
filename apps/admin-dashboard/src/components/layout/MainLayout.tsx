@@ -7,7 +7,7 @@ const LayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const { isExpanded } = useSidebar();
 
   return (
-    <div className="min-h-[100dvh] h-[100dvh] w-full max-w-full bg-white flex overflow-hidden relative">
+    <div className="h-full w-full max-w-full bg-white flex overflow-hidden relative">
       {/* Global Fixed/Floating Sidebar (Collapsed / Expanded / Mobile Drawer) */}
       <Sidebar />
 
@@ -16,7 +16,7 @@ const LayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         style={{
           transition: 'padding-left 250ms cubic-bezier(0.16, 1, 0.3, 1)',
         }}
-        className={`flex-1 h-[100dvh] min-h-0 min-w-0 flex flex-col pt-3 pb-3 pr-3 sm:pt-4 sm:pb-4 sm:pr-4 md:pr-5 xl:pr-6 w-full max-w-full overflow-hidden bg-white ${
+        className={`flex-1 h-full min-h-0 min-w-0 flex flex-col pt-3 pb-3 pr-3 sm:pt-4 sm:pb-4 sm:pr-4 md:pr-5 xl:pr-6 w-full max-w-full overflow-hidden bg-white ${
           isExpanded
             ? 'pl-3 sm:pl-4 md:pl-[84px] lg:pl-[284px]'
             : 'pl-3 sm:pl-4 md:pl-[84px] lg:pl-[88px]'

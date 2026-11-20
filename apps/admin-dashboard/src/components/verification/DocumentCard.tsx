@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { VerificationDocument, DocumentStatus } from '../../data/verification';
+import { CustomSelect } from '../common/CustomSelect';
 import { Eye, Check, X, ShieldAlert, Phone, User, HeartHandshake, ChevronDown } from 'lucide-react';
 
 interface ChangeStatusControlProps {
@@ -275,7 +276,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
         {isRejecting && (
           <div className="mt-3 p-3 rounded-[12px] bg-neutral border border-primary/10 space-y-2">
             <span className="text-[11px] font-sans text-ink block">Reason for rejection:</span>
-            <select
+            <CustomSelect
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               className="w-full text-xs font-sans px-2.5 py-1.5 rounded-[8px] border border-primary/15 bg-white text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -285,7 +286,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
                   {r}
                 </option>
               ))}
-            </select>
+            </CustomSelect>
             <input
               type="text"
               value={rejectRemarks}
@@ -421,7 +422,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
       {isRejecting && (
         <div className="mt-2.5 p-2.5 rounded-[12px] bg-neutral border border-primary/10 space-y-2">
           <span className="text-[11px] font-sans text-ink block">Reason for rejection:</span>
-          <select
+          <CustomSelect
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
             className="w-full text-xs font-sans px-2.5 py-1.5 rounded-[8px] border border-primary/15 bg-white text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -431,7 +432,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
                 {r}
               </option>
             ))}
-          </select>
+          </CustomSelect>
           <input
             type="text"
             value={rejectRemarks}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Order, OrderStatus } from '../../data/ordersData';
 import { initialRiders } from '../../data/riders';
+import { CustomSelect } from '../common/CustomSelect';
 import {
   X,
   Bike,
@@ -246,7 +247,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                   <label className="block font-sans text-[10px] font-medium text-ink/70 mb-1">
                     {order.rider ? 'Reassign Rider:' : 'Assign Available Rider:'}
                   </label>
-                  <select
+                  <CustomSelect
                     value={selectedRiderId}
                     onChange={(e) => {
                       setSelectedRiderId(e.target.value);
@@ -260,7 +261,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                         {r.name} ({r.vehicleType} · {r.city})
                       </option>
                     ))}
-                  </select>
+                  </CustomSelect>
                 </div>
               )}
             </div>

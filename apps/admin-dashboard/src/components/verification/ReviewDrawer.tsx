@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Applicant } from '../../data/verification';
 import { StatusBadge } from './StatusBadge';
 import { DocumentCard } from './DocumentCard';
+import { CustomSelect } from '../common/CustomSelect';
 import { Lightbox } from './Lightbox';
 import { X } from 'lucide-react';
 
@@ -137,7 +138,7 @@ export const ReviewDrawer: React.FC<ReviewDrawerProps> = ({
                   {applicant.type === 'Vendor' ? 'Business Category' : 'Vehicle Type'}
                 </span>
                 {applicant.type === 'Rider' && applicant.status === 'Pending' ? (
-                  <select
+                  <CustomSelect
                     value={applicant.vehicleType || 'Motorcycle'}
                     onChange={(e) => {
                       const newType = e.target.value as
@@ -148,14 +149,14 @@ export const ReviewDrawer: React.FC<ReviewDrawerProps> = ({
                         | 'On foot';
                       onUpdateVehicleType?.(applicant.id, newType);
                     }}
-                    className="mt-0.5 px-2 py-0.5 rounded-[6px] border border-primary/20 bg-white text-primary font-medium text-xs focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+                    className="mt-0.5 px-2 py-0.5 rounded-[8px] border border-primary/20 bg-white text-primary font-medium text-xs focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
                   >
                     <option value="Motorcycle">Motorcycle</option>
                     <option value="Scooter">Scooter</option>
                     <option value="Electric">Electric</option>
                     <option value="Bicycle">Bicycle (No motor docs)</option>
                     <option value="On foot">On foot (No motor docs)</option>
-                  </select>
+                  </CustomSelect>
                 ) : (
                   <span className="font-medium text-primary mt-0.5 block truncate">
                     {applicant.type === 'Vendor'

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, UserPlus, Shield } from 'lucide-react';
 import { StaffRole } from '../../data/staffData';
+import { CustomSelect } from '../common/CustomSelect';
 
 interface AddStaffModalProps {
   isOpen: boolean;
@@ -128,7 +129,7 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
               <label className="block font-sans text-xs font-medium text-ink mb-1">
                 RBAC Role <span className="text-secondary">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -138,7 +139,7 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
                     {r}
                   </option>
                 ))}
-              </select>
+              </CustomSelect>
             </div>
 
             <div>

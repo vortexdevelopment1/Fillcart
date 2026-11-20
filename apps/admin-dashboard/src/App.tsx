@@ -5,7 +5,9 @@ import { HomePage } from './pages/HomePage';
 import { DocumentVerificationPage } from './pages/DocumentVerificationPage';
 import { ProductsPage } from './pages/ProductsPage';
 import { VendorsPage } from './pages/VendorsPage';
+import { VendorDetailPage } from './pages/VendorDetailPage';
 import { RidersPage } from './pages/RidersPage';
+import { RiderDetailPage } from './pages/RiderDetailPage';
 import { OrdersPage } from './pages/OrdersPage';
 import { FinancePage } from './pages/FinancePage';
 import { ReportsPage } from './pages/ReportsPage';
@@ -55,6 +57,14 @@ export const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/vendors/:vendorId"
+          element={
+            <ProtectedRoute module="Users">
+              <VendorDetailPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* 3. Rider Management */}
         <Route
@@ -62,6 +72,14 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute module="Users">
               <RidersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/riders/:riderId"
+          element={
+            <ProtectedRoute module="Users">
+              <RiderDetailPage />
             </ProtectedRoute>
           }
         />

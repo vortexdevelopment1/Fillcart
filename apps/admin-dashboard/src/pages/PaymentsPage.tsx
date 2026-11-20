@@ -5,6 +5,7 @@ import { ReceiptModal } from '../components/payments/ReceiptModal';
 import { GenerateStatementModal } from '../components/payments/GenerateStatementModal';
 import { ConfirmPayoutModal } from '../components/payments/ConfirmPayoutModal';
 import { HatchBar } from '../components/common/HatchBar';
+import { CustomSelect } from '../components/common/CustomSelect';
 import {
   DollarSign,
   Clock,
@@ -398,7 +399,7 @@ export const PaymentsPage: React.FC = () => {
               {/* Method Filter */}
               <div className="flex items-center gap-1.5">
                 <Filter className="w-3.5 h-3.5 text-ink/50" />
-                <select
+                <CustomSelect
                   value={selectedMethod}
                   onChange={(e) => {
                     setSelectedMethod(e.target.value);
@@ -411,11 +412,11 @@ export const PaymentsPage: React.FC = () => {
                   <option value="Card">Card</option>
                   <option value="Bank">Bank Transfer</option>
                   <option value="COD">Cash on Delivery</option>
-                </select>
+                </CustomSelect>
               </div>
 
               {/* Status Filter */}
-              <select
+              <CustomSelect
                 value={selectedStatus}
                 onChange={(e) => {
                   setSelectedStatus(e.target.value);
@@ -428,7 +429,7 @@ export const PaymentsPage: React.FC = () => {
                 <option value="Pending">Pending</option>
                 <option value="Failed">Failed</option>
                 <option value="Refunded">Refunded</option>
-              </select>
+              </CustomSelect>
             </div>
           </div>
 
@@ -580,7 +581,7 @@ export const PaymentsPage: React.FC = () => {
                   </button>
                 </div>
 
-                <select
+                <CustomSelect
                   value={pageSize}
                   onChange={(e) => {
                     setPageSize(Number(e.target.value));
@@ -591,7 +592,7 @@ export const PaymentsPage: React.FC = () => {
                   <option value={8}>8 / page</option>
                   <option value={16}>16 / page</option>
                   <option value={24}>24 / page</option>
-                </select>
+                </CustomSelect>
               </div>
             </div>
           )}

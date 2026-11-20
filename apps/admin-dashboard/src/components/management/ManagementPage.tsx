@@ -7,10 +7,10 @@ import { StatCardActive } from './StatCardActive';
 import { StatCardPending } from './StatCardPending';
 import { StatCardSuspended } from './StatCardSuspended';
 import { PersonRow } from './PersonRow';
-import { ProfileModal } from './ProfileModal';
 import { PersonFormModal } from './PersonFormModal';
 import { ConfirmActionModal, ActionType } from './ConfirmActionModal';
 import { PaginationControl } from '../common/PaginationControl';
+import { CustomSelect } from '../common/CustomSelect';
 import { Toast } from '../verification/Toast';
 import { Search, Upload, Plus, ChevronDown } from 'lucide-react';
 
@@ -43,20 +43,48 @@ export const ManagementPage: React.FC<{ config: ManagementPageConfig }> = ({ con
   const isVendor = config.type === 'vendor';
   const rawList: (ManagementVendor | ManagementRider)[] = isVendor ? vendors : riders;
 
-  // ──────────── TOOLBAR FILTERS STATE ────────────
-  const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [filter1, setFilter1] = useState('All'); // Category (Vendor) or Vehicle Type (Rider)
-  const [availabilityFilter, setAvailabilityFilter] = useState('All'); // Rider only
-  const [accountStatusFilter, setAccountStatusFilter] = useState('All'); // All | Active | Inactive | Suspended
-  const [verificationFilter, setVerificationFilter] = useState('All'); // All | Verified | Pending | Rejected
+  // ──────────── PERSISTENT TOOLBAR FILTERS STATE ────────────
+  const storageKey = `mgmt_state_${config.type}`;
+  const savedState = useMemo(() => {
+    try {
+      const saved = sessionStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  }, [storageKey]);
+
+  const [searchInput, setSearchInput] = useState(savedState?.searchInput || '');
+  const [debouncedSearch, setDebouncedSearch] = useState(savedState?.searchInput || '');
+  const [filter1, setFilter1] = useState(savedState?.filter1 || 'All'); // Category (Vendor) or Vehicle Type (Rider)
+  const [availabilityFilter, setAvailabilityFilter] = useState(savedState?.availabilityFilter || 'All'); // Rider only
+  const [accountStatusFilter, setAccountStatusFilter] = useState(savedState?.accountStatusFilter || 'All'); // All | Active | Inactive | Suspended
+  const [verificationFilter, setVerificationFilter] = useState(savedState?.verificationFilter || 'All'); // All | Verified | Pending | Rejected
 
   // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(savedState?.currentPage || 1);
   const [pageSize, setPageSize] = useState(8);
 
+  // Save list state to sessionStorage whenever it changes
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          searchInput,
+          filter1,
+          availabilityFilter,
+          accountStatusFilter,
+          verificationFilter,
+          currentPage,
+        })
+      );
+    } catch {
+      // Ignore sessionStorage errors
+    }
+  }, [storageKey, searchInput, filter1, availabilityFilter, accountStatusFilter, verificationFilter, currentPage]);
+
   // Modal states
-  const [viewItem, setViewItem] = useState<ManagementVendor | ManagementRider | null>(null);
   const [formItem, setFormItem] = useState<ManagementVendor | ManagementRider | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -207,14 +235,6 @@ export const ManagementPage: React.FC<{ config: ManagementPageConfig }> = ({ con
       setActive(config.type, actionTarget.id);
     }
 
-    // If view modal was open on this item, update viewItem pointer
-    if (viewItem && viewItem.id === actionTarget.id) {
-      setTimeout(() => {
-        const fresh = (isVendor ? vendors : riders).find((i) => i.id === actionTarget.id);
-        if (fresh) setViewItem(fresh);
-      }, 50);
-    }
-
     setConfirmAction(null);
     setActionTarget(null);
   };
@@ -222,15 +242,6 @@ export const ManagementPage: React.FC<{ config: ManagementPageConfig }> = ({ con
   const handleOpenDocuments = (target: ManagementVendor | ManagementRider) => {
     navigate(`/document-verification?type=${config.type}&id=${target.id}`);
   };
-
-  // Find applicant documents for view modal
-  const viewApplicantDocs = useMemo(() => {
-    if (!viewItem) return undefined;
-    const match = applicants.find(
-      (a) => a.entityId === viewItem.id || a.name === (isVendor ? (viewItem as ManagementVendor).storeName : (viewItem as ManagementRider).name)
-    );
-    return match?.documents;
-  }, [applicants, viewItem, isVendor]);
 
   return (
     <div className="w-full flex flex-col gap-4 pb-12 pt-3">
@@ -320,80 +331,68 @@ export const ManagementPage: React.FC<{ config: ManagementPageConfig }> = ({ con
             {/* Filter Selects */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* Filter 1: Category or Vehicle Type */}
-              <div className="relative">
-                <select
-                  value={filter1}
-                  onChange={(e) => {
-                    setFilter1(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="h-[34px] pl-3 pr-7 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer appearance-none focus:outline-none focus:ring-2 focus:ring-secondary shadow-xs"
-                >
-                  <option value="All">All {config.filter1Label.toLowerCase()}s</option>
-                  {config.categoriesOrVehicleTypes.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink/50 pointer-events-none" />
-              </div>
+              <CustomSelect
+                value={filter1}
+                onChange={(e) => {
+                  setFilter1(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="h-[34px] px-3 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary shadow-xs"
+              >
+                <option value="All">All {config.filter1Label.toLowerCase()}s</option>
+                {config.categoriesOrVehicleTypes.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </CustomSelect>
 
               {/* Rider Availability Select (Riders only) */}
               {!isVendor && (
-                <div className="relative">
-                  <select
-                    value={availabilityFilter}
-                    onChange={(e) => {
-                      setAvailabilityFilter(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="h-[34px] pl-3 pr-7 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer appearance-none focus:outline-none focus:ring-2 focus:ring-secondary shadow-xs"
-                  >
-                    <option value="All">All availability</option>
-                    <option value="Online">Online</option>
-                    <option value="Offline">Offline</option>
-                    <option value="On delivery">On delivery</option>
-                  </select>
-                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink/50 pointer-events-none" />
-                </div>
+                <CustomSelect
+                  value={availabilityFilter}
+                  onChange={(e) => {
+                    setAvailabilityFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="h-[34px] px-3 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary shadow-xs"
+                >
+                  <option value="All">All availability</option>
+                  <option value="Online">Online</option>
+                  <option value="Offline">Offline</option>
+                  <option value="On delivery">On delivery</option>
+                </CustomSelect>
               )}
 
               {/* Account Status Select (All / Active / Inactive / Suspended) */}
-              <div className="relative">
-                <select
-                  value={accountStatusFilter}
-                  onChange={(e) => {
-                    setAccountStatusFilter(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="h-[34px] pl-3 pr-7 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer appearance-none focus:outline-none focus:ring-2 focus:ring-secondary shadow-xs"
-                >
-                  <option value="All">All status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Suspended">Suspended</option>
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink/50 pointer-events-none" />
-              </div>
+              <CustomSelect
+                value={accountStatusFilter}
+                onChange={(e) => {
+                  setAccountStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="h-[34px] px-3 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary shadow-xs"
+              >
+                <option value="All">All status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Suspended">Suspended</option>
+              </CustomSelect>
 
               {/* Verification Select (All / Verified / Pending / Rejected) */}
-              <div className="relative">
-                <select
-                  value={verificationFilter}
-                  onChange={(e) => {
-                    setVerificationFilter(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="h-[34px] pl-3 pr-7 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer appearance-none focus:outline-none focus:ring-2 focus:ring-secondary shadow-xs"
-                >
-                  <option value="All">All verification</option>
-                  <option value="Verified">Verified</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink/50 pointer-events-none" />
-              </div>
+              <CustomSelect
+                value={verificationFilter}
+                onChange={(e) => {
+                  setVerificationFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="h-[34px] px-3 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary shadow-xs"
+              >
+                <option value="All">All verification</option>
+                <option value="Verified">Verified</option>
+                <option value="Pending">Pending</option>
+                <option value="Rejected">Rejected</option>
+              </CustomSelect>
             </div>
           </div>
 
@@ -405,7 +404,9 @@ export const ManagementPage: React.FC<{ config: ManagementPageConfig }> = ({ con
                   key={item.id}
                   type={config.type}
                   item={item}
-                  onView={() => setViewItem(item)}
+                  onView={() => {
+                    navigate(isVendor ? `/vendors/${item.id}` : `/riders/${item.id}`);
+                  }}
                   onEdit={() => {
                     setFormItem(item);
                     setIsFormOpen(true);
@@ -483,24 +484,7 @@ export const ManagementPage: React.FC<{ config: ManagementPageConfig }> = ({ con
       </div>
 
       {/* ──────────── MODALS ──────────── */}
-      {/* 1. Full View Profile Modal */}
-      <ProfileModal
-        isOpen={Boolean(viewItem)}
-        type={config.type}
-        item={viewItem}
-        applicantDocs={viewApplicantDocs}
-        onClose={() => setViewItem(null)}
-        onEdit={() => {
-          setFormItem(viewItem);
-          setIsFormOpen(true);
-        }}
-        onSuspend={() => viewItem && handleOpenAction('suspend', viewItem)}
-        onReactivate={() => viewItem && handleOpenAction('reactivate', viewItem)}
-        onSetInactive={() => viewItem && handleOpenAction('set_inactive', viewItem)}
-        onSetActive={() => viewItem && handleOpenAction('set_active', viewItem)}
-      />
-
-      {/* 2. Add / Edit Form Modal */}
+      {/* 1. Add / Edit Form Modal */}
       <PersonFormModal
         isOpen={isFormOpen}
         type={config.type}
@@ -512,10 +496,6 @@ export const ManagementPage: React.FC<{ config: ManagementPageConfig }> = ({ con
         onSubmit={(data) => {
           if (formItem) {
             editPerson(config.type, formItem.id, data);
-            // Refresh viewItem if editing currently open profile
-            if (viewItem && viewItem.id === formItem.id) {
-              setViewItem((prev: any) => ({ ...prev, ...data }));
-            }
           } else {
             addPerson(config.type, data);
           }

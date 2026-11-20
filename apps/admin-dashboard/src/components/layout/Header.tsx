@@ -170,7 +170,20 @@ export const Header: React.FC = () => {
   }, [isProfileOpen]);
 
   const isHome = location.pathname === '/';
-  const pageMeta = ROUTE_CONFIG[location.pathname];
+  let pageMeta = ROUTE_CONFIG[location.pathname];
+  if (!pageMeta) {
+    if (location.pathname.startsWith('/vendors/')) {
+      pageMeta = {
+        title: 'Vendor Details',
+        subtitle: 'Manage vendor store, verification status, catalogue & payouts',
+      };
+    } else if (location.pathname.startsWith('/riders/')) {
+      pageMeta = {
+        title: 'Rider Details',
+        subtitle: 'Manage delivery partner, vehicle spec, SLA & earnings',
+      };
+    }
+  }
 
   useEffect(() => {
     const hour = new Date().getHours();

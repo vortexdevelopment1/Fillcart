@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { HatchBar } from '../components/common/HatchBar';
+import { CustomSelect } from '../components/common/CustomSelect';
 import {
   Receipt,
   FileSpreadsheet,
@@ -323,7 +324,7 @@ export const TaxesPage: React.FC = () => {
                     </td>
                     <td className="py-3 px-3 font-mono font-semibold text-ink/80">{cat.hsnCode}</td>
                     <td className="py-3 px-3">
-                      <select
+                      <CustomSelect
                         value={cat.slab}
                         onChange={(e) => handleUpdateSlab(cat.id, Number(e.target.value) as any)}
                         className="px-2 py-1 rounded-lg border border-primary/20 bg-neutral/20 text-primary font-mono font-bold text-xs focus:outline-none focus:border-secondary"
@@ -332,7 +333,7 @@ export const TaxesPage: React.FC = () => {
                         <option value={5}>5%</option>
                         <option value={12}>12%</option>
                         <option value={18}>18%</option>
-                      </select>
+                      </CustomSelect>
                     </td>
                     <td className="py-3 px-3 text-ink/60">{cat.cess}%</td>
                     <td className="py-3 px-3 text-ink/60 text-right">{cat.lastUpdated}</td>
@@ -401,7 +402,7 @@ export const TaxesPage: React.FC = () => {
 
           <div className="flex items-center gap-2">
             {/* Filter */}
-            <select
+            <CustomSelect
               value={vendorRegFilter}
               onChange={(e) => setVendorRegFilter(e.target.value as any)}
               className="px-3 py-1.5 rounded-full border border-primary/15 bg-white font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -409,7 +410,7 @@ export const TaxesPage: React.FC = () => {
               <option value="All">All Merchants</option>
               <option value="Registered">Registered (GSTIN)</option>
               <option value="Unregistered">Not Registered</option>
-            </select>
+            </CustomSelect>
 
             {/* Search */}
             <div className="relative w-48 sm:w-56">

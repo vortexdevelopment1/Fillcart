@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { GeneralSettings } from '../../types/settings';
 import { ToggleSwitch } from './ToggleSwitch';
+import { CustomSelect } from '../common/CustomSelect';
 import { Image, Upload, AlertCircle } from 'lucide-react';
 
 interface GeneralTabProps {
@@ -183,7 +184,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
               </p>
             </div>
             <div className="w-full sm:w-72">
-              <select
+              <CustomSelect
                 id="timezone"
                 disabled={readOnly}
                 value={data.timezone}
@@ -194,7 +195,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                 <option value="Asia/Dubai (GST +04:00)">Asia/Dubai (GST +04:00)</option>
                 <option value="Asia/Singapore (SGT +08:00)">Asia/Singapore (SGT +08:00)</option>
                 <option value="UTC (Coordinated Universal Time)">UTC (+00:00)</option>
-              </select>
+              </CustomSelect>
             </div>
           </div>
 
@@ -230,7 +231,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
               </p>
             </div>
             <div className="w-full sm:w-72">
-              <select
+              <CustomSelect
                 id="language"
                 disabled={readOnly}
                 value={data.language}
@@ -240,7 +241,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                 <option value="English (India)">English (India)</option>
                 <option value="Hindi (हिंदी)">Hindi (हिंदी)</option>
                 <option value="Hinglish">Hinglish</option>
-              </select>
+              </CustomSelect>
             </div>
           </div>
         </div>
