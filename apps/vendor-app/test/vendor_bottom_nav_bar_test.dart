@@ -41,7 +41,7 @@ void main() {
       expect(find.byType(SvgPicture), findsNWidgets(5));
     });
 
-    testWidgets('active item displays active color (#D4F932) and filled SVG', (
+    testWidgets('active item displays active color (#C8F169) and filled SVG', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
