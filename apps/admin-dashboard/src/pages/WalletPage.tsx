@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
 import { HatchBar } from '../components/common/HatchBar';
+import { SearchInput } from '../components/common/SearchInput';
 import {
   Wallet,
   PlusCircle,
@@ -277,16 +278,13 @@ export const WalletPage: React.FC = () => {
             </div>
 
             {/* Search */}
-            <div className="relative w-48 sm:w-56">
-              <Search className="w-3.5 h-3.5 text-ink/40 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search customer..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 rounded-full border border-primary/15 bg-neutral/30 text-ink font-sans text-xs focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white"
-              />
-            </div>
+            <SearchInput
+              placeholder="Search customer..."
+              value={search}
+              onChange={setSearch}
+              containerClassName="w-48 sm:w-56"
+              className="py-1.5 rounded-full border border-primary/15 bg-neutral/30 focus:ring-2 focus:ring-secondary focus:bg-white"
+            />
           </div>
 
           <div className="overflow-x-auto">

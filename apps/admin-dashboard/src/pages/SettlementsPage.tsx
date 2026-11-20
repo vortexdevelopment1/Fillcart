@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
 import { CustomSelect } from '../components/common/CustomSelect';
+import { SearchInput } from '../components/common/SearchInput';
 import {
   HandCoins,
   CheckCircle2,
@@ -357,18 +358,15 @@ export const SettlementsPage: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           {/* Search */}
-          <div className="relative w-48 sm:w-60">
-            <Search className="w-3.5 h-3.5 text-ink/40 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder={`Search ${activeTab.toLowerCase()}...`}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 rounded-full border border-primary/15 bg-white font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
-            />
-          </div>
+          <SearchInput
+            placeholder={`Search ${activeTab.toLowerCase()}...`}
+            value={search}
+            onChange={setSearch}
+            containerClassName="w-48 sm:w-60"
+            className="py-1.5 rounded-full border border-primary/15 bg-white focus:ring-2 focus:ring-secondary"
+          />
 
           {/* Status Filter */}
           <CustomSelect

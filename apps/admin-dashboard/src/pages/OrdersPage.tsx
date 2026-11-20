@@ -6,6 +6,7 @@ import { OrderDetailsModal } from '../components/orders/OrderDetailsModal';
 import { OrdersActivityCard } from '../components/charts/OrdersActivityCard';
 import { HatchBar } from '../components/common/HatchBar';
 import { CustomSelect } from '../components/common/CustomSelect';
+import { SearchInput } from '../components/common/SearchInput';
 import {
   Search,
   Filter,
@@ -168,9 +169,9 @@ export const OrdersPage: React.FC = () => {
   );
 
   return (
-    <div className="pb-12 w-full">
+    <div className="w-full max-w-full min-w-0 pb-12 box-border">
       {/* BELOW 1280px: 4 stat cards move ABOVE the page content as a 2x2 grid (<640px: 1 col) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 min-[1280px]:hidden mb-[14px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 min-[1280px]:hidden mb-[14px] w-full min-w-0">
         {renderStatCards()}
       </div>
 
@@ -184,7 +185,7 @@ export const OrdersPage: React.FC = () => {
         style={{
           transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
         }}
-        className="grid grid-cols-1 min-[1280px]:grid-cols-[minmax(0,1fr)_270px] min-[1280px]:gap-x-[16px] items-start w-full"
+        className="grid grid-cols-1 min-[1280px]:grid-cols-[minmax(0,1fr)_270px] min-[1280px]:gap-x-[16px] items-start w-full min-w-0 max-w-full"
       >
         {/* LEFT COLUMN (min-width: 0, flex column, gap 14px), top to bottom:
             1) the Orders heatmap card (title "Orders", number, badge, Week/Month pills, heatmap, day labels)
@@ -199,24 +200,21 @@ export const OrdersPage: React.FC = () => {
           </div>
 
           {/* 2) Toolbar */}
-          <div className="p-3.5 rounded-[22px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 flex-1 min-w-[240px]">
-              <div className="relative flex-1 max-w-md">
-                <Search className="w-4 h-4 text-ink/40 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search by order #, customer, or vendor..."
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="w-full pl-9 pr-3 py-1.5 rounded-full border border-primary/15 bg-neutral/40 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white transition-all"
-                />
-              </div>
+          <div className="p-3.5 rounded-[22px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] flex flex-wrap items-center justify-between gap-3 min-w-0 max-w-full">
+            <div className="flex items-center gap-2.5 flex-1 min-w-[220px] flex-wrap sm:flex-nowrap">
+              <SearchInput
+                placeholder="Search by order #, customer, or vendor..."
+                value={search}
+                onChange={(val) => {
+                  setSearch(val);
+                  setCurrentPage(1);
+                }}
+                containerClassName="flex-1 min-w-[180px] max-w-md"
+                className="py-1.5 rounded-full border border-primary/15 bg-neutral/40 focus:ring-2 focus:ring-secondary focus:bg-white"
+              />
 
               {/* Status Filter */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-shrink-0">
                 <Filter className="w-3.5 h-3.5 text-ink/50" />
                 <CustomSelect
                   value={selectedStatus}

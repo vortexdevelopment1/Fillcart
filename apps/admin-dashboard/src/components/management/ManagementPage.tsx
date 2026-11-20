@@ -11,6 +11,7 @@ import { PersonFormModal } from './PersonFormModal';
 import { ConfirmActionModal, ActionType } from './ConfirmActionModal';
 import { PaginationControl } from '../common/PaginationControl';
 import { CustomSelect } from '../common/CustomSelect';
+import { SearchInput } from '../common/SearchInput';
 import { Toast } from '../verification/Toast';
 import { Search, Upload, Plus, ChevronDown } from 'lucide-react';
 
@@ -317,16 +318,13 @@ export const ManagementPage: React.FC<{ config: ManagementPageConfig }> = ({ con
           {/* Toolbar */}
           <div className="w-full p-2.5 sm:p-3 rounded-[20px] bg-white border border-primary/10 shadow-xs flex flex-wrap items-center justify-between gap-2.5 select-none">
             {/* Search Input (name, city, phone, email) */}
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40 pointer-events-none" />
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search name, city or phone"
-                className="w-full pl-9 pr-3 py-2 rounded-full text-xs font-sans border border-primary/10 focus:outline-none focus:ring-2 focus:ring-secondary text-ink placeholder:text-ink/40"
-              />
-            </div>
+            <SearchInput
+              value={searchInput}
+              onChange={setSearchInput}
+              placeholder="Search name, city or phone"
+              containerClassName="flex-1 min-w-[200px]"
+              className="py-2 rounded-full border border-primary/10 focus:ring-2 focus:ring-secondary"
+            />
 
             {/* Filter Selects */}
             <div className="flex items-center gap-2 flex-wrap">

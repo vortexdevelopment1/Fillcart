@@ -6,6 +6,7 @@ import { GenerateStatementModal } from '../components/payments/GenerateStatement
 import { ConfirmPayoutModal } from '../components/payments/ConfirmPayoutModal';
 import { HatchBar } from '../components/common/HatchBar';
 import { CustomSelect } from '../components/common/CustomSelect';
+import { SearchInput } from '../components/common/SearchInput';
 import {
   DollarSign,
   Clock,
@@ -381,20 +382,17 @@ export const PaymentsPage: React.FC = () => {
         <div className="space-y-4">
           {/* Toolbar */}
           <div className="p-3.5 rounded-[22px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 flex-1 min-w-[240px]">
-              <div className="relative flex-1 max-w-md">
-                <Search className="w-4 h-4 text-ink/40 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search by transaction #, party name, or ref..."
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="w-full pl-9 pr-3 py-1.5 rounded-full border border-primary/15 bg-neutral/40 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white transition-all"
-                />
-              </div>
+            <div className="flex items-center gap-2.5 flex-1 min-w-[240px] flex-wrap sm:flex-nowrap">
+              <SearchInput
+                placeholder="Search by transaction #, party name, or ref..."
+                value={search}
+                onChange={(val) => {
+                  setSearch(val);
+                  setCurrentPage(1);
+                }}
+                containerClassName="flex-1 max-w-md min-w-[200px]"
+                className="py-1.5 rounded-full border border-primary/15 bg-neutral/40 focus:ring-2 focus:ring-secondary focus:bg-white"
+              />
 
               {/* Method Filter */}
               <div className="flex items-center gap-1.5">

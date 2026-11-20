@@ -89,7 +89,7 @@ export const DocumentVerificationPage: React.FC = () => {
   }, [applicants, activeTab, statusFilter, searchQuery]);
 
   return (
-    <div className="w-full flex flex-col gap-4 pb-12">
+    <div className="w-full max-w-full min-w-0 flex flex-col gap-4 pb-12 box-border">
       {/* Back Link if opened via deep link */}
       {backRoute && (
         <div className="flex items-center">

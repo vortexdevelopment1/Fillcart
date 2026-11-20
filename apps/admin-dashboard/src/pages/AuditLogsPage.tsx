@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AuditLogEntry, AuditAction, ApiLogEntry, initialApiLogs } from '../data/auditData';
 import { CustomSelect } from '../components/common/CustomSelect';
+import { SearchInput } from '../components/common/SearchInput';
 import {
   History,
   Search,
@@ -389,19 +390,16 @@ export const AuditLogsPage: React.FC = () => {
         {/* Filters Row */}
         <div className="flex flex-wrap items-center gap-2.5 pt-1">
           {/* Search */}
-          <div className="relative flex-1 min-w-[220px] max-w-sm">
-            <Search className="w-4 h-4 text-ink/40 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder={isApiTab ? "Search endpoint, user, IP, request ID..." : "Search target, action details, IP, admin..."}
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full pl-9 pr-3 py-1.5 rounded-full border border-primary/15 bg-neutral/40 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white transition-all"
-            />
-          </div>
+          <SearchInput
+            placeholder={isApiTab ? "Search endpoint, user, IP, request ID..." : "Search target, action details, IP, admin..."}
+            value={search}
+            onChange={(val) => {
+              setSearch(val);
+              setCurrentPage(1);
+            }}
+            containerClassName="flex-1 min-w-[220px] max-w-sm"
+            className="py-1.5 rounded-full border border-primary/15 bg-neutral/40 focus:ring-2 focus:ring-secondary focus:bg-white"
+          />
 
           {isApiTab ? (
             <>

@@ -325,7 +325,7 @@ export const OrdersActivityCard: React.FC = () => {
           </div>
 
           {/* Light Panel: background rgba(255,255,255,0.55), radius 12px, padding 6px, width 100% */}
-          <div className="w-full bg-white/[0.55] rounded-[12px] p-[6px] shadow-xs overflow-x-auto min-[900px]:overflow-x-visible no-scrollbar">
+          <div className="w-full bg-white/[0.55] rounded-[12px] p-[6px] shadow-xs overflow-x-auto no-scrollbar">
             <div className="flex items-end gap-1.5 w-full min-w-[340px] min-[900px]:min-w-0">
               {/* Y-Axis level indicators for the 7 rows */}
               <div className="flex flex-col justify-between h-[89px] text-[8px] font-sans text-primary/70 font-semibold select-none flex-shrink-0 text-right w-[20px] py-[0.5px]">

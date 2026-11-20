@@ -5,6 +5,8 @@ import { createVendorDocuments, VerificationDocument } from '../data/verificatio
 import { PersonFormModal } from '../components/management/PersonFormModal';
 import { ConfirmActionModal, ActionType } from '../components/management/ConfirmActionModal';
 import { Lightbox } from '../components/verification/Lightbox';
+import { DocumentCard } from '../components/verification/DocumentCard';
+import { SearchInput } from '../components/common/SearchInput';
 import {
   ArrowLeft,
   ExternalLink,
@@ -44,6 +46,8 @@ export const VendorDetailPage: React.FC = () => {
     setInactive,
     setActive,
     editPerson,
+    approveDocument,
+    rejectDocument,
     showToast,
   } = useVerification();
 
@@ -80,15 +84,33 @@ export const VendorDetailPage: React.FC = () => {
   const [productSearch, setProductSearch] = useState('');
 
   // Applicant documents
-  const applicantDocs = useMemo(() => {
-    if (!vendor) return [];
-    const match = applicants.find(
+  const matchedApplicant = useMemo(() => {
+    if (!vendor) return null;
+    return applicants.find(
       (a) => a.entityId === vendor.id || a.name === vendor.storeName
     );
-    return match?.documents && match.documents.length > 0
-      ? match.documents
-      : createVendorDocuments(vendor.id, vendor.businessCategory);
   }, [applicants, vendor]);
+
+  const applicantDocs = useMemo(() => {
+    if (!vendor) return [];
+    return matchedApplicant?.documents && matchedApplicant.documents.length > 0
+      ? matchedApplicant.documents
+      : createVendorDocuments(vendor.id, vendor.businessCategory);
+  }, [matchedApplicant, vendor]);
+
+  const handleApproveDoc = (docId: string) => {
+    if (matchedApplicant) {
+      approveDocument(matchedApplicant.id, docId);
+      showToast('Document approved successfully');
+    }
+  };
+
+  const handleRejectDoc = (docId: string, reason: string, remarks?: string) => {
+    if (matchedApplicant) {
+      rejectDocument(matchedApplicant.id, docId, reason, remarks);
+      showToast('Document rejected');
+    }
+  };
 
   const applicableDocs = useMemo(
     () => applicantDocs.filter((d) => !d.isNotApplicable),
@@ -215,7 +237,7 @@ export const VendorDetailPage: React.FC = () => {
         <button
           type="button"
           onClick={handleBack}
-          className="min-h-[40px] inline-flex items-center gap-1.5 text-xs font-sans font-medium text-ink/75 hover:text-ink transition-colors py-2 px-3 -ml-2 rounded-full hover:bg-neutral focus:outline-none focus:ring-2 focus:ring-secondary"
+          className="min-h-[40px] inline-flex items-center gap-1.5 text-xs font-sans font-medium text-ink/75 hover:text-ink transition-colors py-2 px-3.5 rounded-full hover:bg-neutral active:bg-neutral/80 focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <ArrowLeft className="w-4 h-4 text-ink" />
           Back to Vendors
@@ -522,15 +544,10 @@ export const VendorDetailPage: React.FC = () => {
                     {approvedDocsCount} of {applicableDocs.length} approved ({progressPercent}%)
                   </span>
                 </div>
-                <div className="w-full h-[8px] rounded-full bg-primary/10 overflow-hidden">
+                <div className="w-full h-[8px] rounded-full bg-neutral overflow-hidden border border-black/[0.04]">
                   <div
-                    style={{
-                      width: `${progressPercent}%`,
-                      backgroundColor: '#FFFFFF',
-                      backgroundImage:
-                        'repeating-linear-gradient(45deg, #123747 0, #123747 1px, transparent 1px, transparent 2.5px)',
-                    }}
-                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${progressPercent}%` }}
+                    className="h-full rounded-full bg-secondary transition-all duration-500"
                   />
                 </div>
               </div>
@@ -548,72 +565,13 @@ export const VendorDetailPage: React.FC = () => {
             {/* Checklist */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {applicantDocs.map((doc) => (
-                <div
+                <DocumentCard
                   key={doc.id}
-                  className={`p-3.5 rounded-[18px] border border-primary/10 flex items-center justify-between gap-3 text-xs font-sans shadow-xs ${
-                    doc.isNotApplicable ? 'bg-neutral/40 opacity-50' : 'bg-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    {!doc.isNotApplicable && (
-                      <button
-                        type="button"
-                        onClick={() => setLightboxDoc(doc.name)}
-                        className="w-10 h-10 rounded-[10px] hatch hover:bg-secondary flex-shrink-0 flex items-center justify-center border border-primary/10 cursor-pointer"
-                        title={`Preview ${doc.name}`}
-                      >
-                        <Eye className="w-4 h-4 text-ink/70" />
-                      </button>
-                    )}
-
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span
-                          className={`font-medium text-ink ${
-                            doc.isNotApplicable ? 'line-through text-ink/50' : ''
-                          }`}
-                        >
-                          {doc.name}
-                        </span>
-                        {doc.isNotApplicable ? (
-                          <span className="px-1.5 py-0.2 rounded-full text-[9px] border border-primary/20 text-ink/60 bg-white">
-                            Not applicable
-                          </span>
-                        ) : doc.requirement === 'Required' ? (
-                          <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-primary text-white">
-                            Required
-                          </span>
-                        ) : (
-                          <span className="px-1.5 py-0.2 rounded-full text-[9px] border border-primary/20 text-ink/70">
-                            {doc.requirement}
-                          </span>
-                        )}
-                        {doc.tag && (
-                          <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-secondary text-white">
-                            {doc.tag}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[11px] text-ink/55 block mt-0.5 break-words">
-                        {doc.purpose}
-                      </span>
-                    </div>
-                  </div>
-
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0 ${
-                      doc.isNotApplicable
-                        ? 'bg-transparent text-ink/40'
-                        : doc.status === 'Approved'
-                        ? 'bg-primary text-white'
-                        : doc.status === 'Rejected'
-                        ? 'bg-white border border-black text-ink'
-                        : 'bg-secondary text-white'
-                    }`}
-                  >
-                    {doc.isNotApplicable ? 'N/A' : doc.status}
-                  </span>
-                </div>
+                  document={doc}
+                  onPreview={(name) => setLightboxDoc(name)}
+                  onApprove={handleApproveDoc}
+                  onReject={handleRejectDoc}
+                />
               ))}
             </div>
           </div>
@@ -630,16 +588,13 @@ export const VendorDetailPage: React.FC = () => {
               </div>
 
               {/* Product search input */}
-              <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink/40 pointer-events-none" />
-                <input
-                  type="text"
-                  value={productSearch}
-                  onChange={(e) => setProductSearch(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full pl-8 pr-3 py-1.5 min-h-[38px] rounded-full text-xs font-sans border border-primary/10 focus:outline-none focus:ring-2 focus:ring-secondary text-ink placeholder:text-ink/40"
-                />
-              </div>
+              <SearchInput
+                value={productSearch}
+                onChange={setProductSearch}
+                placeholder="Search products..."
+                containerClassName="w-full sm:w-64"
+                className="py-1.5 min-h-[38px] rounded-full border border-primary/10 focus:ring-2 focus:ring-secondary"
+              />
             </div>
 
             {/* Products Table (Horizontally scrollable on small screens) */}
@@ -711,12 +666,12 @@ export const VendorDetailPage: React.FC = () => {
                   Processed via NEFT / Automated
                 </span>
               </div>
-              <div className="p-4 rounded-[18px] bg-secondary/15 border border-secondary/30 shadow-xs">
-                <span className="text-[10px] text-ink/60 block">Pending Payout</span>
-                <span className="text-ink font-semibold text-base mt-1 block">
+              <div className="p-4 rounded-[18px] bg-secondary text-white border border-secondary shadow-xs">
+                <span className="text-[10px] text-white/75 block">Pending Payout</span>
+                <span className="text-white font-semibold text-base mt-1 block">
                   {vendor.pendingPayout}
                 </span>
-                <span className="text-[10px] text-ink/60 block mt-0.5">
+                <span className="text-[10px] text-white/70 block mt-0.5">
                   Scheduled for upcoming Monday
                 </span>
               </div>
@@ -726,7 +681,7 @@ export const VendorDetailPage: React.FC = () => {
             <div className="p-5 rounded-[20px] border border-primary/10 bg-white shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-sans text-xs font-semibold text-ink uppercase tracking-wider">
+                  <h4 className="font-heading text-base font-normal text-ink">
                     Last 7 Days Sales Activity
                   </h4>
                   <p className="text-[11px] font-sans text-ink/55 mt-0.5">
@@ -738,36 +693,43 @@ export const VendorDetailPage: React.FC = () => {
                 </span>
               </div>
 
-              <div className="h-36 flex items-end justify-between gap-3 pt-4 px-2">
-                {chartData.map((amount, idx) => {
-                  const isTallest = amount === maxVal && amount > 0;
-                  const heightPercent = Math.max(12, (amount / maxVal) * 100);
+              <div className="pt-4 px-1 sm:px-2 overflow-x-auto min-w-0">
+                <div className="h-36 flex items-end justify-between gap-2 sm:gap-3 min-w-[280px]">
+                  {chartData.map((amount, idx) => {
+                    const isTallest = amount === maxVal && amount > 0;
+                    const heightPercent = Math.max(12, (amount / maxVal) * 100);
 
-                  return (
-                    <div
-                      key={daysOfWeek[idx]}
-                      className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group"
-                    >
-                      <span className="text-[10px] font-sans text-ink/60 opacity-0 group-hover:opacity-100 transition-opacity">
-                        ₹{amount}
-                      </span>
+                    return (
                       <div
-                        style={{ height: `${heightPercent}%` }}
-                        className={`w-full max-w-[34px] rounded-t-[8px] transition-all ${
-                          isTallest ? 'bg-primary' : 'bg-black'
-                        }`}
-                        title={`${daysOfWeek[idx]}: ₹${amount}`}
-                      />
-                      <span
-                        className={`text-[10px] font-sans ${
-                          isTallest ? 'font-semibold text-ink' : 'text-ink/60'
-                        }`}
+                        key={daysOfWeek[idx]}
+                        className="relative flex-1 flex flex-col items-center gap-1.5 h-full justify-end group min-w-0"
                       >
-                        {daysOfWeek[idx]}
-                      </span>
-                    </div>
-                  );
-                })}
+                        {/* Hover Tooltip */}
+                        <div className="absolute -top-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-ink text-white text-[10px] font-sans font-medium px-2 py-0.5 rounded-[6px] shadow-md pointer-events-none whitespace-nowrap z-10">
+                          ₹{amount.toLocaleString()}
+                        </div>
+
+                        {/* Bar */}
+                        <div
+                          style={{ height: `${heightPercent}%` }}
+                          className={`w-full max-w-[34px] rounded-t-[8px] transition-all duration-200 ${
+                            isTallest ? 'bg-primary hover:bg-primary/90' : 'bg-secondary hover:bg-secondary/90'
+                          }`}
+                          title={`${daysOfWeek[idx]}: ₹${amount}`}
+                        />
+
+                        {/* Day Label */}
+                        <span
+                          className={`text-[10px] font-sans transition-colors ${
+                            isTallest ? 'font-semibold text-ink' : 'text-ink/60'
+                          }`}
+                        >
+                          {daysOfWeek[idx]}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>

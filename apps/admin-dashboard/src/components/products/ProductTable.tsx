@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { Product, Category } from '../../data/products';
 import { ProductRow } from './ProductRow';
 import { CustomSelect } from '../common/CustomSelect';
+import { SearchInput } from '../common/SearchInput';
 import {
   Search,
   ChevronDown,
@@ -228,19 +229,16 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         {/* Filter Toolbar */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Search Input */}
-          <div className="relative w-[150px] sm:w-[170px]">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-primary/60 pointer-events-none" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
-              placeholder="Search products..."
-              className="w-full h-[30px] pl-7 pr-2.5 text-[11px] font-sans bg-white border border-primary/10 rounded-full text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
-            />
-          </div>
+          <SearchInput
+            value={search}
+            onChange={(val) => {
+              setSearch(val);
+              setCurrentPage(1);
+            }}
+            placeholder="Search products..."
+            containerClassName="w-[150px] sm:w-[170px]"
+            className="h-[30px] pl-7 pr-7 text-[11px] bg-white border border-primary/10 rounded-full focus:ring-2 focus:ring-primary shadow-xs"
+          />
 
           {/* Brand Select */}
           <CustomSelect

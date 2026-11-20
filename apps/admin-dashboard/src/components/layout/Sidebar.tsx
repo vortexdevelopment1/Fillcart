@@ -320,13 +320,14 @@ export const Sidebar: React.FC = () => {
           transition:
             'width 250ms cubic-bezier(0.16, 1, 0.3, 1), transform 250ms cubic-bezier(0.16, 1, 0.3, 1)',
           overflowX: 'hidden',
+          boxSizing: 'border-box',
         }}
         className={`
-          fixed top-3 left-3 bottom-3 h-[calc(100dvh-24px)] max-h-[calc(100dvh-24px)]
-          md:top-4 md:left-4 md:bottom-4 md:h-[calc(100vh-32px)] md:max-h-none
-          bg-primary text-white rounded-[24px] z-50 select-none
+          fixed top-3 left-3 h-[calc(100dvh-24px)]
+          md:top-4 md:left-4 md:h-[calc(100dvh-32px)]
+          bg-primary text-white rounded-[24px] z-50 select-none box-border
           flex flex-col overflow-y-hidden overflow-x-hidden shadow-2xl border border-white/[0.08]
-          ${isPanelOpen ? 'p-[14px_10px]' : 'pt-6 pb-3 px-[8px] items-center'}
+          ${isPanelOpen ? 'p-[14px_10px]' : 'pt-3.5 pb-3 px-[8px] items-center'}
           ${
             isMobileOpen
               ? 'translate-x-0 w-[256px] p-[14px_10px]'

@@ -57,7 +57,7 @@ const ROUTE_CONFIG: Record<string, { title: string; subtitle: string }> = {
 
 // Avatar button component with full accessibility, focus rings, and status dot
 interface AdminAvatarButtonProps {
-  isHome: boolean;
+  isHome?: boolean;
   isOpen: boolean;
   onClick: () => void;
   className?: string;
@@ -65,12 +65,13 @@ interface AdminAvatarButtonProps {
 }
 
 const AdminAvatarButton: React.FC<AdminAvatarButtonProps> = ({
-  isHome,
   isOpen,
   onClick,
   className = '',
   buttonRef,
 }) => {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <button
       ref={buttonRef}
@@ -81,20 +82,21 @@ const AdminAvatarButton: React.FC<AdminAvatarButtonProps> = ({
       aria-expanded={isOpen}
       className={`rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-transform duration-150 active:scale-95 flex-shrink-0 ${className}`}
     >
-      {isHome ? (
-        <div className="relative flex-shrink-0">
+      <div className="relative flex-shrink-0">
+        {!imgError ? (
           <img
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
             alt="Sarah Profile"
+            onError={() => setImgError(true)}
             className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm ring-1 ring-primary/10"
           />
-          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-secondary rounded-full border-2 border-white" />
-        </div>
-      ) : (
-        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-sans text-xs font-medium shadow-sm ring-1 ring-primary/10 select-none flex-shrink-0">
-          AD
-        </div>
-      )}
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-sans text-xs font-medium shadow-sm ring-1 ring-primary/10 select-none flex-shrink-0">
+            SM
+          </div>
+        )}
+        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-secondary rounded-full border-2 border-white" />
+      </div>
     </button>
   );
 };

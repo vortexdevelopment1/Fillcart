@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Category } from '../../data/products';
 import { CustomSelect } from '../common/CustomSelect';
+import { SearchInput } from '../common/SearchInput';
 import {
   Plus,
   Pencil,
@@ -78,18 +79,15 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
           {/* Search */}
-          <div className="relative w-[180px] sm:w-[220px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink/45 pointer-events-none" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search category..."
-              className="w-full h-[34px] pl-8 pr-3 text-xs font-sans bg-white border border-primary/10 rounded-full text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
-            />
-          </div>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search category..."
+            containerClassName="w-[180px] sm:w-[220px]"
+            className="h-[34px] bg-white border border-primary/10 rounded-full focus:ring-2 focus:ring-primary shadow-xs"
+          />
 
           {/* Status filter */}
           <CustomSelect

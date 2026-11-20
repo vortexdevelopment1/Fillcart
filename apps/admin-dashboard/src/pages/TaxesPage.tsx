@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { HatchBar } from '../components/common/HatchBar';
 import { CustomSelect } from '../components/common/CustomSelect';
+import { SearchInput } from '../components/common/SearchInput';
 import {
   Receipt,
   FileSpreadsheet,
@@ -413,16 +414,13 @@ export const TaxesPage: React.FC = () => {
             </CustomSelect>
 
             {/* Search */}
-            <div className="relative w-48 sm:w-56">
-              <Search className="w-3.5 h-3.5 text-ink/40 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search vendor or GSTIN..."
-                value={vendorSearch}
-                onChange={(e) => setVendorSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 rounded-full border border-primary/15 bg-white font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
-              />
-            </div>
+            <SearchInput
+              placeholder="Search vendor or GSTIN..."
+              value={vendorSearch}
+              onChange={setVendorSearch}
+              containerClassName="w-48 sm:w-56"
+              className="py-1.5 rounded-full border border-primary/15 bg-white focus:ring-2 focus:ring-secondary"
+            />
           </div>
         </div>
 

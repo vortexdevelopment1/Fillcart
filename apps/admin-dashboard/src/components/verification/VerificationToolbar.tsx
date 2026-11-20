@@ -1,7 +1,8 @@
 import React from 'react';
-import { Search, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { VerificationStatus } from '../../data/verification';
 import { CustomSelect } from '../common/CustomSelect';
+import { SearchInput } from '../common/SearchInput';
 
 interface VerificationToolbarProps {
   activeTab: 'All' | 'Riders' | 'Vendors';
@@ -23,7 +24,7 @@ export const VerificationToolbar: React.FC<VerificationToolbarProps> = ({
   const tabs: ('All' | 'Riders' | 'Vendors')[] = ['All', 'Riders', 'Vendors'];
 
   return (
-    <div className="w-full flex items-center justify-between gap-4 flex-wrap select-none pt-1">
+    <div className="w-full flex items-center justify-between gap-3 sm:gap-4 flex-wrap select-none pt-1 min-w-0 max-w-full">
       {/* Left: Pill Tabs [All | Riders | Vendors] in soft black-5% container */}
       <div className="inline-flex items-center p-1 rounded-full bg-neutral gap-1 overflow-x-auto no-scrollbar max-w-full min-w-0">
         {tabs.map((tab) => {
@@ -46,19 +47,16 @@ export const VerificationToolbar: React.FC<VerificationToolbarProps> = ({
         })}
       </div>
 
-      {/* Right: Search input (pill, 210px) + Status select */}
-      <div className="flex items-center gap-3">
-        {/* Search input */}
-        <div className="relative w-[210px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink/45 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search name or city"
-            className="w-full h-[36px] pl-8 pr-3 text-xs font-sans bg-white border border-black/[0.08] rounded-full text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-secondary shadow-sm"
-          />
-        </div>
+      {/* Right: Search input (with clear X) + Status select */}
+      <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap sm:flex-nowrap min-w-0 max-w-full">
+        {/* Search input with Clear (X) button */}
+        <SearchInput
+          value={searchQuery}
+          onChange={onSearchChange}
+          placeholder="Search name or city"
+          containerClassName="w-full sm:w-[220px] min-w-0 flex-1 sm:flex-initial"
+          className="h-[36px] bg-white border border-black/[0.08] rounded-full focus:ring-2 focus:ring-secondary shadow-sm"
+        />
 
         {/* Status select dropdown */}
         <CustomSelect
