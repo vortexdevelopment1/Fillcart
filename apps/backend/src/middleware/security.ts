@@ -1,0 +1,19 @@
+import helmet from "helmet";
+import type { RequestHandler } from "express";
+
+export function createSecurityMiddleware(): RequestHandler {
+  return helmet({
+    contentSecurityPolicy: true,
+    crossOriginEmbedderPolicy: true,
+    crossOriginOpenerPolicy: true,
+    crossOriginResourcePolicy: { policy: "same-site" },
+    dnsPrefetchControl: true,
+    frameguard: { action: "deny" },
+    hidePoweredBy: true,
+    hsts: true,
+    ieNoOpen: true,
+    noSniff: true,
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    xssFilter: true,
+  });
+}

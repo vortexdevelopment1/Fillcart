@@ -2,13 +2,18 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "tasks": {
+    "db:generate": {
+      "inputs": ["prisma/schema.prisma", "prisma7.config.ts"],
+      "outputs": ["src/database/generated/client/**"],
+      "cache": true
+    },
     "generate": {
       "inputs": ["$TURBO_DEFAULT$", "../openapi/v1/openapi.yaml"],
       "outputs": ["src/generated/**"],
       "cache": true
     },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "@fillcart/backend#db:generate"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/packages/config/typescript/**"
@@ -24,7 +29,7 @@
       "outputs": ["dist/**"]
     },
     "type-check": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "@fillcart/backend#db:generate"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/packages/config/typescript/**"
@@ -43,7 +48,7 @@
       "dependsOn": []
     },
     "test": {
-      "dependsOn": []
+      "dependsOn": ["@fillcart/backend#db:generate"]
     },
     "dev": {
       "cache": false,

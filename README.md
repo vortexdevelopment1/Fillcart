@@ -1,104 +1,183 @@
 # Fillcart – Scalable Monorepo Platform
 
-Fillcart is a multi-vendor on-demand product delivery platform (similar to Blinkit and BigBasket, without a 10-minute delivery constraint) engineered with a scalable, production-grade monorepo architecture.
+Fillcart is a multi-vendor on-demand product delivery platform engineered with a modular, security-hardened monorepo architecture.
+
+> [!IMPORTANT] > **New Developer Onboarding & Architecture Verification:**
+>
+> - [**Fillcart Developer Onboarding, Local Setup & Integration Guide**](FILLCART_DEVELOPER_ONBOARDING_GUIDE.md) — The authoritative guide for local Docker PostgreSQL setup, Central Auth environment configuration, S2S integration, and application setup.
+> - [**Fillcart Repository Verification & Architecture Audit Report**](FILLCART_REPOSITORY_VERIFICATION_REPORT.md) — The comprehensive technical verification audit, baseline evidence, and open architectural decisions.
 
 ---
 
-## 1. Monorepo Overview
+## 1. Current Implementation Status
 
-This repository houses the entire Fillcart digital ecosystem across mobile, web, backend, shared packages, and cloud infrastructure:
+To prevent confusion, the table below documents the exact implementation status of each component in this repository snapshot:
 
-```
-fillcart/
+| Subsystem / Application       | Directory                   | Status                                | Description                                                                                                                                                                 |
+| ----------------------------- | --------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Central Auth Backend**      | `apps/backend/`             | **Implemented & Operational**         | Express 5, Prisma 7, PostgreSQL 16. Handles authentication, Argon2id passwords, Ed25519 tokens, single-use refresh tokens, OTP via MSG91, and S2S session verification.     |
+| **Shared Packages**           | `packages/*`                | **Implemented & Verified**            | All 8 TypeScript packages (`api-contracts`, `constants`, `design-tokens`, `shared-types`, `ui-web`, `utils`, `validations`, `config`) pass strict typecheck and unit tests. |
+| **Shared Flutter Foundation** | `packages/flutter_shared/`  | **Implemented & Verified**            | Reusable Dart library (`fillcart_shared`): `FCNetworkClient`, interceptors (Auth, Correlation, Safe Logging), Material 3 `FCTheme`, and atomic UI widgets.                  |
+| **Vendor Mobile App**         | `apps/vendor-app/`          | **Application Foundation / Skeleton** | Flutter 3.44.4 + Dart 3.12.2. Valid `pubspec.yaml`, entry point with error boundaries, BLoC state management foundation, and widget tests; business domain screens pending. |
+| **Customer Mobile App**       | `apps/customer-app/`        | **Directory Scaffold Only**           | Feature folder layout with placeholder files. **No `pubspec.yaml` exists yet**; not a runnable application in this snapshot.                                                |
+| **Rider Mobile App**          | `apps/rider-app/`           | **Directory Scaffold Only**           | Feature folder layout with placeholder files. **No `pubspec.yaml` exists yet**; not a runnable application in this snapshot.                                                |
+| **Admin Dashboard**           | `apps/admin-dashboard/`     | **Directory Scaffold Only**           | Next.js directory scaffold with `.gitkeep` files. Build scripts echo pending Phase 2.2.6.                                                                                   |
+| **Customer Website**          | `apps/website/`             | **Directory Scaffold Only**           | Next.js directory scaffold with `.gitkeep` files. Build scripts echo pending Phase 2.2.6.                                                                                   |
+| **Business Backend Modules**  | `apps/backend/src/modules/` | **Scaffold Placeholders Only**        | 18 domain folders with `.gitkeep`. **Do NOT implement business domain APIs here.** Business backends must be developed as independent domain services.                      |
+
+---
+
+## 2. Monorepo Overview & Project Tour
+
+```text
+Fillcart/
 ├── apps/
-│   ├── customer-app/       # Flutter + Dart mobile app for end customers
-│   ├── vendor-app/         # Flutter + Dart mobile app for store vendors & managers
-│   ├── rider-app/          # Flutter + Dart mobile app for delivery fleet riders
-│   ├── website/            # Next.js + TypeScript public marketing & web portal
-│   ├── admin-dashboard/    # Next.js + TypeScript central operations admin panel
-│   └── backend/            # Express.js + TypeScript modular REST backend with Prisma & PostgreSQL
+│   ├── backend/             # Central Auth & Identity Provider (Express 5, Prisma 7, PostgreSQL 16)
+│   ├── vendor-app/          # Vendor Mobile Application (Flutter 3.44.4 foundation / BLoC)
+│   ├── customer-app/        # Customer Mobile Application (Directory scaffold; no pubspec.yaml)
+│   ├── rider-app/           # Rider Mobile Application (Directory scaffold; no pubspec.yaml)
+│   ├── admin-dashboard/     # Admin Web Portal (Next.js directory scaffold; pending Phase 2.2.6)
+│   └── website/             # Customer Web Storefront (Next.js directory scaffold; pending Phase 2.2.6)
 ├── packages/
-│   ├── flutter_shared/     # Reusable Flutter widgets, themes, networking utilities, and common components (Dart)
-│   ├── ui-web/             # Reusable React components, hooks, and UI shared between website and admin dashboard
-│   ├── api-contracts/      # Shared API contracts & endpoint specifications
-│   ├── design-tokens/      # Cross-platform design tokens (colors, typography, spacing, themes)
-│   ├── shared-types/       # TypeScript type definitions shared across web & backend
-│   ├── validations/        # Reusable runtime schemas & input validation rules
-│   ├── constants/          # Shared platform-wide constants
-│   ├── utils/              # Shared helper functions and utility libraries
-│   ├── assets/             # Brand logos, shared vector icons, and graphics
-│   └── config/             # Shared tooling configurations (TypeScript, ESLint, Prettier)
-├── infrastructure/         # Deployment definitions, Docker configurations, Nginx, CI/CD, and monitoring
-├── docs/                   # Architectural blueprints, database schemas, and developer documentation
-├── scripts/                # Repository orchestration, build, and operational automation scripts
-├── .github/                # GitHub Actions workflows and CI/CD pipelines
-├── .gitignore              # Production-grade Git ignore specifications
-├── .env.example            # Environment variables template
-└── README.md               # Repository documentation and architecture map
+│   ├── api-contracts/       # OpenAPI 3.1 specifications and generated TypeScript DTOs
+│   ├── config/              # Shared ESLint, Prettier, and TypeScript base configurations
+│   ├── constants/           # Shared platform constants and system-wide enumerations
+│   ├── design-tokens/       # Cross-platform design tokens (colors, typography, spacing)
+│   ├── flutter_shared/      # Shared Flutter package (FCNetworkClient, interceptors, FCTheme)
+│   ├── shared-types/        # Shared TypeScript domain interfaces and auth token claims
+│   ├── ui-web/              # Shared React/Web UI components and coordinateWebLockRefresh helper
+│   ├── utils/               # Shared cross-cutting utility functions
+│   ├── validations/         # Shared Zod validation schemas for requests and payloads
+│   └── assets/              # Brand assets, vectors, and shared graphics
+├── infrastructure/         # Deployment definitions, Docker configurations, and CI/CD templates
+├── docs/                   # Architectural blueprints, contracts, and integration documentation
+├── scripts/                # Workspace automation scripts (including flutter-tooling.mjs)
+├── docker-compose.yml       # Canonical Docker Compose template for local PostgreSQL 16
+├── package.json             # Root monorepo configuration (npm workspaces)
+├── turbo.json               # Turborepo build, lint, and test pipeline configuration
+├── .nvmrc                   # Pinned Node.js version (26.13.1)
+├── FILLCART_DEVELOPER_ONBOARDING_GUIDE.md   # Authoritative local setup and integration guide
+├── FILLCART_REPOSITORY_VERIFICATION_REPORT.md # Technical verification audit and gate report
+└── README.md               # Repository documentation and architecture overview
 ```
 
 ---
 
-## 2. Technology Stack
+## 3. Technology Stack
 
-| Layer                   | Technology                                            |
-| ----------------------- | ----------------------------------------------------- |
-| **Runtime**             | Node.js v26.13.1 LTS                                  |
-| **Monorepo Engine**     | Turborepo (npm-compatible)                            |
-| **Package Manager**     | npm Workspaces (v11.20.0)                             |
-| **Mobile Applications** | Flutter (v3.44.4 stable) + Dart (v3.12.2)             |
-| **Website & Admin**     | Next.js + TypeScript (Feature-Based Structure)        |
-| **Central Backend**     | Express.js + TypeScript (Modular Domain Architecture) |
-| **Database**            | PostgreSQL                                            |
-| **ORM**                 | Prisma 7                                              |
-| **API Architecture**    | REST API (OpenAPI 3.1 authoritative contract)         |
-| **Real-time Engine**    | WebSockets (Planned)                                  |
-
----
-
-## 3. Applications Breakdown
-
-### A. Customer Mobile App (`apps/customer-app`)
-
-Built with **Flutter & Dart** using feature-first architecture. Handles customer discovery, product browsing, cart management, checkout, order tracking, addresses, payment gateway integration, and customer profile.
-
-### B. Vendor Mobile App (`apps/vendor-app`)
-
-Built with **Flutter & Dart**. Empowers store owners and merchants to manage catalogs, real-time inventories, incoming orders, preparation workflows, promotional offers, store earnings, and analytics.
-
-### C. Rider Mobile App (`apps/rider-app`)
-
-Built with **Flutter & Dart**. Equips delivery partners with shift availability toggling, dispatch delivery requests, pickup confirmations, route navigation, live delivery tracking, earnings summaries, and delivery history.
-
-### D. Public Website (`apps/website`)
-
-Built with **Next.js & TypeScript**. Serves as the high-performance, SEO-optimized public portal showcasing platform offerings, onboarding funnels for vendors/riders, corporate information, careers, and support.
-
-### E. Admin Dashboard (`apps/admin-dashboard`)
-
-Built with **Next.js & TypeScript**. The mission-control dashboard for Fillcart operations, platform governance, inventory auditing, vendor KYC, rider verification, dispute resolution, financial reports, analytics, and global system configurations.
-
-### F. Central Backend API (`apps/backend`)
-
-Built with **Express.js & TypeScript** following clean modular architecture. Organizes business domains independently into 25 dedicated modules (auth, users, vendors, catalog, orders, payments, delivery, refunds, analytics, etc.), each containing its own controllers, services, repositories, models, DTOs, validators, routes, interfaces, and test suites.
+| Layer                  | Technology            | Version / Specification                                      |
+| ---------------------- | --------------------- | ------------------------------------------------------------ |
+| **Runtime**            | Node.js               | `v26.13.1` (Active LTS, pinned in `.nvmrc`)                  |
+| **Package Manager**    | npm Workspaces        | `v11.20.0` or higher                                         |
+| **Monorepo Engine**    | Turborepo             | `2.11.11`                                                    |
+| **Database**           | PostgreSQL            | `16-alpine` (Docker)                                         |
+| **ORM**                | Prisma                | `7.10.1`                                                     |
+| **Backend Framework**  | Express               | `5.3.0` (Modular TypeScript)                                 |
+| **Password Security**  | Argon2id              | `@node-rs/argon2` ($m=65536, t=3, p=1$)                      |
+| **Token Cryptography** | Ed25519 (EdDSA)       | Native Node.js `crypto` with JWKS (`/.well-known/jwks.json`) |
+| **Mobile Framework**   | Flutter & Dart        | Flutter `3.44.4` / Dart `3.12.2`                             |
+| **State Management**   | BLoC                  | `flutter_bloc: ^8.1.6`, `equatable: ^2.0.7`                  |
+| **Mobile Networking**  | Dio                   | `5.7.0` (wrapped in `FCNetworkClient`)                       |
+| **Web Framework**      | Next.js & React       | Next.js / React 19 (Scaffold)                                |
+| **API Contracts**      | OpenAPI               | OpenAPI 3.1 validated with Redocly                           |
+| **Validation**         | Zod                   | `3.25.x`                                                     |
+| **Test Runners**       | Vitest & Flutter Test | Vitest `5.1.0` (Web & Backend), Flutter Test (Mobile)        |
 
 ---
 
-## 4. Shared Packages Policy
+## 4. Architectural Boundaries & Security Model
 
-- **Dart vs TypeScript Isolation**: Flutter applications write in Dart and consume reusable Dart code from `packages/flutter_shared/` without directly importing TypeScript packages. Mobile and web UI implementations remain strictly segregated.
-- **Language-Neutral API Contracts**: `packages/api-contracts/` uses OpenAPI specifications as the single authoritative source of truth, compiling into TypeScript contracts (`typescript/`) and Dart client models (`dart/`).
-- **Web UI Reusability**: Shared React components, design patterns, hooks, and presentation layouts between the public website and admin dashboard are housed within `packages/ui-web/`.
-- **Contract Sharing**: Web applications and backend share `api-contracts`, `shared-types`, `validations`, `constants`, and `utils`.
-- **Design Consistency**: Shared tokens (`colors`, `typography`, `spacing`, `themes`) in `packages/design-tokens/` ensure brand consistency across Flutter mobile apps and React web portals.
-- **No Domain Contamination**: Application-specific business logic is prohibited from `packages/`. Only reusable, agnostic utilities and contracts reside here.
+1. **Central Auth Boundary:**
+   - Central Auth (`apps/backend`) is solely an **Identity Provider (IdP)**. It owns user identities, credentials, login/registration, OTP verification, sessions, refresh tokens, role assignments, and S2S authorization.
+   - **Business domains (Orders, Products, Payments, Cart, Delivery, etc.) must NOT be implemented inside `apps/backend`.** The directories in `apps/backend/src/modules/` are repository scaffolds.
+2. **Database Isolation & Least-Privilege Roles:**
+   - **`fillcart_user` (`MIGRATION_DATABASE_URL`):** Privileged schema-owner role used exclusively for Prisma migrations and the standalone CLI maintenance script (`cleanup.ts`).
+   - **`fillcart_app_user` (`DATABASE_URL`):** Runtime least-privilege connection. It has `SELECT`, `INSERT`, and `UPDATE` privileges, with **zero `DELETE` privileges** across all operational tables.
+   - Business services must **never** query Central Auth database tables directly.
+3. **Live S2S Session Verification:**
+   - Business backends must authenticate incoming user requests by calling Central Auth's live S2S verification endpoint: `POST /api/v1/internal/auth/verify-session`.
+   - Authorization is **fail-closed**: if Central Auth is unreachable or the session is revoked, the business service must reject the request immediately.
+4. **Dart vs. TypeScript Isolation:**
+   - Flutter applications consume shared Dart packages (`packages/flutter_shared`) and must not depend on TypeScript packages.
+   - Web applications and the backend share TypeScript packages (`api-contracts`, `shared-types`, `validations`, `constants`, `utils`, `ui-web`).
 
 ---
 
-## 5. Architectural Principles
+## 5. Quick Start (Local Development)
 
-1. **Single Monorepo**: All applications and shared resources version-controlled in a unified repository.
-2. **Independent Mobile Apps**: Each mobile app maintains its own Flutter project lifecycle.
-3. **Single Backend Hub**: All customer, vendor, rider, and administrative interfaces interact with the central Express backend.
-4. **Single Source of Truth Database**: PostgreSQL managed centrally via Prisma in the backend.
-5. **Horizontal Scalability**: Stateless API design prepared for containerization and load-balanced multi-instance deployments.
+### Prerequisites
+
+- Node.js `v26.13.1` (run `nvm use` if using nvm)
+- npm `v11.20.0` or higher
+- Docker Desktop
+- Flutter `3.44.4` / Dart `3.12.2` (for mobile development)
+
+### Step 1: Install Dependencies
+
+```bash
+npm install
+```
+
+### Step 2: Start Local PostgreSQL Database
+
+```bash
+npm run docker:db:up
+```
+
+_(Starts PostgreSQL 16 container `fillcart-postgres` on `127.0.0.1:5432`)_
+
+### Step 3: Configure Backend Environment
+
+```bash
+# Windows PowerShell:
+Copy-Item apps/backend/.env.example apps/backend/.env
+
+# macOS / Linux:
+cp apps/backend/.env.example apps/backend/.env
+```
+
+### Step 4: Run Migrations & Generate Prisma Client
+
+```bash
+npx --prefix apps/backend prisma migrate deploy --config apps/backend/prisma7.config.ts
+npx --prefix apps/backend prisma generate --schema=apps/backend/prisma/schema.prisma
+```
+
+### Step 5: Start Central Auth Development Server
+
+```bash
+npm --workspace=@fillcart/backend run dev
+```
+
+Verify the server is running:
+
+```bash
+curl http://127.0.0.1:4000/health/ready
+```
+
+_(Expected response: `{"status":"ready", ...}`)_
+
+---
+
+## 6. Primary Workspace Scripts
+
+| Command                                    | Purpose                                                                              |
+| ------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `npm run build`                            | Builds all packages and backend using Turborepo                                      |
+| `npm run type-check`                       | Runs strict TypeScript typechecks across the monorepo                                |
+| `npm run test`                             | Runs unit tests across packages and Central Auth backend                             |
+| `npm run lint:openapi`                     | Validates OpenAPI 3.1 specifications with Redocly                                    |
+| `npm run docker:db:up`                     | Starts local PostgreSQL container (`docker compose up -d postgres`)                  |
+| `npm run docker:db:down`                   | Stops local PostgreSQL container safely (data preserved)                             |
+| `npm run docker:db:clean`                  | Destructive database reset: stops and wipes Docker volume (`docker compose down -v`) |
+| `node scripts/flutter-tooling.mjs format`  | Formats Dart code across Flutter packages                                            |
+| `node scripts/flutter-tooling.mjs analyze` | Runs Dart analyzer across Flutter packages                                           |
+| `node scripts/flutter-tooling.mjs test`    | Runs tests across Flutter packages                                                   |
+
+---
+
+## 7. Developer Guides & Reference Documents
+
+- [**Developer Onboarding & Integration Guide**](FILLCART_DEVELOPER_ONBOARDING_GUIDE.md) — Comprehensive local setup, 19-variable environment table, audience derivation rules, applicant promotion workflow, and troubleshooting.
+- [**Repository Verification & Architecture Report**](FILLCART_REPOSITORY_VERIFICATION_REPORT.md) — Codebase audit, evidence logs, gate evaluations, and the 8 open architectural decisions.
+- [**OpenAPI 3.1 Specification**](packages/api-contracts/openapi/v1/openapi.yaml) — Authoritative REST API contracts.
