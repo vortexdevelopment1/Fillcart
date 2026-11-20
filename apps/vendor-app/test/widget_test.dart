@@ -2,6 +2,8 @@ import 'package:fillcart_shared/fillcart_shared.dart';
 import 'package:fillcart_vendor/app/vendor_app.dart';
 import 'package:fillcart_vendor/core/bloc/app_status_bloc.dart';
 import 'package:fillcart_vendor/core/presentation/placeholder_home_screen.dart';
+import 'package:fillcart_vendor/features/onboarding/onboarding.dart';
+import 'package:fillcart_vendor/features/splash/splash.dart';
 import 'package:fillcart_vendor/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,10 +11,23 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('VendorApp Foundation Widget Tests', () {
-    testWidgets('boots VendorApp and renders PlaceholderHomeScreen', (
+    testWidgets('boots VendorApp with splash transitioning to OnboardingScreen', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const VendorApp());
+      expect(find.byType(SplashScreen), findsOneWidget);
+
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(OnboardingScreen), findsOneWidget);
+      expect(find.text('Open your\ndigital store'), findsOneWidget);
+    });
+
+    testWidgets('boots VendorApp and renders PlaceholderHomeScreen when splash disabled', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const VendorApp(enableSplash: false));
       await tester.pumpAndSettle();
 
       expect(find.byType(PlaceholderHomeScreen), findsOneWidget);
@@ -26,7 +41,7 @@ void main() {
     testWidgets('verifies Material 3 theme and typography application', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(const VendorApp());
+      await tester.pumpWidget(const VendorApp(enableSplash: false));
       await tester.pumpAndSettle();
 
       final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
@@ -44,7 +59,7 @@ void main() {
     testWidgets('tapping Refresh Status triggers status refresh event', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(const VendorApp());
+      await tester.pumpWidget(const VendorApp(enableSplash: false));
       await tester.pumpAndSettle();
 
       expect(find.text('System Ready'), findsOneWidget);
