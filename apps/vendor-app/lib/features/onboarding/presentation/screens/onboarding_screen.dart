@@ -1,5 +1,6 @@
 import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/onboarding_item.dart';
 import '../widgets/onboarding_dot_indicator.dart';
 
@@ -120,12 +121,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           foregroundColor: const Color(0xFF64748B),
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         ),
-                        child: const Text(
+                        child: Text(
                           'skip',
-                          style: TextStyle(
+                          style: GoogleFonts.inter(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w400,
-                            color: Color(0xFF64748B),
+                            color: const Color(0xFF64748B),
                           ),
                         ),
                       )
@@ -187,27 +188,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                           const SizedBox(height: 28.0),
 
-                          // Title
-                          Text(
-                            item.title,
-                            style: const TextStyle(
-                              fontSize: 32.0,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF000000),
-                              height: 1.15,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 14.0),
+                          // Text Content Box (Fixed width: 270px)
+                          SizedBox(
+                            width: 270.0,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Title (Font Family: Sora)
+                                Text(
+                                  item.title,
+                                  style: GoogleFonts.sora(
+                                    fontSize: 32.0,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF0F172A),
+                                    height: 1.15,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 14.0),
 
-                          // Subtitle
-                          Text(
-                            item.description,
-                            style: const TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF64748B),
-                              height: 1.35,
+                                // Subtitle (Font Family: Inter)
+                                Text(
+                                  item.description,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w400,
+                                    color: const Color(0xFF64748B),
+                                    height: 1.35,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 24.0),
@@ -234,31 +244,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     shape: const StadiumBorder(),
                   ),
                   child: isLastPage
-                      ? const Text(
+                      ? Text(
                           'Get Started',
-                          style: TextStyle(
+                          style: GoogleFonts.inter(
                             fontSize: 17.0,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                         )
-                      : const Row(
+                      : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               'Next',
-                              style: TextStyle(
+                              style: GoogleFonts.inter(
                                 fontSize: 17.0,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
                             ),
                             SizedBox(width: 8.0),
-                            Icon(
-                              Icons.arrow_forward_rounded,
-                              size: 20.0,
-                              color: Colors.white,
+                            SizedBox(
+                              width: 20.0,
+                              height: 20.0,
+                              child: Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 20.0,
+                                color: Colors.white,
+                              ),
                             ),
                           ],
                         ),

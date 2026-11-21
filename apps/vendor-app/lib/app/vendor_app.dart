@@ -30,7 +30,7 @@ class VendorApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: FCTheme.lightTheme,
         darkTheme: FCTheme.darkTheme,
-        themeMode: ThemeMode.system,
+        themeMode: ThemeMode.light,
         home: home ??
             (showSplash
                 ? const SplashScreen()

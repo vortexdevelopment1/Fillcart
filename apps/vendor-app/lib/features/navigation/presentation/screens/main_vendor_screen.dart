@@ -21,19 +21,21 @@ class MainVendorScreen extends StatefulWidget {
 
 class _MainVendorScreenState extends State<MainVendorScreen> {
   late int _currentIndex;
-
-  final List<Widget> _screens = const [
-    VendorDashboardScreen(),
-    VendorEarningsScreen(),
-    VendorOrdersScreen(),
-    VendorInventoryScreen(),
-    VendorProfileScreen(),
-  ];
+  late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+    _screens = [
+      const VendorDashboardScreen(),
+      const VendorEarningsScreen(),
+      const VendorOrdersScreen(),
+      VendorInventoryScreen(
+        onBackToHome: () => _onTabTapped(0),
+      ),
+      const VendorProfileScreen(),
+    ];
   }
 
   void _onTabTapped(int index) {
