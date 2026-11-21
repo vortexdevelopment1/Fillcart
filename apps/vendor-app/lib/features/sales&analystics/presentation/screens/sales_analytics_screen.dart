@@ -117,9 +117,7 @@ class _SalesAnalyticsScreenState extends State<SalesAnalyticsScreen> {
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 13.5,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                               color: isSelected
                                   ? const Color(0xFF111827)
                                   : const Color(0xFF4B5563),
