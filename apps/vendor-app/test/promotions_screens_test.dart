@@ -31,7 +31,7 @@ void main() {
     expect(find.text('Flat 10% Off'), findsOneWidget);
     expect(find.text('Buy 2 Get 1 Free'), findsOneWidget);
     expect(find.text('Weekend Deal'), findsOneWidget);
-    expect(find.text('Continue'), findsOneWidget);
+    expect(find.text('Create Promotion'), findsOneWidget);
   });
 
   testWidgets('ChoosePromotionTypeScreen renders and selects options',

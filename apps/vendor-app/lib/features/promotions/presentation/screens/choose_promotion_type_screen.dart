@@ -17,22 +17,22 @@ class _ChoosePromotionTypeScreenState extends State<ChoosePromotionTypeScreen> {
   final List<Map<String, dynamic>> _promoTypes = const [
     {
       'title': 'Percentage / Flat Discount',
-      'subtitle': 'Give a % or flat discount on products or categories',
+      'subtitle': 'Give a % or flat discount on\nproducts or categories',
       'icon': 'assets/cardsicon/percentage.png',
     },
     {
       'title': 'Buy X Get Y Free',
-      'subtitle': 'Offer a free product on purchase of a quantity',
+      'subtitle': 'Offer a free product on\npurchase of a quantity',
       'icon': 'assets/cardsicon/Buy2get1.png',
     },
     {
       'title': 'Combo Offer',
-      'subtitle': 'Create a bundle of multiple products at a special price',
+      'subtitle': 'Create a bundle of multiple\nproducts at a special price',
       'icon': 'assets/cardsicon/combo_offer.png',
     },
     {
       'title': 'Order Value Offer',
-      'subtitle': 'Give discount on a minimum order value',
+      'subtitle': 'Give discount on a\nminimum order value',
       'icon': 'assets/cardsicon/offer.png',
     },
     {

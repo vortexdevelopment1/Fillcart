@@ -27,7 +27,7 @@ class PromotionTypeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isSelected ? const Color(0xFFC8F169) : const Color(0xFFF3F4F6),
-          width: isSelected ? 2 : 1,
+          width: 2,
         ),
         boxShadow: const [
           BoxShadow(
@@ -74,14 +74,18 @@ class PromotionTypeCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 3),
-                      Text(
-                        subtitle,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xFF6B7280),
-                          height: 1.3,
+                      SizedBox(
+                        width: 210,
+                        height: 39.75,
+                        child: Text(
+                          subtitle,
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF6B7280),
+                            height: 1.3,
+                          ),
                         ),
                       ),
                     ],
@@ -96,7 +100,7 @@ class PromotionTypeCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: isSelected
-                          ? const Color(0xFF84CC16)
+                          ? const Color(0xFFC8F169)
                           : const Color(0xFFD1D5DB),
                       width: 2,
                     ),
@@ -108,7 +112,7 @@ class PromotionTypeCard extends StatelessWidget {
                             height: 10,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFF84CC16),
+                              color: Color(0xFFC8F169),
                             ),
                           ),
                         )

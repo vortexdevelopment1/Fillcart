@@ -120,6 +120,26 @@ class PromotionPerformanceScreen extends StatelessWidget {
                               height: 48,
                               fit: BoxFit.contain,
                               filterQuality: FilterQuality.high,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Text(
+                                    '%',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF111827),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -134,9 +154,11 @@ class PromotionPerformanceScreen extends StatelessWidget {
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF111827),
+                                    height: 1.2,
+                                    letterSpacing: -0.2,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 4),
                                 Text(
                                   subtitle,
                                   style: const TextStyle(
@@ -144,6 +166,8 @@ class PromotionPerformanceScreen extends StatelessWidget {
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400,
                                     color: Color(0xFF374151),
+                                    height: 1.2,
+                                    letterSpacing: -0.1,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -160,7 +184,10 @@ class PromotionPerformanceScreen extends StatelessWidget {
                                       style: const TextStyle(
                                         fontFamily: 'Inter',
                                         fontSize: 11,
+                                        fontWeight: FontWeight.w400,
                                         color: Color(0xFF4B5563),
+                                        height: 1.2,
+                                        letterSpacing: -0.1,
                                       ),
                                     ),
                                   ],
@@ -198,7 +225,7 @@ class PromotionPerformanceScreen extends StatelessWidget {
                         Expanded(
                           child: _buildMetricCard(
                             cardBgColor: const Color(0xFFF4FBE8),
-                            iconAsset: 'assets/cardsicon/total-orders.png',
+                            iconAsset: 'assets/cardsicon/order.png',
                             value: '286',
                             label: 'Orders',
                             subtext: '↑ +18%',
@@ -208,7 +235,7 @@ class PromotionPerformanceScreen extends StatelessWidget {
                         Expanded(
                           child: _buildMetricCard(
                             cardBgColor: const Color(0xFFFFFDF5),
-                            iconAsset: 'assets/cardsicon/net_revenue.png',
+                            iconAsset: 'assets/cardsicon/rupess.png',
                             value: '₹24,680',
                             label: 'Revenue',
                             subtext: '↑ +22%',
@@ -231,7 +258,7 @@ class PromotionPerformanceScreen extends StatelessWidget {
                         Expanded(
                           child: _buildMetricCard(
                             cardBgColor: const Color(0xFFFAF7FF),
-                            iconAsset: 'assets/cardsicon/custom_demand.png',
+                            iconAsset: 'assets/cardsicon/users.png',
                             value: '214',
                             label: 'Unique Customers',
                           ),
@@ -290,7 +317,8 @@ class PromotionPerformanceScreen extends StatelessWidget {
     String? subtext,
   }) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      height: 140,
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: BoxDecoration(
         color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
@@ -308,9 +336,12 @@ class PromotionPerformanceScreen extends StatelessWidget {
               height: 48,
               fit: BoxFit.contain,
               filterQuality: FilterQuality.high,
+              errorBuilder: (context, error, stackTrace) {
+                return _buildFallbackIcon(label);
+              },
             ),
           ),
-          const SizedBox(height: 12),
+          const Spacer(),
           Text(
             value,
             style: const TextStyle(
@@ -318,6 +349,7 @@ class PromotionPerformanceScreen extends StatelessWidget {
               fontSize: 22,
               fontWeight: FontWeight.w600,
               color: Color(0xFF111827),
+              height: 1.15,
             ),
           ),
           const SizedBox(height: 2),
@@ -328,10 +360,11 @@ class PromotionPerformanceScreen extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w400,
               color: Color(0xFF6B7280),
+              height: 1.15,
             ),
           ),
           if (subtext != null) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               subtext,
               style: const TextStyle(
@@ -339,11 +372,57 @@ class PromotionPerformanceScreen extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF027A48),
+                height: 1.15,
               ),
             ),
           ],
         ],
       ),
     );
+  }
+
+  Widget _buildFallbackIcon(String label) {
+    if (label.contains('Orders')) {
+      return Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: const Color(0xFFDCFCE7),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(Icons.shopping_cart_outlined, color: Color(0xFF16A34A), size: 24),
+      );
+    } else if (label.contains('Revenue')) {
+      return Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFEF3C7),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        alignment: Alignment.center,
+        child: const Text('₹', style: TextStyle(color: Color(0xFFEA580C), fontSize: 24, fontWeight: FontWeight.bold)),
+      );
+    } else if (label.contains('Discount')) {
+      return Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFCE7F3),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(Icons.local_offer_outlined, color: Color(0xFFE11D48), size: 24),
+      );
+    } else {
+      return Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3E8FF),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(Icons.group_outlined, color: Color(0xFF9333EA), size: 24),
+      );
+    }
   }
 }

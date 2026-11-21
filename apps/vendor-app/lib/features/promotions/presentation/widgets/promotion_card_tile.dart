@@ -108,6 +108,8 @@ class PromotionCardTile extends StatelessWidget {
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF111827),
+                                height: 1.2,
+                                letterSpacing: -0.2,
                               ),
                             ),
                           ),
@@ -127,47 +129,56 @@ class PromotionCardTile extends StatelessWidget {
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: tagTextColor,
+                                height: 1.2,
                               ),
                             ),
                           ),
                           const SizedBox(width: 4),
-                          PopupMenuButton<String>(
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            icon: const Icon(
-                              Icons.more_vert,
-                              color: Color(0xFF9CA3AF),
-                              size: 18,
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: PopupMenuButton<String>(
+                              padding: EdgeInsets.zero,
+                              iconSize: 18,
+                              constraints: const BoxConstraints(),
+                              icon: const Icon(
+                                Icons.more_vert,
+                                color: Color(0xFF9CA3AF),
+                                size: 18,
+                              ),
+                              onSelected: (value) {
+                                if (value == 'view' && onTap != null) {
+                                  onTap!();
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'view',
+                                  child: Text('View Performance'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text('Edit Offer'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'deactivate',
+                                  child: Text('End Offer'),
+                                ),
+                              ],
                             ),
-                            onSelected: (value) {
-                              if (value == 'view' && onTap != null) {
-                                onTap!();
-                              }
-                            },
-                            itemBuilder: (context) => [
-                              const PopupMenuItem(
-                                value: 'view',
-                                child: Text('View Performance'),
-                              ),
-                              const PopupMenuItem(
-                                value: 'edit',
-                                child: Text('Edit Offer'),
-                              ),
-                              const PopupMenuItem(
-                                value: 'deactivate',
-                                child: Text('End Offer'),
-                              ),
-                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         subtitle,
                         style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 12,
+                          fontWeight: FontWeight.w400,
                           color: Color(0xFF6B7280),
+                          height: 1.2,
+                          letterSpacing: -0.1,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -184,7 +195,10 @@ class PromotionCardTile extends StatelessWidget {
                             style: const TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 11,
+                              fontWeight: FontWeight.w400,
                               color: Color(0xFF6B7280),
+                              height: 1.2,
+                              letterSpacing: -0.1,
                             ),
                           ),
                         ],

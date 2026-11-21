@@ -396,7 +396,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                     );
                   },
                   child: const Text(
-                    'Continue',
+                    'Create Promotion',
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 16,
