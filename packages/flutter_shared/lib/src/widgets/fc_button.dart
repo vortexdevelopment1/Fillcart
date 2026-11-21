@@ -107,7 +107,7 @@ class FCButton extends StatelessWidget {
               FCSpacing.minTouchTarget,
               FCSpacing.minTouchTarget,
             ),
-            shape: const RoundedRectangleBorder(
+            shape: RoundedRectangleBorder(
               borderRadius: FCSpacing.borderRadiusMd,
             ),
             textStyle: theme.textTheme.labelLarge?.copyWith(

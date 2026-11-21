@@ -128,6 +128,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(VendorInventoryScreen), findsOneWidget);
 
+      // Tap top-left back arrow in Products & Inventory screen -> should return to Home
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+      expect(find.byType(VendorDashboardScreen), findsOneWidget);
+
       // Switch to Profile tab (index 4)
       await tester.tap(find.text('Profile'));
       await tester.pumpAndSettle();

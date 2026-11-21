@@ -94,7 +94,7 @@ abstract final class FCTheme {
             horizontal: FCSpacing.lg,
             vertical: FCSpacing.sm,
           ),
-          shape: const RoundedRectangleBorder(borderRadius: FCSpacing.borderRadiusMd),
+          shape: RoundedRectangleBorder(borderRadius: FCSpacing.borderRadiusMd),
           textStyle: textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -115,7 +115,7 @@ abstract final class FCTheme {
             vertical: FCSpacing.sm,
           ),
           side: BorderSide(color: colorScheme.outline, width: 1.5),
-          shape: const RoundedRectangleBorder(borderRadius: FCSpacing.borderRadiusMd),
+          shape: RoundedRectangleBorder(borderRadius: FCSpacing.borderRadiusMd),
           textStyle: textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w600,
           ),
