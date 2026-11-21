@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/inventory_metrics.dart';
 import '../../models/inventory_product.dart';
 import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
@@ -7,6 +8,8 @@ import '../widgets/product_item_card.dart';
 import '../widgets/quick_action_card.dart';
 import '../widgets/segmented_tab_switch.dart';
 import '../widgets/stock_availability_card.dart';
+import '../widgets/add_product_bottom_sheet.dart';
+import 'bulk_update_stock_screen.dart';
 import 'inventory_product_selection_screen.dart';
 import 'stock_alert_settings_screen.dart';
 import 'stock_history_screen.dart';
@@ -89,7 +92,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
 
   void _navigateToUpdateStock(InventoryProduct product) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => UpdateStockScreen(product: product),
       ),
     );
@@ -97,7 +100,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
 
   void _navigateToStockHistory(InventoryProduct product) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => StockHistoryScreen(product: product),
       ),
     );
@@ -105,7 +108,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
 
   void _navigateToAlertSettings(InventoryProduct product) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => StockAlertSettingsScreen(product: product),
       ),
     );
@@ -113,12 +116,12 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
 
   void _onQuickActionUpdateStock() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => InventoryProductSelectionScreen(
           title: 'Update Stock',
           onProductSelected: (product) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
+              MaterialPageRoute<void>(
                 builder: (_) => UpdateStockScreen(product: product),
               ),
             );
@@ -130,12 +133,12 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
 
   void _onQuickActionStockHistory() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => InventoryProductSelectionScreen(
           title: 'Stock History',
           onProductSelected: (product) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
+              MaterialPageRoute<void>(
                 builder: (_) => StockHistoryScreen(product: product),
               ),
             );
@@ -146,10 +149,9 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
   }
 
   void _onQuickActionBulkUpdate() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Bulk stock update mode selected.'),
-        backgroundColor: Color(0xFF0F172A),
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const BulkUpdateStockScreen(),
       ),
     );
   }
@@ -165,7 +167,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
       Navigator.of(context).pop();
     } else {
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (_) => const MainVendorScreen(initialIndex: 0),
         ),
         (route) => false,
@@ -187,9 +189,9 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
             child: Container(
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: IconButton(
                 icon: const Icon(
@@ -217,9 +219,9 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
               child: Container(
                 width: 44,
                 height: 44,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: IconButton(
                   icon: const Icon(
@@ -238,24 +240,17 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
           ? Padding(
               padding: const EdgeInsets.only(bottom: 72),
               child: FloatingActionButton.extended(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Add product flow opened.'),
-                      backgroundColor: Color(0xFF0F172A),
-                    ),
-                  );
-                },
+                onPressed: () => AddProductBottomSheet.show(context),
                 backgroundColor: const Color(0xFFD4F932),
                 foregroundColor: const Color(0xFF0F172A),
                 elevation: 4,
                 icon: const Icon(Icons.add, size: 20, color: Color(0xFF0F172A)),
-                label: const Text(
+                label: Text(
                   'Add Product',
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F172A),
+                    color: const Color(0xFF0F172A),
                   ),
                 ),
                 shape: const StadiumBorder(),
@@ -629,7 +624,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
   }
 
   void _showProductActionsModal(InventoryProduct product) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),

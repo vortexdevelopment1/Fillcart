@@ -46,9 +46,9 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
             child: Container(
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: IconButton(
                 icon: const Icon(
