@@ -52,7 +52,7 @@ class VendorBottomNavBar extends StatelessWidget {
   final ValueChanged<int> onTap;
 
   /// Signature Fillcart Vendor accent lime color.
-  static const Color activeColor = Color(0xFFD4F932);
+  static const Color activeColor = Color(0xFFC8F169);
 
   /// Unselected item color.
   static const Color inactiveColor = Color(0xFFECEFF1);
