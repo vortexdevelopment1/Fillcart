@@ -49,7 +49,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   final InventoryMetrics _metrics = const InventoryMetrics();
-  List<InventoryProduct> _products = InventoryProduct.demoProducts;
+  final List<InventoryProduct> _products = InventoryProduct.demoProducts;
 
   @override
   void initState() {
@@ -533,7 +533,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
             children: [
               Expanded(
                 child: InventoryOverviewCard(
-                  svgPath: 'assets/svg/out_of_stock.svg',
+                  svgPath: 'assets/svg/Ban Icon.svg',
                   title: 'Out of Stock',
                   count: '${_metrics.outOfStockCount}',
                   backgroundColor: const Color(0xFFFEF2F2),
