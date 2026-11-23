@@ -1,18 +1,12 @@
-/**
- * Settings Section Access Controller
- *
- * TEMPORARY: single mock password. Replace verifyPassword() with the real admin login/re-auth API once backend login is ready.
- */
+import { adminApi, AdminApiError } from './adminApi';
 
-// 1. Password Configuration
-// Fallback default password is "Admin@123", configured via VITE_SETTINGS_PASSWORD
-const MOCK_SETTINGS_PASSWORD = import.meta.env.VITE_SETTINGS_PASSWORD || 'Admin@123';
-
-// 2. Constants
-export const UNLOCK_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+// Constants
+export const DEFAULT_UNLOCK_DURATION_MS = 15 * 60 * 1000; // 15 minutes default fallback
+export const UNLOCK_DURATION_MS = DEFAULT_UNLOCK_DURATION_MS;
 export const BRUTE_FORCE_MAX_ATTEMPTS = 5;
 export const BRUTE_FORCE_LOCKOUT_MS = 60 * 1000; // 60 seconds
 
+const STORAGE_KEY_SETTINGS_TOKEN = 'fillkart_settings_grant_token';
 const STORAGE_KEY_UNLOCKED_UNTIL = 'fillkart_settings_unlocked_until';
 const STORAGE_KEY_FAILED_ATTEMPTS = 'fillkart_settings_failed_attempts';
 const STORAGE_KEY_LOCKOUT_UNTIL = 'fillkart_settings_lockout_until';
@@ -21,9 +15,9 @@ const STORAGE_KEY_LOCKOUT_UNTIL = 'fillkart_settings_lockout_until';
 export const SETTINGS_LOCK_EVENT = 'fillkart:settings-lock-changed';
 
 /**
- * Checks whether the Settings section is currently unlocked and the 10-minute
- * session has not expired. Unlock state is stored in sessionStorage so it clears
- * automatically when the browser tab closes.
+ * Checks whether the Settings section is currently unlocked and the token / session
+ * has not expired. Unlock state and tokens are stored in sessionStorage only (never in localStorage)
+ * so they clear automatically when the browser tab closes.
  */
 export const isSettingsUnlocked = (): boolean => {
   try {
@@ -33,9 +27,10 @@ export const isSettingsUnlocked = (): boolean => {
     const expiresAt = parseInt(raw, 10);
     if (isNaN(expiresAt) || Date.now() >= expiresAt) {
       // Session has expired
-      sessionStorage.removeItem(STORAGE_KEY_UNLOCKED_UNTIL);
+      lockSettings();
       return false;
     }
+
     return true;
   } catch {
     return false;
@@ -43,12 +38,28 @@ export const isSettingsUnlocked = (): boolean => {
 };
 
 /**
- * Unlocks the Settings section for 10 minutes.
+ * Retrieves the ephemeral settings grant token from sessionStorage (or null if locked).
  */
-export const unlockSettings = (): void => {
+export const getSettingsToken = (): string | null => {
+  if (!isSettingsUnlocked()) return null;
   try {
-    const expiresAt = Date.now() + UNLOCK_DURATION_MS;
+    return sessionStorage.getItem(STORAGE_KEY_SETTINGS_TOKEN);
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Unlocks the Settings section using the backend-provided grant token and expiration duration.
+ */
+export const unlockSettings = (token: string = '', expiresInSeconds: number = 900): void => {
+  try {
+    const durationMs = (expiresInSeconds || 900) * 1000;
+    const expiresAt = Date.now() + durationMs;
     sessionStorage.setItem(STORAGE_KEY_UNLOCKED_UNTIL, expiresAt.toString());
+    if (token) {
+      sessionStorage.setItem(STORAGE_KEY_SETTINGS_TOKEN, token);
+    }
     resetFailedAttempts();
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent(SETTINGS_LOCK_EVENT, { detail: { unlocked: true } }));
@@ -60,9 +71,11 @@ export const unlockSettings = (): void => {
 
 /**
  * Manually locks the Settings section immediately (e.g. on logout or session timeout).
+ * Ensures grant token is wiped from sessionStorage.
  */
 export const lockSettings = (): void => {
   try {
+    sessionStorage.removeItem(STORAGE_KEY_SETTINGS_TOKEN);
     sessionStorage.removeItem(STORAGE_KEY_UNLOCKED_UNTIL);
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent(SETTINGS_LOCK_EVENT, { detail: { unlocked: false } }));
@@ -137,6 +150,19 @@ export const getLockoutStatus = (): {
 };
 
 /**
+ * Sets lockout explicitly for a number of seconds (e.g. from backend 403 ACCOUNT_LOCKED).
+ */
+export const setBruteForceLockout = (seconds: number = 60): void => {
+  try {
+    const lockoutUntil = Date.now() + seconds * 1000;
+    sessionStorage.setItem(STORAGE_KEY_LOCKOUT_UNTIL, lockoutUntil.toString());
+    sessionStorage.setItem(STORAGE_KEY_FAILED_ATTEMPTS, BRUTE_FORCE_MAX_ATTEMPTS.toString());
+  } catch {
+    // ignore
+  }
+};
+
+/**
  * Records a failed password attempt and triggers a 60-second lockout if 5 attempts are reached.
  */
 export const recordFailedAttempt = (): { isLocked: boolean; remainingSeconds: number } => {
@@ -146,8 +172,7 @@ export const recordFailedAttempt = (): { isLocked: boolean; remainingSeconds: nu
     sessionStorage.setItem(STORAGE_KEY_FAILED_ATTEMPTS, newAttempts.toString());
 
     if (newAttempts >= BRUTE_FORCE_MAX_ATTEMPTS) {
-      const lockoutUntil = Date.now() + BRUTE_FORCE_LOCKOUT_MS;
-      sessionStorage.setItem(STORAGE_KEY_LOCKOUT_UNTIL, lockoutUntil.toString());
+      setBruteForceLockout(60);
       return { isLocked: true, remainingSeconds: 60 };
     }
 
@@ -170,31 +195,32 @@ export const resetFailedAttempts = (): void => {
 };
 
 /**
- * Verifies the user's password to access Settings.
- *
- * TEMPORARY: single mock password. Replace verifyPassword() with the real admin login/re-auth API once backend login is ready.
- *
- * TODO: Super Admin / "Settings" permission check will go here when backend login is integrated.
- * e.g., const response = await apiClient.post('/api/v1/admin/auth/re-authenticate', { password });
+ * Verifies the user's password to access Settings via POST /api/v1/admin/auth/verify-settings-access.
+ * Stores the returned 15-minute settings token and expiration in sessionStorage (never localStorage).
  */
 export const verifyPassword = async (password: string): Promise<boolean> => {
-  // 1. Check if currently locked out due to brute force
   const lockout = getLockoutStatus();
   if (lockout.isLocked) {
     return false;
   }
 
-  // 2. Simulate network delay (~300ms) for realistic UX and future backend swap
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
-  // 3. Mock comparison with environment/config password
-  const isValid = password.trim() === MOCK_SETTINGS_PASSWORD;
-
-  if (isValid) {
-    unlockSettings();
-    return true;
-  } else {
+  try {
+    const res = await adminApi.verifySettingsAccess(password);
+    if (res.verified && res.token) {
+      unlockSettings(res.token, res.expiresIn || 900);
+      return true;
+    }
+    recordFailedAttempt();
+    return false;
+  } catch (err: unknown) {
+    if (err instanceof AdminApiError) {
+      if (err.statusCode === 403 || err.code === 'ACCOUNT_LOCKED') {
+        setBruteForceLockout(60);
+        return false;
+      }
+    }
     recordFailedAttempt();
     return false;
   }
 };
+

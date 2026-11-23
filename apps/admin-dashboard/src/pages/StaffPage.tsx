@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
   StaffMember,
@@ -11,40 +12,72 @@ import {
 } from '../data/staffData';
 import { AddStaffModal } from '../components/staff/AddStaffModal';
 import { EditStaffModal } from '../components/staff/EditStaffModal';
+import { SearchInput } from '../components/common/SearchInput';
+import { CustomSelect } from '../components/common/CustomSelect';
+import { adminApi, isMockMode } from '../services/adminApi';
+import {
+  mapBackendStaffToFrontend,
+  buildFrontendRolesDictionary,
+  FRONTEND_TO_BACKEND_ROLES,
+} from '../services/adminMappers';
 import {
   Plus,
   MoreVertical,
   Check,
-  Shield,
-  ShieldAlert,
   Save,
   RotateCcw,
   KeyRound,
   Trash2,
   Lock,
+  Filter,
+  Loader2,
+  AlertCircle,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-react';
 
 export const StaffPage: React.FC = () => {
-  const {
-    staff,
-    roles,
-    addStaff,
-    updateStaff,
-    toggleStaffActive,
-    deleteStaff,
-    saveRolePermissions,
-    addCustomRole,
-    logAudit,
-  } = useApp();
+  const { roles: contextRoles, logAudit } = useApp();
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  // Query params extraction
+  const searchQuery = searchParams.get('search') || '';
+  const statusParam = searchParams.get('status') || 'ALL';
+  const profileParam = searchParams.get('profile') || 'ALL';
+  const pageParam = parseInt(searchParams.get('page') || '1', 10);
+  const limitParam = parseInt(searchParams.get('limit') || '10', 10);
+
+  // Staff and Roles state
+  const [staffList, setStaffList] = useState<StaffMember[]>([]);
+  const [rolesDictionary, setRolesDictionary] = useState<Record<string, RolePermissions>>(contextRoles);
+  const [roleIdMapping, setRoleIdMapping] = useState<Record<string, string>>({});
+  const [roleToProfileIdMapping, setRoleToProfileIdMapping] = useState<Record<string, string>>({});
+  const [adminBaseRoleId, setAdminBaseRoleId] = useState<string>('');
+
+  // Pagination state from API
+  const [pagination, setPagination] = useState({
+    page: pageParam,
+    limit: limitParam,
+    total: 0,
+    totalPages: 1,
+  });
+
+  // Loading and Error states
+  const [isLoadingStaff, setIsLoadingStaff] = useState(true);
+  const [staffError, setStaffError] = useState<string | null>(null);
+
+  // Active matrix tab state
   const [activeRoleTab, setActiveRoleTab] = useState<string>('Super Admin');
   const [localPermissions, setLocalPermissions] = useState<RolePermissions>(
-    roles['Super Admin']
+    contextRoles['Super Admin'] || {}
   );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
-  // Modals state
+  // Modals & Toast state
   const [isAddStaffOpen, setIsAddStaffOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
   const [isEditStaffOpen, setIsEditStaffOpen] = useState(false);
@@ -53,6 +86,96 @@ export const StaffPage: React.FC = () => {
   // Tabs scroll & overflow detection
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const showNotification = (msg: string) => {
+    setNotification(msg);
+    setTimeout(() => setNotification(null), 3500);
+  };
+
+  // Helper to update search params
+  const updateQueryParams = useCallback(
+    (updates: Record<string, string | number | undefined>) => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        Object.entries(updates).forEach(([k, v]) => {
+          if (v === undefined || v === '' || v === 'ALL') {
+            next.delete(k);
+          } else {
+            next.set(k, String(v));
+          }
+        });
+        return next;
+      });
+    },
+    [setSearchParams]
+  );
+
+  // 1. Fetch Roles from API
+  const fetchRoles = useCallback(async () => {
+    try {
+      const res = await adminApi.getRoles();
+      if (res.roles) {
+        const { rolesDictionary: dict, roleIdMapping: rIds, roleToProfileIdMapping: pIds } =
+          buildFrontendRolesDictionary(res.roles, contextRoles);
+        setRolesDictionary(dict);
+        setRoleIdMapping(rIds);
+        setRoleToProfileIdMapping(pIds);
+
+        // Find system admin base role ID
+        const adminRole = res.roles.find((r) => r.isSystem && r.name === 'ADMIN');
+        if (adminRole) {
+          setAdminBaseRoleId(adminRole.id);
+        } else if (res.roles[0]) {
+          setAdminBaseRoleId(res.roles[0].id);
+        }
+      }
+    } catch {
+      // Fallback to context roles
+      setRolesDictionary(contextRoles);
+    }
+  }, [contextRoles]);
+
+  useEffect(() => {
+    fetchRoles();
+  }, [fetchRoles]);
+
+  // 2. Fetch Staff Directory from API
+  const fetchStaff = useCallback(async () => {
+    setIsLoadingStaff(true);
+    setStaffError(null);
+    try {
+      const backendProfile =
+        profileParam !== 'ALL' ? FRONTEND_TO_BACKEND_ROLES[profileParam] || profileParam : undefined;
+
+      const res = await adminApi.getStaff({
+        page: pageParam,
+        limit: limitParam,
+        search: searchQuery.trim() || undefined,
+        status: statusParam !== 'ALL' ? (statusParam as 'ACTIVE' | 'DEACTIVATED') : undefined,
+        profile: backendProfile,
+      });
+
+      const mapped = res.items.map(mapBackendStaffToFrontend);
+      setStaffList(mapped);
+      setPagination(res.pagination);
+    } catch (err: any) {
+      setStaffError(err.message || 'Failed to load staff accounts');
+    } finally {
+      setIsLoadingStaff(false);
+    }
+  }, [pageParam, limitParam, searchQuery, statusParam, profileParam]);
+
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff]);
+
+  // Sync local matrix permissions when tab switches or dictionary updates
+  useEffect(() => {
+    if (rolesDictionary[activeRoleTab]) {
+      setLocalPermissions(JSON.parse(JSON.stringify(rolesDictionary[activeRoleTab])));
+      setHasUnsavedChanges(false);
+    }
+  }, [activeRoleTab, rolesDictionary]);
 
   const checkTabsScroll = () => {
     const el = tabsContainerRef.current;
@@ -67,7 +190,7 @@ export const StaffPage: React.FC = () => {
     checkTabsScroll();
     window.addEventListener('resize', checkTabsScroll);
     return () => window.removeEventListener('resize', checkTabsScroll);
-  }, [roles]);
+  }, [rolesDictionary]);
 
   const handleTabClick = (e: React.MouseEvent<HTMLButtonElement>, role: string) => {
     if (hasUnsavedChanges) {
@@ -79,53 +202,30 @@ export const StaffPage: React.FC = () => {
     setTimeout(checkTabsScroll, 300);
   };
 
-  // Sync local permissions when tab switches or roles change
-  useEffect(() => {
-    if (roles[activeRoleTab]) {
-      setLocalPermissions(JSON.parse(JSON.stringify(roles[activeRoleTab])));
-      setHasUnsavedChanges(false);
-    }
-  }, [activeRoleTab, roles]);
-
-  const showNotification = (msg: string) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(null), 3000);
-  };
-
   const isSuperAdminTab = activeRoleTab === 'Super Admin';
 
-  // Checkbox toggle logic with dependency rules:
-  // - Create needs View
-  // - Delete needs Edit & View
-  // - Unchecking View unchecks all other actions for that module!
+  // Checkbox toggle logic with dependency rules
   const handleCheckboxToggle = (module: ModuleName, action: ActionName) => {
-    if (isSuperAdminTab) return; // Super Admin is locked
+    if (isSuperAdminTab) return;
 
     setLocalPermissions((prev) => {
       const currentMod = { ...prev[module] };
       const nextVal = !currentMod[action];
       currentMod[action] = nextVal;
 
-      // Rule: Unchecking View turns off everything in module
       if (action === 'View' && !nextVal) {
         currentMod.Create = false;
         currentMod.Edit = false;
         currentMod.Delete = false;
         currentMod.Approve = false;
       }
-
-      // Rule: Create requires View
       if (action === 'Create' && nextVal) {
         currentMod.View = true;
       }
-
-      // Rule: Delete requires Edit & View
       if (action === 'Delete' && nextVal) {
         currentMod.Edit = true;
         currentMod.View = true;
       }
-
-      // Rule: Approve requires View
       if (action === 'Approve' && nextVal) {
         currentMod.View = true;
       }
@@ -139,15 +239,9 @@ export const StaffPage: React.FC = () => {
     setHasUnsavedChanges(true);
   };
 
-  const handleSaveChanges = () => {
-    saveRolePermissions(activeRoleTab, localPermissions);
-    setHasUnsavedChanges(false);
-    showNotification(`Saved permissions for ${activeRoleTab}`);
-  };
-
   const handleDiscardChanges = () => {
-    if (roles[activeRoleTab]) {
-      setLocalPermissions(JSON.parse(JSON.stringify(roles[activeRoleTab])));
+    if (rolesDictionary[activeRoleTab]) {
+      setLocalPermissions(JSON.parse(JSON.stringify(rolesDictionary[activeRoleTab])));
       setHasUnsavedChanges(false);
     }
   };
@@ -155,29 +249,51 @@ export const StaffPage: React.FC = () => {
   const handleCreateNewRole = () => {
     const roleName = window.prompt('Enter new role title (e.g. "Regional Supervisor"):');
     if (roleName && roleName.trim()) {
-      addCustomRole(roleName.trim());
-      setActiveRoleTab(roleName.trim());
-      showNotification(`Created custom role "${roleName.trim()}"`);
+      const name = roleName.trim();
+      setRolesDictionary((prev) => ({
+        ...prev,
+        [name]: JSON.parse(JSON.stringify(contextRoles['Support Admin'] || contextRoles['Super Admin'])),
+      }));
+      setActiveRoleTab(name);
+      showNotification(`Created local preview for role "${name}". Note: Backend persistence coming soon.`);
     }
   };
 
-  const handleToggleStaff = (id: string) => {
-    const success = toggleStaffActive(id);
-    if (!success) {
-      showNotification('Cannot deactivate the last active Super Admin account.');
-    }
+  // Optimistic Toggle with rollback and backend reason toast
+  const handleToggleStaff = async (id: string) => {
+    const target = staffList.find((s) => s.id === id);
+    if (!target) return;
+
+    const previousState = target.isActive;
+    const nextActive = !previousState;
     setActiveMenuId(null);
+
+    // 1. Optimistic Update
+    setStaffList((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, isActive: nextActive } : s))
+    );
+
+    try {
+      await adminApi.updateStaffStatus(id, {
+        status: nextActive ? 'ACTIVE' : 'DEACTIVATED',
+        reason: nextActive ? undefined : 'Administrative deactivation',
+      });
+      showNotification(
+        `Staff account ${target.name} has been ${nextActive ? 'activated' : 'deactivated'}.`
+      );
+    } catch (err: any) {
+      // 2. Rollback on Error
+      setStaffList((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, isActive: previousState } : s))
+      );
+      showNotification(err.message || 'Action failed: Unable to update staff status.');
+    }
   };
 
   const handleDeleteStaff = (id: string) => {
     const confirm = window.confirm('Are you sure you want to delete this staff account?');
     if (confirm) {
-      const success = deleteStaff(id);
-      if (!success) {
-        showNotification('Cannot delete the last Super Admin account.');
-      } else {
-        showNotification('Staff member removed.');
-      }
+      showNotification('Direct account deletion is not permitted in Phase 1. Use Deactivate instead.');
     }
     setActiveMenuId(null);
   };
@@ -188,13 +304,13 @@ export const StaffPage: React.FC = () => {
     setActiveMenuId(null);
   };
 
-  const availableRoleNames = Object.keys(roles);
+  const availableRoleNames = Object.keys(rolesDictionary);
 
   return (
     <div className="space-y-5 pb-12 w-full max-w-full min-w-0">
       {/* Toast Notification */}
       {notification && (
-        <div className="p-3 rounded-2xl bg-primary text-white font-sans text-xs font-medium fixed bottom-6 right-6 z-50 shadow-lg animate-in fade-in slide-in-from-bottom-2">
+        <div className="p-3.5 rounded-2xl bg-primary text-white font-sans text-xs font-medium fixed bottom-6 right-6 z-50 shadow-xl border border-white/10 animate-in fade-in slide-in-from-bottom-2">
           {notification}
         </div>
       )}
@@ -203,9 +319,12 @@ export const StaffPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-5 items-start w-full max-w-full min-w-0">
         {/* ─── LEFT COLUMN: STAFF LIST ─── */}
         <div className="space-y-4 w-full max-w-full min-w-0">
-          <div className="p-4 rounded-[24px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] flex items-center justify-between">
+          {/* Header Card */}
+          <div className="p-4 rounded-[24px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
             <div>
-              <h2 className="font-heading text-lg font-normal text-ink">Ops Team Staff ({staff.length})</h2>
+              <h2 className="font-heading text-lg font-normal text-ink">
+                Ops Team Staff ({pagination.total})
+              </h2>
               <p className="font-sans text-xs text-ink/60">
                 Authorized internal administrators & operators
               </p>
@@ -213,121 +332,265 @@ export const StaffPage: React.FC = () => {
 
             <button
               onClick={() => setIsAddStaffOpen(true)}
-              className="px-4 py-2 rounded-full bg-primary text-white font-sans text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-secondary"
+              className="px-4 py-2 rounded-full bg-primary text-white font-sans text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-secondary flex-shrink-0"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Staff</span>
             </button>
           </div>
 
-          {/* Staff Member Rows */}
-          <div className="space-y-2.5">
-            {staff.map((member) => (
-              <div
-                key={member.id}
-                className="w-full rounded-[20px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.03)] hover:border-secondary hover:bg-neutral/20 transition-all p-[12px_18px] relative select-none"
+          {/* Search & Filter Toolbar */}
+          <div className="p-3.5 rounded-[22px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] flex flex-wrap items-center justify-between gap-2.5 min-w-0">
+            <div className="flex items-center gap-2 flex-1 min-w-[200px] flex-wrap sm:flex-nowrap">
+              <SearchInput
+                placeholder="Search staff by name or email..."
+                value={searchQuery}
+                onChange={(val) => updateQueryParams({ search: val, page: 1 })}
+                containerClassName="flex-1 min-w-[160px]"
+                className="py-1.5 text-xs rounded-full border border-primary/15 bg-neutral/40 focus:ring-2 focus:ring-secondary focus:bg-white"
+              />
+
+              {/* Status Filter */}
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <Filter className="w-3.5 h-3.5 text-ink/50" />
+                <CustomSelect
+                  value={statusParam}
+                  onChange={(e) => updateQueryParams({ status: e.target.value, page: 1 })}
+                  className="px-2.5 py-1.5 rounded-full border border-primary/15 bg-neutral/40 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
+                >
+                  <option value="ALL">All Status</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="DEACTIVATED">Deactivated</option>
+                </CustomSelect>
+              </div>
+
+              {/* Profile Filter */}
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <CustomSelect
+                  value={profileParam}
+                  onChange={(e) => updateQueryParams({ profile: e.target.value, page: 1 })}
+                  className="px-2.5 py-1.5 rounded-full border border-primary/15 bg-neutral/40 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
+                >
+                  <option value="ALL">All Roles</option>
+                  {availableRoleNames.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                </CustomSelect>
+              </div>
+            </div>
+
+            {(searchQuery || statusParam !== 'ALL' || profileParam !== 'ALL') && (
+              <button
+                onClick={() =>
+                  updateQueryParams({ search: undefined, status: undefined, profile: undefined, page: 1 })
+                }
+                className="px-2.5 py-1 rounded-full border border-primary/20 text-ink/75 hover:bg-neutral font-sans text-xs font-medium flex items-center gap-1 transition-colors"
+                title="Reset filters"
               >
-                <div className="flex items-center justify-between gap-3">
-                  {/* Left: Initials tile (36px, radius 12, bg-neutral, text-primary) + Name + Email */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-[36px] h-[36px] rounded-[12px] bg-neutral text-primary font-sans text-xs flex items-center justify-center font-medium flex-shrink-0 select-none">
-                      {member.initials}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-sans text-[13px] font-medium text-ink truncate leading-tight">
-                          {member.name}
-                        </h4>
-                        <span
-                          className={`px-2 py-0.5 rounded-full font-sans text-[10px] font-medium leading-none ${
-                            member.role === 'Super Admin'
-                              ? 'bg-primary text-white'
-                              : member.role === 'Manager'
-                              ? 'bg-secondary text-white'
-                              : 'bg-neutral text-primary border border-primary/20'
-                          }`}
-                        >
-                          {member.role}
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset</span>
+              </button>
+            )}
+          </div>
+
+          {/* Staff Member Rows */}
+          {isLoadingStaff ? (
+            <div className="p-12 text-center rounded-[20px] bg-white border border-primary/10 flex flex-col items-center justify-center gap-3">
+              <Loader2 className="w-7 h-7 text-primary animate-spin" />
+              <span className="font-sans text-xs text-ink/60">Loading staff members...</span>
+            </div>
+          ) : staffError ? (
+            <div className="p-8 text-center rounded-[20px] bg-white border border-red-200 flex flex-col items-center justify-center gap-3">
+              <AlertCircle className="w-8 h-8 text-red-500" />
+              <h4 className="font-heading text-sm text-ink">{staffError}</h4>
+              <button
+                onClick={fetchStaff}
+                className="px-4 py-1.5 rounded-full bg-primary text-white font-sans text-xs font-medium hover:bg-primary/90"
+              >
+                Retry
+              </button>
+            </div>
+          ) : staffList.length === 0 ? (
+            <div className="p-12 text-center rounded-[20px] bg-white border border-primary/10 flex flex-col items-center justify-center">
+              <Users className="w-10 h-10 text-primary/30 mx-auto mb-2" />
+              <h4 className="font-heading text-base font-normal text-ink">No staff members found</h4>
+              <p className="font-sans text-xs text-ink/50 mt-1">Try clearing filters or search criteria</p>
+              {(searchQuery || statusParam !== 'ALL' || profileParam !== 'ALL') && (
+                <button
+                  onClick={() =>
+                    updateQueryParams({ search: undefined, status: undefined, profile: undefined, page: 1 })
+                  }
+                  className="mt-3 px-4 py-1.5 rounded-full bg-primary text-white font-sans text-xs font-medium"
+                >
+                  Reset Filters
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {staffList.map((member) => (
+                <div
+                  key={member.id}
+                  className="w-full rounded-[20px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.03)] hover:border-secondary hover:bg-neutral/20 transition-all p-[12px_18px] relative select-none"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    {/* Left: Initials tile + Name + Email */}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-[36px] h-[36px] rounded-[12px] bg-neutral text-primary font-sans text-xs flex items-center justify-center font-medium flex-shrink-0 select-none">
+                        {member.initials}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-sans text-[13px] font-medium text-ink truncate leading-tight">
+                            {member.name}
+                          </h4>
+                          <span
+                            className={`px-2 py-0.5 rounded-full font-sans text-[10px] font-medium leading-none ${
+                              member.role === 'Super Admin'
+                                ? 'bg-primary text-white'
+                                : member.role === 'Operations Admin'
+                                ? 'bg-secondary text-white'
+                                : 'bg-neutral text-primary border border-primary/20'
+                            }`}
+                          >
+                            {member.role}
+                          </span>
+                        </div>
+                        <span className="font-sans text-[11px] text-ink/55 truncate block mt-0.5">
+                          {member.email} · Last login: {member.lastLogin}
                         </span>
                       </div>
-                      <span className="font-sans text-[11px] text-ink/55 truncate block mt-0.5">
-                        {member.email} · Last login: {member.lastLogin}
-                      </span>
                     </div>
-                  </div>
 
-                  {/* Right: Active Toggle + Kebab Menu */}
-                  <div className="flex items-center gap-2.5 flex-shrink-0">
-                    {/* Active toggle button */}
-                    <button
-                      type="button"
-                      onClick={() => handleToggleStaff(member.id)}
-                      className={`w-10 h-5 rounded-full transition-colors relative p-0.5 focus:outline-none focus:ring-2 focus:ring-secondary ${
-                        member.isActive ? 'bg-primary' : 'bg-primary/20'
-                      }`}
-                      title={member.isActive ? 'Click to deactivate' : 'Click to activate'}
-                      aria-pressed={member.isActive}
-                    >
-                      <div
-                        className={`w-4 h-4 rounded-full bg-white transition-transform ${
-                          member.isActive ? 'translate-x-5' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-
-                    {/* Kebab Action Menu */}
-                    <div className="relative">
+                    {/* Right: Active Toggle + Kebab Menu */}
+                    <div className="flex items-center gap-2.5 flex-shrink-0">
+                      {/* Active toggle button */}
                       <button
-                        onClick={() =>
-                          setActiveMenuId(activeMenuId === member.id ? null : member.id)
-                        }
-                        className="w-8 h-8 rounded-full hover:bg-neutral flex items-center justify-center text-ink/60 transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
-                        aria-label="Staff options"
+                        type="button"
+                        onClick={() => handleToggleStaff(member.id)}
+                        className={`w-10 h-5 rounded-full transition-colors relative p-0.5 focus:outline-none focus:ring-2 focus:ring-secondary ${
+                          member.isActive ? 'bg-primary' : 'bg-primary/20'
+                        }`}
+                        title={member.isActive ? 'Click to deactivate' : 'Click to activate'}
+                        aria-pressed={member.isActive}
                       >
-                        <MoreVertical className="w-4 h-4" />
+                        <div
+                          className={`w-4 h-4 rounded-full bg-white transition-transform ${
+                            member.isActive ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
                       </button>
 
-                      {activeMenuId === member.id && (
-                        <div className="absolute right-0 top-9 z-30 w-44 rounded-2xl bg-white border border-primary/10 shadow-xl py-1.5 animate-in fade-in">
-                          <button
-                            onClick={() => {
-                              setEditingStaff(member);
-                              setIsEditStaffOpen(true);
-                              setActiveMenuId(null);
-                            }}
-                            className="w-full px-3 py-1.5 text-left font-sans text-xs text-ink hover:bg-neutral flex items-center gap-2"
-                          >
-                            <span>Edit Profile</span>
-                          </button>
-                          <button
-                            onClick={() => handleResetPassword(member.name)}
-                            className="w-full px-3 py-1.5 text-left font-sans text-xs text-ink hover:bg-neutral flex items-center gap-2"
-                          >
-                            <KeyRound className="w-3.5 h-3.5 text-secondary" />
-                            <span>Reset Password</span>
-                          </button>
-                          <button
-                            onClick={() => handleToggleStaff(member.id)}
-                            className="w-full px-3 py-1.5 text-left font-sans text-xs text-ink hover:bg-neutral flex items-center gap-2"
-                          >
-                            <span>{member.isActive ? 'Deactivate' : 'Activate'}</span>
-                          </button>
-                          <div className="my-1 border-t border-primary/10" />
-                          <button
-                            onClick={() => handleDeleteStaff(member.id)}
-                            className="w-full px-3 py-1.5 text-left font-sans text-xs text-primary hover:bg-neutral flex items-center gap-2"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 text-primary" />
-                            <span>Delete Account</span>
-                          </button>
-                        </div>
-                      )}
+                      {/* Kebab Action Menu */}
+                      <div className="relative">
+                        <button
+                          onClick={() =>
+                            setActiveMenuId(activeMenuId === member.id ? null : member.id)
+                          }
+                          className="w-8 h-8 rounded-full hover:bg-neutral flex items-center justify-center text-ink/60 transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
+                          aria-label="Staff options"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+
+                        {activeMenuId === member.id && (
+                          <div className="absolute right-0 top-9 z-30 w-44 rounded-2xl bg-white border border-primary/10 shadow-xl py-1.5 animate-in fade-in">
+                            <button
+                              onClick={() => {
+                                setEditingStaff(member);
+                                setIsEditStaffOpen(true);
+                                setActiveMenuId(null);
+                              }}
+                              className="w-full px-3 py-1.5 text-left font-sans text-xs text-ink hover:bg-neutral flex items-center gap-2"
+                            >
+                              <span>Edit Profile</span>
+                            </button>
+                            <button
+                              onClick={() => handleResetPassword(member.name)}
+                              className="w-full px-3 py-1.5 text-left font-sans text-xs text-ink hover:bg-neutral flex items-center gap-2"
+                            >
+                              <KeyRound className="w-3.5 h-3.5 text-secondary" />
+                              <span>Reset Password</span>
+                            </button>
+                            <button
+                              onClick={() => handleToggleStaff(member.id)}
+                              className="w-full px-3 py-1.5 text-left font-sans text-xs text-ink hover:bg-neutral flex items-center gap-2"
+                            >
+                              <span>{member.isActive ? 'Deactivate' : 'Activate'}</span>
+                            </button>
+                            <div className="my-1 border-t border-primary/10" />
+                            <button
+                              onClick={() => handleDeleteStaff(member.id)}
+                              className="w-full px-3 py-1.5 text-left font-sans text-xs text-primary hover:bg-neutral flex items-center gap-2"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-primary" />
+                              <span>Delete Account</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {pagination.total > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 px-1">
+              <span className="font-sans text-xs text-ink/60">
+                Showing{' '}
+                <strong className="text-ink">
+                  {(pagination.page - 1) * pagination.limit + 1} -{' '}
+                  {Math.min(pagination.page * pagination.limit, pagination.total)}
+                </strong>{' '}
+                of <strong className="text-ink">{pagination.total}</strong> staff
+              </span>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => updateQueryParams({ page: 1 })}
+                  disabled={pagination.page <= 1}
+                  className="w-7 h-7 rounded-lg bg-white border border-primary/15 disabled:opacity-30 flex items-center justify-center text-ink hover:bg-neutral transition-colors"
+                  aria-label="First page"
+                >
+                  <ChevronsLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => updateQueryParams({ page: pagination.page - 1 })}
+                  disabled={pagination.page <= 1}
+                  className="w-7 h-7 rounded-lg bg-white border border-primary/15 disabled:opacity-30 flex items-center justify-center text-ink hover:bg-neutral transition-colors"
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+
+                <span className="px-2 py-1 font-sans text-xs font-medium text-ink">
+                  Page {pagination.page} of {pagination.totalPages}
+                </span>
+
+                <button
+                  onClick={() => updateQueryParams({ page: pagination.page + 1 })}
+                  disabled={pagination.page >= pagination.totalPages}
+                  className="w-7 h-7 rounded-lg bg-white border border-primary/15 disabled:opacity-30 flex items-center justify-center text-ink hover:bg-neutral transition-colors"
+                  aria-label="Next page"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => updateQueryParams({ page: pagination.totalPages })}
+                  disabled={pagination.page >= pagination.totalPages}
+                  className="w-7 h-7 rounded-lg bg-white border border-primary/15 disabled:opacity-30 flex items-center justify-center text-ink hover:bg-neutral transition-colors"
+                  aria-label="Last page"
+                >
+                  <ChevronsRight className="w-3.5 h-3.5" />
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* ─── RIGHT COLUMN: ROLE PERMISSIONS MATRIX ─── */}
@@ -336,7 +599,7 @@ export const StaffPage: React.FC = () => {
             <div className="min-w-0">
               <h2 className="font-heading text-lg font-normal text-ink truncate">Role Permissions Matrix</h2>
               <p className="font-sans text-xs text-ink/60 truncate">
-                Granular action policies across 9 core modules
+                Granular action policies across 9 core modules (Read-only)
               </p>
             </div>
 
@@ -401,25 +664,26 @@ export const StaffPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Unsaved Changes Warning Bar */}
+          {/* Unsaved Changes Warning Bar with Disabled Save Action */}
           {hasUnsavedChanges && activeRoleTab !== 'External Roles' && (
-            <div className="p-3 rounded-2xl bg-secondary/15 border border-secondary/30 flex items-center justify-between gap-3 animate-in fade-in">
-              <span className="font-sans text-xs text-primary font-medium">
-                Unsaved modifications to <strong>{activeRoleTab}</strong> matrix
+            <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-center justify-between gap-3 animate-in fade-in">
+              <span className="font-sans text-xs text-amber-800 font-medium">
+                Unsaved modifications to <strong>{activeRoleTab}</strong> matrix (Preview Only)
               </span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleDiscardChanges}
                   className="px-3 py-1 rounded-full text-xs font-sans font-medium text-ink hover:bg-white transition-colors"
                 >
-                  Discard
+                  Reset
                 </button>
                 <button
-                  onClick={handleSaveChanges}
-                  className="px-4 py-1 rounded-full bg-primary text-white text-xs font-sans font-medium hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1.5"
+                  disabled
+                  title="Backend role permission updating endpoint is coming soon"
+                  className="px-3.5 py-1 rounded-full bg-primary/40 text-white text-xs font-sans font-medium cursor-not-allowed flex items-center gap-1.5 shadow-none"
                 >
                   <Save className="w-3 h-3" />
-                  <span>Save Changes</span>
+                  <span>Save (Coming soon)</span>
                 </button>
               </div>
             </div>
@@ -501,7 +765,6 @@ export const StaffPage: React.FC = () => {
 
                             return (
                               <td key={action} className="py-2 px-2 text-center w-[15%] min-w-[50px]">
-                                {/* Custom 22px Checkbox: checked = PRIMARY + white tick */}
                                 <button
                                   type="button"
                                   disabled={isSuperAdminTab}
@@ -527,18 +790,13 @@ export const StaffPage: React.FC = () => {
             </div>
           )}
 
-          {/* Sticky Save Changes Bar at bottom if modified */}
-          {hasUnsavedChanges && (
-            <div className="pt-2 flex justify-end">
-              <button
-                onClick={handleSaveChanges}
-                className="px-6 py-2 rounded-full bg-primary text-white font-sans text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-secondary"
-              >
-                <Save className="w-3.5 h-3.5" />
-                <span>Save {activeRoleTab} Permissions</span>
-              </button>
-            </div>
-          )}
+          {/* Bottom Info Note */}
+          <div className="pt-1 flex items-center justify-between text-[11px] font-sans text-ink/50">
+            <span>Permissions reflect active database profiles. Modifications are view-only.</span>
+            {hasUnsavedChanges && (
+              <span className="text-amber-700 font-medium">Save disabled (Backend save coming soon)</span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -546,11 +804,13 @@ export const StaffPage: React.FC = () => {
       <AddStaffModal
         isOpen={isAddStaffOpen}
         onClose={() => setIsAddStaffOpen(false)}
-        onAdd={(data) => {
-          addStaff(data);
-          showNotification(`Added ${data.name} to ops staff.`);
+        onSuccess={(name) => {
+          showNotification(`Invitation sent to ${name}. Staff directory updated.`);
+          fetchStaff();
         }}
         availableRoles={availableRoleNames}
+        adminRoleId={adminBaseRoleId}
+        roleToProfileIdMapping={roleToProfileIdMapping}
       />
 
       {/* Edit Staff Modal */}
@@ -562,8 +822,10 @@ export const StaffPage: React.FC = () => {
           setEditingStaff(null);
         }}
         onSave={(id, updates) => {
-          updateStaff(id, updates);
-          showNotification('Updated staff member profile.');
+          setStaffList((prev) =>
+            prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
+          );
+          showNotification('Updated staff member preview.');
         }}
         availableRoles={availableRoleNames}
       />

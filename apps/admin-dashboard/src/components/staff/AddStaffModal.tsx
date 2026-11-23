@@ -1,55 +1,74 @@
 import React, { useState } from 'react';
-import { X, UserPlus, Shield } from 'lucide-react';
+import { X, UserPlus, Loader2 } from 'lucide-react';
 import { StaffRole } from '../../data/staffData';
 import { CustomSelect } from '../common/CustomSelect';
+import { adminApi, isMockMode } from '../../services/adminApi';
 
 interface AddStaffModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (data: { name: string; email: string; phone: string; role: StaffRole; isActive: boolean }) => void;
+  onSuccess: (staffName: string) => void;
   availableRoles: string[];
+  adminRoleId?: string;
+  roleToProfileIdMapping?: Record<string, string>;
 }
 
 export const AddStaffModal: React.FC<AddStaffModalProps> = ({
   isOpen,
   onClose,
-  onAdd,
+  onSuccess,
   availableRoles,
+  adminRoleId,
+  roleToProfileIdMapping = {},
 }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<StaffRole>(availableRoles[0] || 'Support');
+  const [role, setRole] = useState<StaffRole>(availableRoles[0] || 'Operations Admin');
   const [password, setPassword] = useState('');
   const [isActive, setIsActive] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !phone.trim() || !password.trim()) {
-      setError('Please fill in all required fields.');
+    if (!name.trim() || !email.trim()) {
+      setError('Please fill in full name and email address.');
       return;
     }
     if (!email.includes('@')) {
       setError('Please enter a valid company email address.');
       return;
     }
-    if (phone.length < 10) {
-      setError('Phone number must have at least 10 digits.');
-      return;
+
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      // Find roleId & profileId
+      const targetRoleId = adminRoleId || '00000000-0000-0000-0000-000000000001';
+      const targetProfileId = roleToProfileIdMapping[role] || undefined;
+
+      await adminApi.inviteStaff({
+        fullName: name.trim(),
+        email: email.trim().toLowerCase(),
+        roleId: targetRoleId,
+        profileId: targetProfileId,
+      });
+
+      onSuccess(name.trim());
+      setName('');
+      setEmail('');
+      setPhone('');
+      setPassword('');
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Failed to send staff invitation. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    onAdd({
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      role,
-      isActive,
-    });
-
-    onClose();
   };
 
   return (
@@ -57,7 +76,8 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
       <div className="bg-white rounded-[24px] max-w-md w-full p-6 shadow-2xl border border-primary/10 relative">
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-neutral hover:bg-neutral/80 flex items-center justify-center text-ink transition-colors focus:outline-none focus:ring-2 focus:ring-secondary"
+          disabled={isSubmitting}
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-neutral hover:bg-neutral/80 flex items-center justify-center text-ink transition-colors focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50"
           aria-label="Close dialog"
         >
           <X className="w-4 h-4" />
@@ -74,7 +94,7 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
         </div>
 
         {error && (
-          <div className="p-3 mb-3 rounded-xl bg-neutral/80 border border-primary/20 text-xs font-sans text-primary">
+          <div className="p-3 mb-3 rounded-xl bg-red-50 border border-red-200 text-xs font-sans text-red-700">
             {error}
           </div>
         )}
@@ -89,7 +109,8 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
               placeholder="e.g. Anjali Nair"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
+              disabled={isSubmitting}
+              className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-60"
               required
             />
           </div>
@@ -104,22 +125,23 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
                 placeholder="anjali@fillkart.in"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-60"
                 required
               />
             </div>
 
             <div>
               <label className="block font-sans text-xs font-medium text-ink mb-1">
-                Phone Number <span className="text-secondary">*</span>
+                Phone Number
               </label>
               <input
                 type="tel"
                 placeholder="9820011223"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
-                required
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-60"
               />
             </div>
           </div>
@@ -132,7 +154,8 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
               <CustomSelect
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-60"
               >
                 {availableRoles.map((r) => (
                   <option key={r} value={r}>
@@ -144,15 +167,15 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
 
             <div>
               <label className="block font-sans text-xs font-medium text-ink mb-1">
-                Temporary Password <span className="text-secondary">*</span>
+                Temporary Password
               </label>
               <input
                 type="password"
-                placeholder="••••••••"
+                placeholder="Sent via invitation"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
-                required
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-60"
               />
             </div>
           </div>
@@ -160,14 +183,15 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
           <div className="flex items-center justify-between p-3 rounded-xl bg-neutral/40 border border-primary/10">
             <div>
               <span className="font-sans text-xs font-medium text-ink block">Account Active</span>
-              <span className="font-sans text-[11px] text-ink/50 block">Can log into ops console</span>
+              <span className="font-sans text-[11px] text-ink/50 block">Status upon invite acceptance</span>
             </div>
             <button
               type="button"
               onClick={() => setIsActive(!isActive)}
+              disabled={isSubmitting}
               className={`w-11 h-6 rounded-full transition-colors relative p-0.5 focus:outline-none focus:ring-2 focus:ring-secondary ${
                 isActive ? 'bg-primary' : 'bg-primary/20'
-              }`}
+              } disabled:opacity-60`}
               aria-pressed={isActive}
             >
               <div
@@ -182,15 +206,24 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-full border border-primary/20 text-ink font-sans text-xs font-medium hover:bg-neutral transition-colors"
+              disabled={isSubmitting}
+              className="px-4 py-2 rounded-full border border-primary/20 text-ink font-sans text-xs font-medium hover:bg-neutral transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-full bg-primary text-white font-sans text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary"
+              disabled={isSubmitting}
+              className="px-5 py-2 rounded-full bg-primary text-white font-sans text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary flex items-center gap-1.5 disabled:opacity-60"
             >
-              Create Staff Account
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Inviting...</span>
+                </>
+              ) : (
+                <span>Invite Staff Member</span>
+              )}
             </button>
           </div>
         </form>
