@@ -4,18 +4,21 @@ import 'package:go_router/go_router.dart';
 
 import '../features/authentication/bloc/auth_bloc.dart';
 import '../features/authentication/data/mock_auth_repository.dart';
+import '../features/kyc/bloc/kyc_bloc.dart';
 import '../shared/theme/rider_theme.dart';
 import 'router/app_router.dart';
 
 /// Root widget for the Fillcart Rider Application.
 class RiderApp extends StatefulWidget {
   final AuthRepository? authRepository;
+  final KycBloc? kycBloc;
   final GoRouter? router;
   final String? initialLocation;
 
   const RiderApp({
     super.key,
     this.authRepository,
+    this.kycBloc,
     this.router,
     this.initialLocation,
   });
@@ -27,6 +30,7 @@ class RiderApp extends StatefulWidget {
 class _RiderAppState extends State<RiderApp> {
   late final GoRouter _router;
   late final AuthBloc _authBloc;
+  late final KycBloc _kycBloc;
 
   @override
   void initState() {
@@ -39,18 +43,25 @@ class _RiderAppState extends State<RiderApp> {
     _authBloc = AuthBloc(
       repository: widget.authRepository ?? const MockAuthRepository(),
     );
+    _kycBloc = widget.kycBloc ?? KycBloc();
   }
 
   @override
   void dispose() {
     _authBloc.close();
+    if (widget.kycBloc == null) {
+      _kycBloc.close();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _authBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _authBloc),
+        BlocProvider.value(value: _kycBloc),
+      ],
       child: MaterialApp.router(
         title: 'Fillcart Rider',
         debugShowCheckedModeBanner: false,

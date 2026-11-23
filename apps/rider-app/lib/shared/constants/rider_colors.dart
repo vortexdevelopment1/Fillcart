@@ -9,6 +9,7 @@ abstract final class RiderColors {
   static const Color primaryPressed = Color(0xFFE5CF00);
   static const Color earningNeon = Color(0xFFC1FE03);
   static const Color incentiveIndigo = Color(0xFF4338CA);
+  static const Color permissionBlue = Color(0xFF4AA2FF);
 
   // Status & Telemetry
   static const Color onlineGreen = Color(0xFF00D850);

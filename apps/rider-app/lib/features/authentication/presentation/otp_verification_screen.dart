@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../shared/constants/rider_colors.dart';
@@ -29,6 +30,16 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   int _resendCountdown = 30;
   Timer? _timer;
   String? _errorMessage;
+  bool _isNavigating = false;
+
+  String get _displayPhoneNumber {
+    final raw = widget.phoneNumber.trim();
+    if (raw.startsWith('+91')) {
+      final stripped = raw.substring(3).trim();
+      return stripped.isNotEmpty ? stripped : raw;
+    }
+    return raw;
+  }
 
   @override
   void initState() {
@@ -76,10 +87,23 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       } else {
         _focusNodes[index].unfocus();
         if (_currentOtp.length == _otpLength) {
-          _submitOtp();
+          final isSuccess = context.read<AuthBloc>().state is AuthSuccess;
+          _onVerifyOrNextPressed(isSuccess);
         }
       }
     }
+  }
+
+  void _onVerifyOrNextPressed(bool isSuccess) {
+    if (_isNavigating) return;
+
+    if (isSuccess) {
+      _isNavigating = true;
+      context.replace('/otp-success');
+      return;
+    }
+
+    _submitOtp();
   }
 
   void _submitOtp() {
@@ -116,17 +140,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              key: const Key('auth_success_snackbar'),
-              content: Text(
-                'Phone verified (+91 ${state.phoneNumber}). Next: Vehicle Details (1848:51738) in Batch 2.',
-                style: GoogleFonts.poppins(),
-              ),
-              backgroundColor: RiderColors.onSurfaceDark,
-              duration: const Duration(seconds: 4),
-            ),
-          );
+          if (!_isNavigating) {
+            _isNavigating = true;
+            context.replace('/otp-success');
+          }
         } else if (state is AuthFailure) {
           setState(() {
             _errorMessage = state.message;
@@ -164,15 +181,44 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
                     // Centered Subtitle
                     Center(
-                      child: Text(
-                        'We sent an sms with a 6-digit code to your registered Email. Please enter it so we can be sure that this Email belongs to you.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFF5B5B5B),
-                          height: 1.5,
-                        ),
+                      child: Column(
+                        key: const Key('otp_subtitle'),
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text.rich(
+                            TextSpan(
+                              text: 'Enter the 6-digit OTP sent to ',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFF5B5B5B),
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: '+91',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFF000000),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            key: const Key('otp_subtitle_first_line'),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _displayPhoneNumber,
+                            key: const Key('otp_phone_number_text'),
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF000000),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -291,42 +337,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       ),
                     ],
 
-                    // Development confirmation banner (shows only on successful verification)
-                    if (isSuccess) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        key: const Key('dev_auth_success_banner'),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: RiderColors.onlineGreen.withValues(
-                            alpha: 0.12,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: RiderColors.onlineGreen),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.check_circle,
-                              color: RiderColors.onlineGreen,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                '[DEV] Verified +91 ${(state).phoneNumber}. Next Figma screen: Vehicle Details (1848:51738) in Batch 2.',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: RiderColors.onSurfaceDark,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-
                     const SizedBox(height: 24),
 
                     // Verify Button (directly below OTP cells)
@@ -335,9 +345,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       height: 50,
                       child: ElevatedButton(
                         key: const Key('otp_verify_button'),
-                        onPressed: (isVerifying || isSuccess)
+                        onPressed: isVerifying
                             ? null
-                            : _submitOtp,
+                            : () => _onVerifyOrNextPressed(isSuccess),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: RiderColors.primaryYellow,
                           foregroundColor: RiderColors.onSurfaceDark,
@@ -358,7 +368,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 ),
                               )
                             : Text(
-                                isSuccess ? 'Verified' : 'Verify',
+                                'Verify',
                                 style: GoogleFonts.poppins(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w500,
