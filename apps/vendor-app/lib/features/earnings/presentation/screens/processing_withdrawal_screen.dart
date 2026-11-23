@@ -58,16 +58,21 @@ class _ProcessingWithdrawalScreenState
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9FAFB),
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 52,
+        centerTitle: true,
         automaticallyImplyLeading: false,
         title: const Text(
           'Processing withdrawal',
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 20,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: textBlack,
+            height: 28 / 20,
+            letterSpacing: 0,
           ),
         ),
       ),

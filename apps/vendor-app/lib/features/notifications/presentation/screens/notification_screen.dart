@@ -100,60 +100,89 @@ class _NotificationScreenState extends State<NotificationScreen> {
           children: [
             // Top Bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: SizedBox(
+                height: 52,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(255, 255, 255, 0.36),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            offset: Offset(0, 1),
+                            blurRadius: 2,
+                            color: Color(0x1A000000),
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         icon: SvgPicture.asset(
                           AppAssets.svgBackArrow,
-                          width: 24,
-                          height: 24,
+                          width: 20,
+                          height: 20,
                           colorFilter: const ColorFilter.mode(
-                            Color(0xFF0F172A),
+                            Color(0xFF111827),
                             BlendMode.srcIn,
                           ),
                         ),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
-                      const SizedBox(width: 16),
-                      const Text(
-                        'Notification',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF0F172A),
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    icon: SvgPicture.asset(
-                      AppAssets.svgSettings,
-                      width: 24,
-                      height: 24,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF0F172A),
-                        BlendMode.srcIn,
+                    ),
+                    const Text(
+                      'Notification',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF111827),
+                        height: 28 / 20,
+                        letterSpacing: 0,
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => const NotificationSettingScreen(),
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(255, 255, 255, 0.36),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            offset: Offset(0, 1),
+                            blurRadius: 2,
+                            color: Color(0x1A000000),
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        icon: SvgPicture.asset(
+                          AppAssets.svgSettings,
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF111827),
+                            BlendMode.srcIn,
+                          ),
                         ),
-                      );
-                    },
-                  ),
-                ],
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const NotificationSettingScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 

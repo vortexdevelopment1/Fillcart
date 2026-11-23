@@ -65,32 +65,59 @@ class _ReportIssuesScreenState extends State<ReportIssuesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F5F7),
+      backgroundColor: const Color(0xFFF7F6F0),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF4F5F7),
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            AppAssets.svgBackArrow,
-            width: 24,
-            height: 24,
-            colorFilter: const ColorFilter.mode(
-              Color(0xFF111827),
-              BlendMode.srcIn,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 52,
+        leadingWidth: 52,
+        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Center(
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 2,
+                    color: Color(0x1A000000),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF111827),
+                    BlendMode.srcIn,
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
             ),
           ),
-          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Report Issues',
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 20,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: Color(0xFF111827),
+            height: 28 / 20,
+            letterSpacing: 0,
           ),
         ),
-        centerTitle: false,
       ),
       body: SafeArea(
         child: Column(

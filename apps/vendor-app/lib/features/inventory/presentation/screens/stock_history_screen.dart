@@ -42,23 +42,35 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
+        toolbarHeight: 52,
+        leadingWidth: 52,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Center(
             child: Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 2,
+                    spreadRadius: 0,
+                    color: Color(0x1A000000),
+                  ),
+                ],
               ),
               child: IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
                 icon: SvgPicture.asset(
                   AppAssets.svgBackArrow,
                   width: 20,
                   height: 20,
                   colorFilter: const ColorFilter.mode(
-                    Color(0xFF0F172A),
+                    Color(0xFF111827),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -70,9 +82,12 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
         title: const Text(
           'Stock History',
           style: TextStyle(
+            fontFamily: 'Inter',
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF0F172A),
+            color: Color(0xFF111827),
+            height: 28 / 20,
+            letterSpacing: 0,
           ),
         ),
       ),
