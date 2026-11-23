@@ -21,7 +21,7 @@ class VendorCompletedOrderDetailsScreen extends StatelessWidget {
 
   final VendorOrder order;
 
-  static const Color brandLime = Color(0xFFD9FB67);
+  static const Color brandLime = Color(0xFFD4FA62);
   static const Color darkCharcoal = Color(0xFF000000);
 
   static const List<OrderItem> _defaultItems = [
@@ -404,8 +404,8 @@ class VendorCompletedOrderDetailsScreen extends StatelessWidget {
                 ),
               ),
 
-              // Subtle Download Invoice Action
-              const SizedBox(height: 8),
+              // Download Invoice Action
+              const SizedBox(height: 12),
               Center(
                 child: TextButton.icon(
                   onPressed: () {

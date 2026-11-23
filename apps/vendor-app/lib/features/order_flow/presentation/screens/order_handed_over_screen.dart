@@ -33,7 +33,7 @@ class OrderHandedOverScreen extends StatelessWidget {
                 width: 96,
                 height: 96,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFC8F169),
+                  color: Color(0xFFD4FA62),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -61,7 +61,7 @@ class OrderHandedOverScreen extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                   color: Color(0xFF6B7280),
                 ),
                 textAlign: TextAlign.center,
@@ -92,7 +92,7 @@ class OrderHandedOverScreen extends StatelessWidget {
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w400,
                             color: Color(0xFF111827),
                           ),
                         ),
@@ -100,7 +100,7 @@ class OrderHandedOverScreen extends StatelessWidget {
                           earnings,
                           style: const TextStyle(
                             fontFamily: 'Inter',
-                            fontSize: 22,
+                            fontSize: 24,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF111827),
                           ),
@@ -115,8 +115,8 @@ class OrderHandedOverScreen extends StatelessWidget {
                           "Added to today's sales",
                           style: TextStyle(
                             fontFamily: 'Inter',
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
                             color: Color(0xFF111827),
                           ),
                         ),
@@ -139,8 +139,8 @@ class OrderHandedOverScreen extends StatelessWidget {
                           'Payout status',
                           style: TextStyle(
                             fontFamily: 'Inter',
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
                             color: Color(0xFF111827),
                           ),
                         ),
@@ -148,7 +148,7 @@ class OrderHandedOverScreen extends StatelessWidget {
                           'Included in next payout',
                           style: TextStyle(
                             fontFamily: 'Inter',
-                            fontSize: 13.5,
+                            fontSize: 14,
                             fontWeight: FontWeight.w400,
                             color: Color(0xFF111827),
                           ),
@@ -164,14 +164,14 @@ class OrderHandedOverScreen extends StatelessWidget {
               // Bottom Actions
               SizedBox(
                 width: double.infinity,
-                height: 54,
+                height: 52,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF000000),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(27),
+                      borderRadius: BorderRadius.circular(26),
                     ),
                   ),
                   onPressed: () {
@@ -191,7 +191,7 @@ class OrderHandedOverScreen extends StatelessWidget {
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
-                height: 54,
+                height: 52,
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF111827),
@@ -200,7 +200,7 @@ class OrderHandedOverScreen extends StatelessWidget {
                       width: 1.0,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(27),
+                      borderRadius: BorderRadius.circular(26),
                     ),
                   ),
                   onPressed: () {

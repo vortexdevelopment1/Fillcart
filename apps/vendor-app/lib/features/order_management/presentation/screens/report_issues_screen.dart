@@ -29,7 +29,7 @@ class _ReportIssuesScreenState extends State<ReportIssuesScreen> {
 
   late String _selectedIssue;
 
-  static const Color darkCharcoal = Color(0xFF111827);
+  static const Color darkCharcoal = Color(0xFF000000);
 
   @override
   void initState() {
@@ -157,8 +157,8 @@ class _ReportIssuesScreenState extends State<ReportIssuesScreen> {
                                           border: Border.all(
                                             color: isSelected
                                                 ? const Color(0xFF111827)
-                                                : const Color(0xFF94A3B8),
-                                            width: 1.8,
+                                                : const Color(0xFFCBD5E1),
+                                            width: isSelected ? 2.0 : 1.5,
                                           ),
                                         ),
                                         child: isSelected
@@ -212,7 +212,7 @@ class _ReportIssuesScreenState extends State<ReportIssuesScreen> {
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 14,
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w500,
                         color: Color(0xFF6B7280),
                       ),
                     ),
@@ -276,7 +276,7 @@ class _ReportIssuesScreenState extends State<ReportIssuesScreen> {
                     backgroundColor: darkCharcoal,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
+                      borderRadius: BorderRadius.circular(26),
                     ),
                     elevation: 0,
                   ),

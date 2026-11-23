@@ -119,7 +119,12 @@ void main() {
       expect(find.byType(VendorEarningsScreen), findsOneWidget);
 
       // Switch to Orders tab (index 2)
-      await tester.tap(find.text('Orders'));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(VendorBottomNavBar),
+          matching: find.text('Orders'),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(VendorOrdersScreen), findsOneWidget);
 

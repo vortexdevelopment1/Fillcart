@@ -31,7 +31,7 @@ void main() {
 
     // 1. Header & search
     expect(find.text('Orders'), findsOneWidget);
-    expect(find.text('Search order ID, name or item'), findsOneWidget);
+    expect(find.text('Search order ID, name...'), findsOneWidget);
     expect(find.byKey(const Key('filter_button')), findsOneWidget);
 
     // 2. All tabs exist
@@ -226,7 +226,7 @@ void main() {
 
     // Should return to standard Orders screen with All tabs
     expect(find.text('Orders'), findsOneWidget);
-    expect(find.text('Search order ID, name or item'), findsOneWidget);
+    expect(find.text('Search order ID, name...'), findsOneWidget);
     expect(find.text('New Orders'), findsOneWidget);
   });
 

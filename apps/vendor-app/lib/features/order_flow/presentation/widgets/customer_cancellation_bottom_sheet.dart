@@ -46,8 +46,8 @@ class CustomerCancellationBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        color: Color(0xFFF4F5F7),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
       child: SafeArea(
@@ -129,14 +129,14 @@ class CustomerCancellationBottomSheet extends StatelessWidget {
             // Primary Button: Got it, Stop packing
             SizedBox(
               width: double.infinity,
-              height: 54,
+              height: 52,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF000000),
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(27),
+                    borderRadius: BorderRadius.circular(26),
                   ),
                 ),
                 onPressed: () {

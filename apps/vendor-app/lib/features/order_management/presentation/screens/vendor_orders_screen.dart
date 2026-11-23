@@ -237,12 +237,12 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                         color: Color(0xFF111827),
                       ),
                       decoration: const InputDecoration(
-                        hintText: 'Search order ID, name or item',
+                        hintText: 'Search order ID, name...',
                         hintStyle: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 15,
                           fontWeight: FontWeight.w400,
-                          color: Color(0xFF4B5563),
+                          color: Color(0xFF94A3B8),
                         ),
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
@@ -579,7 +579,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: const Color(0xFFE5E7EB),
+                      color: const Color(0xFFCBD5E1),
                       width: 1,
                     ),
                     boxShadow: [
@@ -627,12 +627,12 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                               color: Color(0xFF111827),
                             ),
                             decoration: const InputDecoration(
-                              hintText: 'Search order ID, name or item',
+                              hintText: 'Search order ID, name...',
                               hintStyle: TextStyle(
                                 fontFamily: 'Inter',
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xFF4B5563),
+                                color: Color(0xFF94A3B8),
                               ),
                               border: InputBorder.none,
                               enabledBorder: InputBorder.none,
@@ -663,7 +663,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: const Color(0xFFE5E7EB),
+                      color: const Color(0xFFCBD5E1),
                       width: 1,
                     ),
                     boxShadow: [

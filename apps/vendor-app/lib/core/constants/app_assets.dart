@@ -53,6 +53,21 @@ class AppAssets {
   static const String svgHome = '$_svgPath/home.svg';
   static const String svgUser = '$_svgPath/user.svg';
   static const String svgEmail = '$_svgPath/Email.svg';
+  static const String svgAbout = '$_svgPath/About.svg';
+  static const String svgAdjustment = '$_svgPath/Adjustment.svg';
+  static const String svgAvgOrder = '$_svgPath/Avg_order.svg';
+  static const String svgBankAccount = '$_svgPath/bank_account.svg';
+  static const String svgEarningCalendar = '$_svgPath/Earning_calender.svg';
+  static const String svgEarningOrder = '$_svgPath/Earning_order.svg';
+  static const String svgEarningDetails = '$_svgPath/earning_details.svg';
+  static const String svgPlatformCommission = '$_svgPath/platform_commision.svg';
+  static const String svgSettlement = '$_svgPath/settlement.svg';
+  static const String svgShare = '$_svgPath/Share.svg';
+  static const String svgStatement = '$_svgPath/statement.svg';
+  static const String svgTransaction = '$_svgPath/transaction.svg';
+  static const String svgWallet = '$_svgPath/wallet.svg';
+  static const String svgTotalStocks = '$_svgPath/total_stocks.svg';
+  static const String svgGst = '$_svgPath/GST.svg';
 
   // Illustrations & Avatar
   static const String vendorAvatar = '$_illustrationsPath/vendor_avatar.png';
@@ -76,6 +91,15 @@ class AppAssets {
   static const String cardCall = '$_cardsIconPath/Call.png';
   static const String cardEmail = '$_cardsIconPath/Email.png';
   static const String cardStar = '$_cardsIconPath/Star.png';
+  static const String cardAdjustment = '$_cardsIconPath/Adjustment.png';
+  static const String cardAvgOrders = '$_cardsIconPath/avg_orders.png';
+  static const String cardCalendar = '$_cardsIconPath/calender.png';
+  static const String cardEarningPercentage = '$_cardsIconPath/earning_percentage.png';
+  static const String cardGst = '$_cardsIconPath/Gst.png';
+  static const String cardPacking = '$_cardsIconPath/packing.png';
+  static const String cardRupees = '$_cardsIconPath/rupess.png';
+  static const String cardTotalEarning = '$_cardsIconPath/total_earning.png';
+  static const String cardTotalItem = '$_cardsIconPath/total_item.png';
 
   // Embedded byte fallbacks (ensures authentic assets display immediately even during Hot Reload)
   static final Uint8List splashLogoBytes = base64Decode(_splashLogoBase64);

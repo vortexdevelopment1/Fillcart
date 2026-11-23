@@ -90,7 +90,7 @@ class _PrepareTimeModalState extends State<PrepareTimeModal> {
               style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w400,
                 color: Color(0xFF6B7280),
               ),
             ),
@@ -126,7 +126,7 @@ class _PrepareTimeModalState extends State<PrepareTimeModal> {
                           fontFamily: 'Inter',
                           fontSize: 32,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFFC8F169),
+                          color: Color(0xFFD4FA62),
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -200,7 +200,7 @@ class _PrepareTimeModalState extends State<PrepareTimeModal> {
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 color: isSelected
-                                    ? const Color(0xFFC8F169)
+                                    ? const Color(0xFFD4FA62)
                                     : const Color(0xFF111827),
                               ),
                             ),
@@ -278,7 +278,7 @@ class _PrepareTimeModalState extends State<PrepareTimeModal> {
                         style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           color: Color(0xFF111827),
                         ),
                       ),
