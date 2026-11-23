@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import type { PrismaClient } from "../../../database/generated/client/client.js";
-import { CryptoService } from "../../auth/services/crypto.service.js";
+import type { CryptoService } from "../../auth/services/crypto.service.js";
 import {
   BadRequestError,
   NotFoundError,
@@ -180,7 +180,7 @@ export class StaffService {
       where: { id: data.roleId },
     });
     if (!role) {
-      throw new NotFoundError("Role not found", ERROR_CODES.RESOURCE_NOT_FOUND);
+      throw new NotFoundError("Role not found");
     }
 
     // 3. Generate secure invitation token
@@ -240,7 +240,7 @@ export class StaffService {
     });
 
     if (!targetUser) {
-      throw new NotFoundError("Staff user not found", ERROR_CODES.USER_NOT_FOUND);
+      throw new NotFoundError("Staff user not found");
     }
 
     if (targetUser.accountType !== "ADMIN") {

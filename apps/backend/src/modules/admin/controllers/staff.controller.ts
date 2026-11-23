@@ -1,6 +1,6 @@
 import type { Response, NextFunction } from "express";
 import type { AdminAuthRequest } from "../middleware/admin-auth.middleware.js";
-import { StaffService } from "../services/staff.service.js";
+import type { StaffService } from "../services/staff.service.js";
 import { UnauthorizedError } from "../../../errors/app-error.js";
 import { ERROR_CODES } from "../../../constants/error-codes.js";
 import type {
@@ -67,7 +67,7 @@ export class StaffController {
         throw new UnauthorizedError("Admin authentication required", ERROR_CODES.UNAUTHORIZED);
       }
 
-      const { id } = req.params;
+      const id = req.params.id as string;
       const body = req.body as UpdateStaffStatusRequest;
       const result = await this.staffService.updateStaffStatus(id, body, req.adminUser.id);
       res.status(200).json(result);

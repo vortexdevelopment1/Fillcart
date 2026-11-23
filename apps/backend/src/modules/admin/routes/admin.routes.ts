@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { RequestHandler } from "express";
-import { AdminAuthController } from "../controllers/admin-auth.controller.js";
-import { StaffController } from "../controllers/staff.controller.js";
+import type { AdminAuthController } from "../controllers/admin-auth.controller.js";
+import type { StaffController } from "../controllers/staff.controller.js";
 import { validateRequest } from "../../../middleware/validate-request.js";
 import { requirePermission } from "../middleware/admin-auth.middleware.js";
 import {

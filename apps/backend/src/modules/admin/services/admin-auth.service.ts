@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import type { PrismaClient } from "../../../database/generated/client/client.js";
-import { CryptoService } from "../../auth/services/crypto.service.js";
+import type { CryptoService } from "../../auth/services/crypto.service.js";
 import { PasswordService } from "../../auth/services/password.service.js";
 import {
   UnauthorizedError,
@@ -56,7 +56,7 @@ export class AdminAuthService {
 
       throw new ForbiddenError(
         "Too many failed verification attempts. Please wait 60 seconds before trying again.",
-        ERROR_CODES.RATE_LIMITED
+        ERROR_CODES.ACCOUNT_LOCKED
       );
     }
 

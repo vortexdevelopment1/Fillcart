@@ -11,7 +11,7 @@ import { CryptoService } from "../../src/modules/auth/services/crypto.service.js
 import { PasswordService } from "../../src/modules/auth/services/password.service.js";
 import { validateConfig } from "../../src/config/env.js";
 import { ForbiddenError, UnauthorizedError, BadRequestError } from "../../src/errors/app-error.js";
-import type { Response, NextFunction } from "express";
+import type { Response } from "express";
 
 describe("Super Admin Backend Phase 1 Unit Tests", () => {
   let config: any;
@@ -89,8 +89,9 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
       const wrongAudToken = cryptoService.signJwt({
         sub: adminUserId,
         aud: "customer-backend",
-        sid: "session-123",
+        session_id: "session-123",
         account_type: "ADMIN",
+        token_use: "access",
         exp: Math.floor(Date.now() / 1000) + 900,
       });
 
@@ -109,8 +110,9 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
       const customerToken = cryptoService.signJwt({
         sub: adminUserId,
         aud: "admin-backend",
-        sid: "session-123",
+        session_id: "session-123",
         account_type: "CUSTOMER",
+        token_use: "access",
         exp: Math.floor(Date.now() / 1000) + 900,
       });
 
@@ -129,12 +131,13 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
       const token = cryptoService.signJwt({
         sub: adminUserId,
         aud: "admin-backend",
-        sid: "session-123",
+        session_id: "session-123",
         account_type: "ADMIN",
+        token_use: "access",
         exp: Math.floor(Date.now() / 1000) + 900,
       });
 
-      mockPrisma.session.findUnique.mockResolvedValue({
+      mockPrisma.sessionFamily.findUnique = vi.fn().mockResolvedValue({
         id: "session-123",
         isRevoked: false,
         expiresAt: new Date(Date.now() + 60000),
@@ -162,12 +165,13 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
       const token = cryptoService.signJwt({
         sub: adminUserId,
         aud: "admin-backend",
-        sid: "session-123",
+        session_id: "session-123",
         account_type: "ADMIN",
+        token_use: "access",
         exp: Math.floor(Date.now() / 1000) + 900,
       });
 
-      mockPrisma.session.findUnique.mockResolvedValue({
+      mockPrisma.sessionFamily.findUnique = vi.fn().mockResolvedValue({
         id: "session-123",
         isRevoked: false,
         expiresAt: new Date(Date.now() + 60000),
@@ -248,7 +252,7 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
 
   describe("POST /auth/verify-settings-access", () => {
     it("verifies password, returns 15-minute token, and logs success audit log", async () => {
-      const passwordHash = await PasswordService.hashPassword(validPassword, config);
+      const passwordHash = await PasswordService.hashPassword(validPassword);
       mockPrisma.rateLimitRecord.count.mockResolvedValue(0);
       mockPrisma.credential.findFirst.mockResolvedValue({
         id: "cred-1",
@@ -283,7 +287,7 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
     });
 
     it("rejects invalid password, records rate limit and logs failure audit log", async () => {
-      const passwordHash = await PasswordService.hashPassword(validPassword, config);
+      const passwordHash = await PasswordService.hashPassword(validPassword);
       mockPrisma.rateLimitRecord.count.mockResolvedValue(2);
       mockPrisma.credential.findFirst.mockResolvedValue({
         id: "cred-1",
@@ -339,7 +343,7 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
       const validReq = {
         headers: { "x-settings-grant": validToken },
         adminUser: { id: adminUserId },
-      } as AdminAuthRequest;
+      } as unknown as AdminAuthRequest;
       const next = vi.fn();
 
       middleware(validReq, {} as Response, next);
@@ -350,7 +354,7 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
       const invalidReq = {
         headers: { "x-settings-grant": validToken },
         adminUser: { id: "different-user-id" },
-      } as AdminAuthRequest;
+      } as unknown as AdminAuthRequest;
       const invalidNext = vi.fn();
       middleware(invalidReq, {} as Response, invalidNext);
       expect(invalidNext).toHaveBeenCalledWith(expect.any(ForbiddenError));

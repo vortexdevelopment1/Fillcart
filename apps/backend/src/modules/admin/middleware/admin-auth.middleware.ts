@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import type { PrismaClient } from "../../../database/generated/client/client.js";
-import { CryptoService } from "../../auth/services/crypto.service.js";
+import type { CryptoService } from "../../auth/services/crypto.service.js";
 import { UnauthorizedError, ForbiddenError } from "../../../errors/app-error.js";
 import { ERROR_CODES } from "../../../constants/error-codes.js";
 import type { UserAccessTokenClaims } from "@fillcart/shared-types";
@@ -57,7 +57,7 @@ export function createAdminAuthMiddleware(prisma: PrismaClient, cryptoService: C
       }
 
       if (claims.aud !== "admin-backend") {
-        throw new ForbiddenError(
+        throw new UnauthorizedError(
           `Token audience '${claims.aud}' is not authorized for the Super Admin backend`,
           ERROR_CODES.AUDIENCE_MISMATCH
         );
