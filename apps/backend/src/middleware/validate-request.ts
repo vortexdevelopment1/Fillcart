@@ -40,7 +40,12 @@ export function validateRequest(schemas: RequestValidationSchemas) {
           });
         }
       } else {
-        req.query = result.data as Request["query"];
+        Object.defineProperty(req, "query", {
+          value: result.data,
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        });
       }
     }
 
@@ -54,7 +59,12 @@ export function validateRequest(schemas: RequestValidationSchemas) {
           });
         }
       } else {
-        req.params = result.data as Request["params"];
+        Object.defineProperty(req, "params", {
+          value: result.data,
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        });
       }
     }
 
