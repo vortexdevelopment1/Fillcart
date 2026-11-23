@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   FileCheck2,
@@ -26,6 +26,7 @@ import { useToast } from '../../context/ToastContext';
 import { ModuleName } from '../../data/staffData';
 import { SidebarTooltipPortal } from './SidebarTooltipPortal';
 import { lockSettings } from '../../services/settingsAccess';
+import { adminApi } from '../../services/adminApi';
 
 interface NavItemConfig {
   id: string;
@@ -39,6 +40,7 @@ interface NavItemConfig {
 
 export const Sidebar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { stats } = useVerification();
   const {
     isExpanded,
@@ -50,19 +52,13 @@ export const Sidebar: React.FC = () => {
   const { hasPermission, currentRole } = useApp();
   const { addToast } = useToast();
 
-  // On mobile (< 768px), sidebar is completely hidden when closed. When open (isMobileOpen),
-  // it is ALWAYS in full open panel mode (256px wide, expanded header, group titles and links).
-  // Single strap (collapsed mode) is NEVER shown on mobile.
-  // On tablet/desktop (>= 768px), isExpanded controls whether it's collapsed (56px) or expanded (256px).
   const isPanelOpen = isExpanded || isMobileOpen;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     lockSettings();
-    addToast(
-      'info',
-      'Admin Logout',
-      'Session ended (Mock). Production auth will clear tokens & redirect to login on backend integration.'
-    );
+    await adminApi.logout();
+    addToast('info', 'Admin Logout', 'Logged out successfully.');
+    navigate('/login');
   };
 
   // Floating Portal Tooltip state for Collapsed Mode

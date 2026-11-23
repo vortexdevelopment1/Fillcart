@@ -134,6 +134,84 @@ let mockStaffState = [...initialStaff];
 
 export const adminApi = {
   /**
+   * POST /api/v1/auth/login
+   */
+  login: async (payload: { email: string; password: string }): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 400));
+      if (!payload.email || !payload.password) {
+        throw new AdminApiError('Email and password are required', 'VALIDATION_ERROR', 400);
+      }
+      const mockToken = 'mock-admin-access-token';
+      sessionStorage.setItem('fillkart_admin_token', mockToken);
+      sessionStorage.setItem('fillkart_admin_user', JSON.stringify({
+        email: payload.email,
+        name: 'Dev Super Admin',
+        role: 'Super Admin',
+      }));
+      return {
+        accessToken: mockToken,
+        refreshToken: 'mock-refresh-token',
+        expiresIn: 900,
+      };
+    }
+
+    try {
+      const res = await axios.post(`${API_BASE_URL}/auth/login`, payload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = res.data;
+      if (data.accessToken) {
+        sessionStorage.setItem('fillkart_admin_token', data.accessToken);
+        if (data.refreshToken) {
+          sessionStorage.setItem('fillkart_admin_refresh_token', data.refreshToken);
+        }
+        sessionStorage.setItem('fillkart_admin_user', JSON.stringify({
+          email: payload.email,
+          name: 'Dev Super Admin',
+          role: 'Super Admin',
+        }));
+      }
+      return data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * POST /api/v1/auth/logout
+   */
+  logout: async (): Promise<void> => {
+    try {
+      const refreshToken = sessionStorage.getItem('fillkart_admin_refresh_token');
+      if (refreshToken && !isMockMode()) {
+        await axios.post(`${API_BASE_URL}/auth/logout`, { refreshToken }).catch(() => {});
+      }
+    } finally {
+      sessionStorage.removeItem('fillkart_admin_token');
+      sessionStorage.removeItem('fillkart_admin_refresh_token');
+      sessionStorage.removeItem('fillkart_admin_user');
+      sessionStorage.removeItem('fillkart_settings_grant_token');
+      sessionStorage.removeItem('fillkart_settings_unlocked_until');
+      localStorage.removeItem('fillkart_admin_token');
+    }
+  },
+
+  /**
+   * Checks if an admin token exists in session
+   */
+  isAuthenticated: (): boolean => {
+    try {
+      return Boolean(
+        sessionStorage.getItem('fillkart_admin_token') ||
+        localStorage.getItem('fillkart_admin_token')
+      );
+    } catch {
+      return false;
+    }
+  },
+
+  /**
    * POST /api/v1/admin/auth/verify-settings-access
    */
   verifySettingsAccess: async (password: string): Promise<VerifySettingsAccessResponse> => {

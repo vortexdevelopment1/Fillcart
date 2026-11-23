@@ -13,6 +13,7 @@ import {
 import { useToast } from '../../context/ToastContext';
 import { useApp } from '../../context/AppContext';
 import { lockSettings } from '../../services/settingsAccess';
+import { adminApi } from '../../services/adminApi';
 
 export interface AdminProfileContentProps {
   onClose: () => void;
@@ -88,16 +89,12 @@ export const AdminProfileContent: React.FC<AdminProfileContentProps> = ({
     setViewMode('menu');
   };
 
-  const handleLogout = () => {
-    // TODO: Connect production SSO/JWT logout API to invalidate session tokens
+  const handleLogout = async () => {
     lockSettings();
-    addToast(
-      'info',
-      'Admin Logout',
-      'Session ended (Mock). Production auth will clear tokens & redirect to login on backend integration.'
-    );
+    await adminApi.logout();
+    addToast('info', 'Admin Logout', 'Logged out successfully.');
     onClose();
-    navigate('/');
+    navigate('/login');
   };
 
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { MainLayout } from './components/layout/MainLayout';
 import { HomePage } from './pages/HomePage';
 import { DocumentVerificationPage } from './pages/DocumentVerificationPage';
@@ -15,11 +15,26 @@ import { StaffPage } from './pages/StaffPage';
 import { AuditLogsPage } from './pages/AuditLogsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SettingsGuard } from './components/settings/SettingsGuard';
-import { PlaceholderPage } from './pages/PlaceholderPage';
+import { LoginPage } from './pages/LoginPage';
 import { NoAccessState } from './components/common/NoAccessState';
 import { useApp } from './context/AppContext';
 import { ModuleName } from './data/staffData';
-import { Settings } from 'lucide-react';
+import { adminApi } from './services/adminApi';
+
+/**
+ * Ensures user is authenticated before accessing the console.
+ * Redirects unauthenticated requests to /login while preserving location state.
+ */
+const AuthGuard: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  const isAuth = adminApi.isAuthenticated();
+  const location = useLocation();
+
+  if (!isAuth) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
 
 const ProtectedRoute: React.FC<{ module: ModuleName; children: React.ReactElement }> = ({
   module,
@@ -34,139 +49,152 @@ const ProtectedRoute: React.FC<{ module: ModuleName; children: React.ReactElemen
 
 export const App: React.FC = () => {
   return (
-    <MainLayout>
-      <Routes>
-        {/* Home Dashboard */}
-        <Route path="/" element={<HomePage />} />
+    <Routes>
+      {/* Standalone Login Route (No MainLayout shell) */}
+      <Route path="/login" element={<LoginPage />} />
 
-        {/* 1. Document Verification */}
-        <Route
-          path="/document-verification"
-          element={
-            <ProtectedRoute module="Users">
-              <DocumentVerificationPage />
-            </ProtectedRoute>
-          }
-        />
+      {/* Authenticated Application Routes wrapped in MainLayout */}
+      <Route
+        path="/*"
+        element={
+          <AuthGuard>
+            <MainLayout>
+              <Routes>
+                {/* Home Dashboard */}
+                <Route path="/" element={<HomePage />} />
 
-        {/* 2. Vendor Management */}
-        <Route
-          path="/vendors"
-          element={
-            <ProtectedRoute module="Users">
-              <VendorsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/vendors/:vendorId"
-          element={
-            <ProtectedRoute module="Users">
-              <VendorDetailPage />
-            </ProtectedRoute>
-          }
-        />
+                {/* 1. Document Verification */}
+                <Route
+                  path="/document-verification"
+                  element={
+                    <ProtectedRoute module="Users">
+                      <DocumentVerificationPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-        {/* 3. Rider Management */}
-        <Route
-          path="/riders"
-          element={
-            <ProtectedRoute module="Users">
-              <RidersPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/riders/:riderId"
-          element={
-            <ProtectedRoute module="Users">
-              <RiderDetailPage />
-            </ProtectedRoute>
-          }
-        />
+                {/* 2. Vendor Management */}
+                <Route
+                  path="/vendors"
+                  element={
+                    <ProtectedRoute module="Users">
+                      <VendorsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/vendors/:vendorId"
+                  element={
+                    <ProtectedRoute module="Users">
+                      <VendorDetailPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-        {/* 4. Order Management (Built & Connected) */}
-        <Route
-          path="/orders"
-          element={
-            <ProtectedRoute module="Orders">
-              <OrdersPage />
-            </ProtectedRoute>
-          }
-        />
+                {/* 3. Rider Management */}
+                <Route
+                  path="/riders"
+                  element={
+                    <ProtectedRoute module="Users">
+                      <RidersPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/riders/:riderId"
+                  element={
+                    <ProtectedRoute module="Users">
+                      <RiderDetailPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-        {/* 5. Products & Categories */}
-        <Route
-          path="/products"
-          element={
-            <ProtectedRoute module="Products">
-              <ProductsPage />
-            </ProtectedRoute>
-          }
-        />
+                {/* 4. Order Management */}
+                <Route
+                  path="/orders"
+                  element={
+                    <ProtectedRoute module="Orders">
+                      <OrdersPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-        {/* 6. Finance Hub (Single page with tabs) */}
-        <Route
-          path="/finance"
-          element={
-            <ProtectedRoute module="Payments">
-              <FinancePage />
-            </ProtectedRoute>
-          }
-        />
+                {/* 5. Products & Categories */}
+                <Route
+                  path="/products"
+                  element={
+                    <ProtectedRoute module="Products">
+                      <ProductsPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-        {/* Redirects from old routes to matching /finance?tab=<name> */}
-        <Route path="/payments" element={<Navigate to="/finance?tab=payments" replace />} />
-        <Route path="/settlements" element={<Navigate to="/finance?tab=settlements" replace />} />
-        <Route path="/commission" element={<Navigate to="/finance?tab=commission" replace />} />
-        <Route path="/wallet" element={<Navigate to="/finance?tab=wallet" replace />} />
-        <Route path="/coupons" element={<Navigate to="/finance?tab=coupons" replace />} />
-        <Route path="/taxes" element={<Navigate to="/finance?tab=taxes" replace />} />
-        <Route path="/finance-overview" element={<Navigate to="/finance?tab=overview" replace />} />
+                {/* 6. Finance Hub */}
+                <Route
+                  path="/finance"
+                  element={
+                    <ProtectedRoute module="Payments">
+                      <FinancePage />
+                    </ProtectedRoute>
+                  }
+                />
 
-        {/* 7. Basic Reports (Built & Connected) */}
-        <Route
-          path="/reports"
-          element={
-            <ProtectedRoute module="Reports">
-              <ReportsPage />
-            </ProtectedRoute>
-          }
-        />
+                {/* Redirects from legacy routes to matching /finance?tab=<name> */}
+                <Route path="/payments" element={<Navigate to="/finance?tab=payments" replace />} />
+                <Route path="/settlements" element={<Navigate to="/finance?tab=settlements" replace />} />
+                <Route path="/commission" element={<Navigate to="/finance?tab=commission" replace />} />
+                <Route path="/wallet" element={<Navigate to="/finance?tab=wallet" replace />} />
+                <Route path="/coupons" element={<Navigate to="/finance?tab=coupons" replace />} />
+                <Route path="/taxes" element={<Navigate to="/finance?tab=taxes" replace />} />
+                <Route path="/finance-overview" element={<Navigate to="/finance?tab=overview" replace />} />
 
-        {/* 8. Staff Roles & Permissions (Built & Connected) */}
-        <Route
-          path="/staff"
-          element={
-            <ProtectedRoute module="Settings">
-              <StaffPage />
-            </ProtectedRoute>
-          }
-        />
+                {/* 7. Basic Reports */}
+                <Route
+                  path="/reports"
+                  element={
+                    <ProtectedRoute module="Reports">
+                      <ReportsPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-        {/* 9. Audit Logs (Built & Connected) */}
-        <Route
-          path="/audit-logs"
-          element={
-            <ProtectedRoute module="Audit Logs">
-              <AuditLogsPage />
-            </ProtectedRoute>
-          }
-        />
+                {/* 8. Staff Roles & Permissions */}
+                <Route
+                  path="/staff"
+                  element={
+                    <ProtectedRoute module="Settings">
+                      <StaffPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-        {/* 10. System Settings (Password Protected via SettingsGuard) */}
-        <Route
-          path="/settings"
-          element={
-            <SettingsGuard>
-              <SettingsPage />
-            </SettingsGuard>
-          }
-        />
+                {/* 9. Audit Logs */}
+                <Route
+                  path="/audit-logs"
+                  element={
+                    <ProtectedRoute module="Audit Logs">
+                      <AuditLogsPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-        {/* Fallback to Home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </MainLayout>
+                {/* 10. System Settings */}
+                <Route
+                  path="/settings"
+                  element={
+                    <SettingsGuard>
+                      <SettingsPage />
+                    </SettingsGuard>
+                  }
+                />
+
+                {/* Fallback to Home */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </MainLayout>
+          </AuthGuard>
+        }
+      />
+    </Routes>
   );
 };
