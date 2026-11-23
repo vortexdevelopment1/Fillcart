@@ -46,12 +46,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleFillDevAdmin = () => {
-    setEmail('admin@fillcart.internal');
-    setPassword('AdminPassword123!');
-    setError(null);
-  };
-
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 bg-[#f4f5f6] select-none relative overflow-hidden">
       {/* Decorative ambient background accents */}
@@ -95,7 +89,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Header Title & Subtitle */}
         <h1 className="font-heading text-[clamp(22px,5vw,26px)] font-normal text-ink leading-tight mb-1 tracking-tight">
-          Fillkart Admin Portal
+          Fillcart Admin Portal
         </h1>
         <p className="font-sans text-xs text-ink/65 leading-relaxed mb-6">
           Sign in to access centralized operations & management console
@@ -113,7 +107,7 @@ export const LoginPage: React.FC = () => {
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="w-full text-left space-y-3.5" noValidate>
+        <form onSubmit={handleSubmit} className="w-full text-left space-y-3.5" noValidate autoComplete="off">
           {/* Email Address */}
           <div>
             <label className="block font-sans text-xs font-medium text-ink/80 mb-1">
@@ -131,7 +125,7 @@ export const LoginPage: React.FC = () => {
                   if (error) setError(null);
                 }}
                 placeholder="admin@fillcart.internal"
-                autoComplete="email"
+                autoComplete="new-password"
                 disabled={isLoading}
                 className="w-full h-12 pl-11 pr-4 rounded-xl border border-primary/20 text-sm text-ink bg-white transition-all focus:outline-none focus:border-[#527781] focus:ring-4 focus:ring-[#527781]/20 disabled:bg-neutral/50 disabled:opacity-60"
                 required
@@ -156,7 +150,7 @@ export const LoginPage: React.FC = () => {
                   if (error) setError(null);
                 }}
                 placeholder="••••••••••••"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 disabled={isLoading}
                 className="w-full h-12 pl-11 pr-11 rounded-xl border border-primary/20 text-sm text-ink bg-white transition-all focus:outline-none focus:border-[#527781] focus:ring-4 focus:ring-[#527781]/20 disabled:bg-neutral/50 disabled:opacity-60"
                 required
@@ -175,17 +169,6 @@ export const LoginPage: React.FC = () => {
                 )}
               </button>
             </div>
-          </div>
-
-          {/* Quick Dev Autofill Button */}
-          <div className="flex justify-end pt-0.5">
-            <button
-              type="button"
-              onClick={handleFillDevAdmin}
-              className="font-sans text-[11px] font-medium text-secondary hover:text-primary transition-colors underline focus:outline-none"
-            >
-              Autofill Dev Super Admin
-            </button>
           </div>
 
           {/* Sign In Submit Button */}
