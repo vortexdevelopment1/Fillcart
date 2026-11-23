@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/product_insight_tile.dart';
 import '../widgets/product_metric_card.dart';
 import '../widgets/product_sales_trend_chart.dart';
@@ -44,10 +46,16 @@ class ProductInsightsScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: const Color(0xFFE5E7EB)),
                       ),
-                      child: const Icon(
-                        Icons.arrow_back_rounded,
-                        color: Color(0xFF111827),
-                        size: 20,
+                      child: Center(
+                        child: SvgPicture.asset(
+                          AppAssets.svgBackArrow,
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF111827),
+                            BlendMode.srcIn,
+                          ),
+                        ),
                       ),
                     ),
                   ),

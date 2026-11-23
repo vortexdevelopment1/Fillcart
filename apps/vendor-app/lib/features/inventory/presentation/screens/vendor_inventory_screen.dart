@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/inventory_metrics.dart';
 import '../../models/inventory_product.dart';
 import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
@@ -46,7 +48,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   final InventoryMetrics _metrics = const InventoryMetrics();
-  List<InventoryProduct> _products = InventoryProduct.demoProducts;
+  final List<InventoryProduct> _products = InventoryProduct.demoProducts;
 
   @override
   void initState() {
@@ -89,7 +91,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
 
   void _navigateToUpdateStock(InventoryProduct product) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => UpdateStockScreen(product: product),
       ),
     );
@@ -97,7 +99,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
 
   void _navigateToStockHistory(InventoryProduct product) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => StockHistoryScreen(product: product),
       ),
     );
@@ -105,7 +107,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
 
   void _navigateToAlertSettings(InventoryProduct product) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => StockAlertSettingsScreen(product: product),
       ),
     );
@@ -113,12 +115,12 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
 
   void _onQuickActionUpdateStock() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => InventoryProductSelectionScreen(
           title: 'Update Stock',
           onProductSelected: (product) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
+              MaterialPageRoute<void>(
                 builder: (_) => UpdateStockScreen(product: product),
               ),
             );
@@ -130,12 +132,12 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
 
   void _onQuickActionStockHistory() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => InventoryProductSelectionScreen(
           title: 'Stock History',
           onProductSelected: (product) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
+              MaterialPageRoute<void>(
                 builder: (_) => StockHistoryScreen(product: product),
               ),
             );
@@ -165,7 +167,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
       Navigator.of(context).pop();
     } else {
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (_) => const MainVendorScreen(initialIndex: 0),
         ),
         (route) => false,
@@ -192,10 +194,14 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFF0F172A),
-                  size: 20,
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF0F172A),
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onPressed: _handleBack,
               ),
@@ -249,7 +255,15 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                 backgroundColor: const Color(0xFFD4F932),
                 foregroundColor: const Color(0xFF0F172A),
                 elevation: 4,
-                icon: const Icon(Icons.add, size: 20, color: Color(0xFF0F172A)),
+                icon: SvgPicture.asset(
+                  AppAssets.svgAddStock,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF0F172A),
+                    BlendMode.srcIn,
+                  ),
+                ),
                 label: const Text(
                   'Add Product',
                   style: TextStyle(
@@ -364,10 +378,14 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: const Color(0xFFE5E7EB),
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 8,
+                  blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -376,8 +394,16 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Icon(Icons.search, color: Color(0xFF94A3B8), size: 22),
-                const SizedBox(width: 10),
+                SvgPicture.asset(
+                  AppAssets.svgSearch,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF4B5563),
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Theme(
                     data: Theme.of(context).copyWith(
@@ -396,9 +422,10 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                       controller: _searchController,
                       textAlignVertical: TextAlignVertical.center,
                       style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF0F172A),
-                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Inter',
+                        fontSize: 14.5,
+                        color: Color(0xFF111827),
+                        fontWeight: FontWeight.w400,
                       ),
                       onChanged: (val) {
                         setState(() {});
@@ -406,8 +433,9 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                       decoration: const InputDecoration(
                         hintText: 'Search products...',
                         hintStyle: TextStyle(
-                          color: Color(0xFF94A3B8),
-                          fontSize: 14,
+                          fontFamily: 'Inter',
+                          color: Color(0xFF4B5563),
+                          fontSize: 14.5,
                           fontWeight: FontWeight.w400,
                         ),
                         border: InputBorder.none,
@@ -448,12 +476,16 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                       ),
                     );
                   },
-                  child: const Padding(
-                    padding: EdgeInsets.all(4),
-                    child: Icon(
-                      Icons.camera_alt_outlined,
-                      color: Color(0xFF0F172A),
-                      size: 22,
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: SvgPicture.asset(
+                      AppAssets.svgCamera,
+                      width: 22,
+                      height: 22,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF0F172A),
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                 ),
@@ -629,7 +661,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
   }
 
   void _showProductActionsModal(InventoryProduct product) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -643,7 +675,15 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  leading: const Icon(Icons.edit_outlined, color: Color(0xFF0F172A)),
+                  leading: SvgPicture.asset(
+                    AppAssets.svgUpdateStock,
+                    width: 22,
+                    height: 22,
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xFF0F172A),
+                      BlendMode.srcIn,
+                    ),
+                  ),
                   title: const Text('Update Stock'),
                   onTap: () {
                     Navigator.pop(ctx);
@@ -651,7 +691,15 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.history_outlined, color: Color(0xFF0F172A)),
+                  leading: SvgPicture.asset(
+                    AppAssets.svgStockHistory,
+                    width: 22,
+                    height: 22,
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xFF0F172A),
+                      BlendMode.srcIn,
+                    ),
+                  ),
                   title: const Text('View Stock History'),
                   onTap: () {
                     Navigator.pop(ctx);
@@ -659,7 +707,15 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.notifications_active_outlined, color: Color(0xFF0F172A)),
+                  leading: SvgPicture.asset(
+                    AppAssets.svgAlertSettings,
+                    width: 22,
+                    height: 22,
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xFF0F172A),
+                      BlendMode.srcIn,
+                    ),
+                  ),
                   title: const Text('Stock Alert Settings'),
                   onTap: () {
                     Navigator.pop(ctx);

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/inventory_product.dart';
 
 /// Screen for configuring low-stock and expiry notifications for a product (Image 5).
@@ -73,10 +75,14 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFF0F172A),
-                  size: 20,
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF0F172A),
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
               ),
@@ -233,7 +239,7 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
               ),
               Switch(
                 value: _lowStockAlertEnabled,
-                activeColor: Colors.white,
+                activeThumbColor: Colors.white,
                 activeTrackColor: const Color(0xFF84CC16),
                 inactiveThumbColor: Colors.white,
                 inactiveTrackColor: const Color(0xFFE2E8F0),
@@ -356,7 +362,7 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
               ),
               Switch(
                 value: _expiryAlertEnabled,
-                activeColor: Colors.white,
+                activeThumbColor: Colors.white,
                 activeTrackColor: const Color(0xFF84CC16),
                 inactiveThumbColor: Colors.white,
                 inactiveTrackColor: const Color(0xFFE2E8F0),

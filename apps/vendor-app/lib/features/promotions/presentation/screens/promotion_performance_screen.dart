@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/promotion_daily_chart.dart';
 
 /// Screen 6: Promotion Performance Analytics Screen - Matching Figma Image 4 exactly.
@@ -45,10 +47,16 @@ class PromotionPerformanceScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: const Color(0xFFE5E7EB)),
                             ),
-                            child: const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Color(0xFF111827),
-                              size: 20,
+                            child: Center(
+                              child: SvgPicture.asset(
+                                AppAssets.svgBackArrow,
+                                width: 20,
+                                height: 20,
+                                colorFilter: const ColorFilter.mode(
+                                  Color(0xFF111827),
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -173,10 +181,14 @@ class PromotionPerformanceScreen extends StatelessWidget {
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    const Icon(
-                                      Icons.calendar_today_outlined,
-                                      size: 11,
-                                      color: Color(0xFF4B5563),
+                                    SvgPicture.asset(
+                                      AppAssets.svgCalendar,
+                                      width: 11,
+                                      height: 11,
+                                      colorFilter: const ColorFilter.mode(
+                                        Color(0xFF4B5563),
+                                        BlendMode.srcIn,
+                                      ),
                                     ),
                                     const SizedBox(width: 4),
                                     Text(

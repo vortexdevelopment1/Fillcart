@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/inventory_product.dart';
 
 enum StockAdjustmentType {
-  add('Add Stock', 'assets/svg/add_stock.svg'),
-  reduce('Reduce Stock', 'assets/svg/reduce_stock.svg'),
-  correct('Correct Stock', 'assets/svg/correct_stock.svg');
+  add('Add Stock', AppAssets.svgAddStock),
+  reduce('Reduce Stock', AppAssets.svgReduceStock),
+  correct('Correct Stock', AppAssets.svgCorrectStock);
 
   final String label;
   final String svgPath;
@@ -120,7 +121,7 @@ class _UpdateStockScreenState extends State<UpdateStockScreen> {
               surface: Colors.white,
               onSurface: Color(0xFF0F172A),
             ),
-            dialogBackgroundColor: Colors.white,
+            dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
             scaffoldBackgroundColor: Colors.white,
             datePickerTheme: const DatePickerThemeData(
               backgroundColor: Colors.white,
@@ -172,10 +173,14 @@ class _UpdateStockScreenState extends State<UpdateStockScreen> {
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFF0F172A),
-                  size: 20,
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF0F172A),
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
               ),

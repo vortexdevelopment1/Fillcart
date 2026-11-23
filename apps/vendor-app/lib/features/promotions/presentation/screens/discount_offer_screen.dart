@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/promotion_step_indicator.dart';
 import 'review_publish_screen.dart';
 
@@ -114,10 +116,16 @@ class _DiscountOfferScreenState extends State<DiscountOfferScreen> {
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: const Color(0xFFE5E7EB)),
                             ),
-                            child: const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Color(0xFF111827),
-                              size: 20,
+                            child: Center(
+                              child: SvgPicture.asset(
+                                AppAssets.svgBackArrow,
+                                width: 20,
+                                height: 20,
+                                colorFilter: const ColorFilter.mode(
+                                  Color(0xFF111827),
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -389,10 +397,14 @@ class _DiscountOfferScreenState extends State<DiscountOfferScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(
-                                    Icons.calendar_today_outlined,
-                                    size: 16,
-                                    color: Color(0xFF6B7280),
+                                  SvgPicture.asset(
+                                    AppAssets.svgCalendar,
+                                    width: 16,
+                                    height: 16,
+                                    colorFilter: const ColorFilter.mode(
+                                      Color(0xFF6B7280),
+                                      BlendMode.srcIn,
+                                    ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
@@ -439,10 +451,14 @@ class _DiscountOfferScreenState extends State<DiscountOfferScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(
-                                    Icons.calendar_today_outlined,
-                                    size: 16,
-                                    color: Color(0xFF6B7280),
+                                  SvgPicture.asset(
+                                    AppAssets.svgCalendar,
+                                    width: 16,
+                                    height: 16,
+                                    colorFilter: const ColorFilter.mode(
+                                      Color(0xFF6B7280),
+                                      BlendMode.srcIn,
+                                    ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(

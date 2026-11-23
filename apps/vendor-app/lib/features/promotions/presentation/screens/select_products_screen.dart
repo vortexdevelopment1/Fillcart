@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/category_checklist_tile.dart';
 import '../widgets/promotion_step_indicator.dart';
 import 'discount_offer_screen.dart';
@@ -113,10 +115,16 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: const Color(0xFFE5E7EB)),
                             ),
-                            child: const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Color(0xFF111827),
-                              size: 20,
+                            child: Center(
+                              child: SvgPicture.asset(
+                                AppAssets.svgBackArrow,
+                                width: 20,
+                                height: 20,
+                                colorFilter: const ColorFilter.mode(
+                                  Color(0xFF111827),
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -141,7 +149,7 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
 
                     // Pill Switcher: Categories vs Products (Figma: Height 40px, Pill Capsule, White, No Border)
                     Container(
-                      height: 40,
+                      height: 48,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
@@ -210,51 +218,83 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Search Container - Figma: Width Fill (328px), Height Hug (40px), Radius 16px, Padding 12px, Gap 11px, No Border
+                    // Search Container matching Image 2
                     Container(
-                      height: 40,
+                      height: 48,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: [
-                          const Icon(
-                            Icons.search,
-                            color: Color(0xFF9CA3AF),
-                            size: 18,
+                          SvgPicture.asset(
+                            AppAssets.svgSearch,
+                            width: 20,
+                            height: 20,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF4B5563),
+                              BlendMode.srcIn,
+                            ),
                           ),
-                          const SizedBox(width: 11), // Figma Gap: 11px
+                          const SizedBox(width: 12),
                           Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              onChanged: (_) => setState(() {}),
-                              cursorColor: const Color(0xFF111827),
-                              style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 13,
-                                color: Color(0xFF111827),
-                              ),
-                              decoration: InputDecoration(
-                                hintText: _selectedTab == 0
-                                    ? 'Search categories...'
-                                    : 'Search products...',
-                                hintStyle: const TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 13,
-                                  color: Color(0xFF9CA3AF),
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                inputDecorationTheme: const InputDecorationTheme(
+                                  filled: false,
+                                  fillColor: Colors.transparent,
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  focusedErrorBorder: InputBorder.none,
                                 ),
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                disabledBorder: InputBorder.none,
-                                errorBorder: InputBorder.none,
-                                focusedErrorBorder: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.zero,
-                                filled: false,
-                                fillColor: Colors.transparent,
+                              ),
+                              child: TextField(
+                                controller: _searchController,
+                                onChanged: (_) => setState(() {}),
+                                textAlignVertical: TextAlignVertical.center,
+                                cursorColor: const Color(0xFF111827),
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFF111827),
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: _selectedTab == 0
+                                      ? 'Search categories...'
+                                      : 'Search products...',
+                                  hintStyle: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFF4B5563),
+                                  ),
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  focusedErrorBorder: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  filled: false,
+                                  fillColor: Colors.transparent,
+                                ),
                               ),
                             ),
                           ),

@@ -1,3 +1,4 @@
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import 'package:fillcart_vendor/features/analytics/revenue_analytics/presentation/screens/revenue_analytics_screen.dart';
 import 'package:fillcart_vendor/features/product_insights/presentation/screens/product_insights_screen.dart';
 import 'package:flutter/material.dart';
@@ -62,10 +63,16 @@ class _SalesAnalyticsScreenState extends State<SalesAnalyticsScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: const Color(0xFFE5E7EB)),
                       ),
-                      child: const Icon(
-                        Icons.arrow_back_rounded,
-                        color: Color(0xFF111827),
-                        size: 20,
+                      child: Center(
+                        child: SvgPicture.asset(
+                          AppAssets.svgBackArrow,
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF111827),
+                            BlendMode.srcIn,
+                          ),
+                        ),
                       ),
                     ),
                   ),

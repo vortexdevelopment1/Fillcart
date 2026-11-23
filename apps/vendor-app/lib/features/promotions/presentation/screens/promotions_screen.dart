@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/promotion_card_tile.dart';
 import '../widgets/promotion_stat_card.dart';
 import 'choose_promotion_type_screen.dart';
@@ -50,10 +52,16 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: const Color(0xFFE5E7EB)),
                             ),
-                            child: const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Color(0xFF111827),
-                              size: 20,
+                            child: Center(
+                              child: SvgPicture.asset(
+                                AppAssets.svgBackArrow,
+                                width: 20,
+                                height: 20,
+                                colorFilter: const ColorFilter.mode(
+                                  Color(0xFF111827),
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -116,7 +124,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                               top: 0,
                               bottom: 0,
                               child: Image.asset(
-                                'assets/cardsicon/promo_banner_art.png',
+                                'assets/illustrations/promotion_banner.png',
                                 width: 145,
                                 fit: BoxFit.contain,
                               ),

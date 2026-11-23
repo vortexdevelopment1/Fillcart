@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => widget.nextScreen ?? const OnboardingScreen(),
       ),
     );

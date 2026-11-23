@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_assets.dart';
 
 /// More Insights row tile for Stock Movement, Order Distribution, Customer Demand.
 class ProductInsightTile extends StatelessWidget {
@@ -60,10 +62,14 @@ class ProductInsightTile extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: Color(0xFF9CA3AF),
-              size: 22,
+            SvgPicture.asset(
+              AppAssets.svgNextArrow,
+              width: 18,
+              height: 18,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF9CA3AF),
+                BlendMode.srcIn,
+              ),
             ),
           ],
         ),

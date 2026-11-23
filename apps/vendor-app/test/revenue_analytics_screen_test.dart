@@ -1,3 +1,4 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/features/analytics/revenue_analytics/presentation/screens/revenue_analytics_screen.dart';
 import 'package:fillcart_vendor/features/analytics/revenue_analytics/presentation/widgets/earnings_breakdown_card.dart';
 import 'package:fillcart_vendor/features/analytics/revenue_analytics/presentation/widgets/revenue_category_donut.dart';
@@ -20,7 +21,7 @@ void main() {
 
       // Top bar
       expect(find.text('Revenue Analytics'), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
+      expect(find.byType(SvgPicture), findsWidgets);
 
       // Date range filter
       expect(find.text('Last 7 Days'), findsOneWidget);

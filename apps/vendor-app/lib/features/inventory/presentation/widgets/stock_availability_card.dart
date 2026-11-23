@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_assets.dart';
 import '../../models/inventory_metrics.dart';
 
 /// Card showing the Stock Availability breakdown progress bar and legend (Image 2).
@@ -35,8 +37,8 @@ class StockAvailabilityCard extends StatelessWidget {
             onTap: onTap,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text(
+              children: [
+                const Text(
                   'Stock Availability',
                   style: TextStyle(
                     fontSize: 16,
@@ -44,10 +46,14 @@ class StockAvailabilityCard extends StatelessWidget {
                     color: Color(0xFF0F172A),
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right,
-                  size: 20,
-                  color: Color(0xFF64748B),
+                SvgPicture.asset(
+                  AppAssets.svgNextArrow,
+                  width: 18,
+                  height: 18,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF64748B),
+                    BlendMode.srcIn,
+                  ),
                 ),
               ],
             ),

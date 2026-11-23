@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/inventory_product.dart';
 import '../widgets/product_item_card.dart';
 
@@ -72,10 +74,14 @@ class _InventoryProductSelectionScreenState
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFF0F172A),
-                  size: 20,
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF0F172A),
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
               ),
@@ -102,10 +108,14 @@ class _InventoryProductSelectionScreenState
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: const Color(0xFFE5E7EB),
+                    width: 1,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.03),
-                      blurRadius: 10,
+                      blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
                   ],
@@ -113,8 +123,16 @@ class _InventoryProductSelectionScreenState
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    const Icon(Icons.search, color: Color(0xFF94A3B8), size: 22),
-                    const SizedBox(width: 10),
+                    SvgPicture.asset(
+                      AppAssets.svgSearch,
+                      width: 20,
+                      height: 20,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF4B5563),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Theme(
                         data: Theme.of(context).copyWith(
@@ -133,16 +151,18 @@ class _InventoryProductSelectionScreenState
                           controller: _searchController,
                           textAlignVertical: TextAlignVertical.center,
                           style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF0F172A),
-                            fontWeight: FontWeight.w500,
+                            fontFamily: 'Inter',
+                            fontSize: 14.5,
+                            color: Color(0xFF111827),
+                            fontWeight: FontWeight.w400,
                           ),
                           onChanged: (val) => setState(() {}),
                           decoration: const InputDecoration(
                             hintText: 'Search products by name or SKU...',
                             hintStyle: TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontSize: 14,
+                              fontFamily: 'Inter',
+                              color: Color(0xFF4B5563),
+                              fontSize: 14.5,
                               fontWeight: FontWeight.w400,
                             ),
                             border: InputBorder.none,

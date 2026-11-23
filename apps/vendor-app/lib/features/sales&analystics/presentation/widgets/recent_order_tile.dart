@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_assets.dart';
 
 /// Recent Order Card for the Orders tab in Sales Analytics.
 class RecentOrderTile extends StatelessWidget {
@@ -100,10 +102,14 @@ class RecentOrderTile extends StatelessWidget {
           const SizedBox(width: 8),
 
           // Chevron Right
-          const Icon(
-            Icons.chevron_right_rounded,
-            color: Color(0xFFD1D5DB),
-            size: 20,
+          SvgPicture.asset(
+            AppAssets.svgNextArrow,
+            width: 16,
+            height: 16,
+            colorFilter: const ColorFilter.mode(
+              Color(0xFFD1D5DB),
+              BlendMode.srcIn,
+            ),
           ),
         ],
       ),

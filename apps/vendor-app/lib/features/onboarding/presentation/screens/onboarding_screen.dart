@@ -1,5 +1,7 @@
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/onboarding_item.dart';
 import '../widgets/onboarding_dot_indicator.dart';
@@ -77,7 +79,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
 
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => widget.nextScreen ?? const MainVendorScreen(),
       ),
     );
@@ -104,10 +106,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     if (!isFirstPage)
                       IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: Color(0xFF1E293B),
-                          size: 24.0,
+                        icon: SvgPicture.asset(
+                          AppAssets.svgBackArrow,
+                          width: 24,
+                          height: 24,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF1E293B),
+                            BlendMode.srcIn,
+                          ),
                         ),
                         onPressed: _previousPage,
                         tooltip: 'Back',
@@ -264,8 +270,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(width: 8.0),
-                            SizedBox(
+                            const SizedBox(width: 8.0),
+                            const SizedBox(
                               width: 20.0,
                               height: 20.0,
                               child: Icon(

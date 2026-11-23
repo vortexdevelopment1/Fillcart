@@ -61,7 +61,7 @@ void main() {
       );
 
       // Back and skip should now be visible
-      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+      expect(find.byTooltip('Back'), findsOneWidget);
       expect(find.text('skip'), findsOneWidget);
 
       // Next button still present
@@ -80,12 +80,12 @@ void main() {
       expect(find.text('Manage your\nstore with ease.'), findsOneWidget);
 
       // Tap Back
-      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.tap(find.byTooltip('Back'));
       await tester.pumpAndSettle();
 
       // Should be back on Screen 1
       expect(find.text('Open your\ndigital store'), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_back), findsNothing);
+      expect(find.byTooltip('Back'), findsNothing);
     });
 
     testWidgets('navigating to screen 3 shows "Get Started" without arrow', (
@@ -116,7 +116,7 @@ void main() {
       expect(find.byIcon(Icons.arrow_forward_rounded), findsNothing);
 
       // Back and skip should be visible
-      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+      expect(find.byTooltip('Back'), findsOneWidget);
       expect(find.text('skip'), findsOneWidget);
     });
 

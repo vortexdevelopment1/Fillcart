@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../../../sales&analystics/presentation/widgets/sales_hero_card.dart';
 import '../widgets/earnings_breakdown_card.dart';
 import '../widgets/revenue_category_donut.dart';
@@ -43,10 +44,16 @@ class _RevenueAnalyticsScreenState extends State<RevenueAnalyticsScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: const Color(0xFFE5E7EB)),
                       ),
-                      child: const Icon(
-                        Icons.arrow_back_rounded,
-                        color: Color(0xFF111827),
-                        size: 20,
+                      child: Center(
+                        child: SvgPicture.asset(
+                          AppAssets.svgBackArrow,
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF111827),
+                            BlendMode.srcIn,
+                          ),
+                        ),
                       ),
                     ),
                   ),

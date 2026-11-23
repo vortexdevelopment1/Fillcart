@@ -1,3 +1,4 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/features/product_insights/presentation/screens/product_insights_screen.dart';
 import 'package:fillcart_vendor/features/product_insights/presentation/widgets/product_insight_tile.dart';
 import 'package:fillcart_vendor/features/product_insights/presentation/widgets/product_metric_card.dart';
@@ -19,7 +20,7 @@ void main() {
 
       // Top bar
       expect(find.text('Product Insights'), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
+      expect(find.byType(SvgPicture), findsWidgets);
 
       // Product Header Card
       expect(find.text('Amul Taaza Milk (1 L)'), findsOneWidget);
