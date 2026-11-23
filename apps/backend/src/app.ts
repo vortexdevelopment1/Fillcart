@@ -24,6 +24,10 @@ import {
 } from "./modules/auth/services/index.js";
 import { AuthController } from "./modules/auth/controllers/auth.controller.js";
 import { createAuthRouter } from "./modules/auth/routes/auth.routes.js";
+import { createAdminAuthMiddleware } from "./modules/admin/middleware/index.js";
+import { AdminAuthService, StaffService } from "./modules/admin/services/index.js";
+import { AdminAuthController, StaffController } from "./modules/admin/controllers/index.js";
+import { createAdminRouter } from "./modules/admin/routes/index.js";
 
 /**
  * Express application factory.
@@ -75,6 +79,20 @@ export function createApp(config: AppConfig): Express {
     accountLinkingService
   );
 
+  // ---------------------------------------------------------------------------
+  // Super Admin Module Dependencies & Services
+  // ---------------------------------------------------------------------------
+  const adminAuthMiddleware = createAdminAuthMiddleware(prisma, cryptoService);
+  const adminAuthService = new AdminAuthService(prisma, cryptoService);
+  const staffService = new StaffService(prisma, cryptoService);
+  const adminAuthController = new AdminAuthController(adminAuthService);
+  const staffController = new StaffController(staffService);
+  const adminRouter = createAdminRouter({
+    adminAuthMiddleware,
+    adminAuthController,
+    staffController,
+  });
+
   // 6. Root Endpoints & Well-Known
   // GET /.well-known/jwks.json
   app.get("/.well-known/jwks.json", authController.getJwks);
@@ -94,6 +112,9 @@ export function createApp(config: AppConfig): Express {
   // Mount Public Central Auth module under /api/v1/auth
   const authRouter = createAuthRouter(authController);
   v1Router.use("/auth", authRouter);
+
+  // Mount Super Admin module under /api/v1/admin
+  v1Router.use("/admin", adminRouter);
 
   // Canonical S2S Internal Live Verification Endpoint:
   // POST /api/v1/internal/auth/verify-session

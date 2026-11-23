@@ -199,6 +199,301 @@ paths:
         "403":
           $ref: "#/components/responses/ErrorResponse"
 
+  /api/v1/admin/auth/verify-settings-access:
+    post:
+      summary: Verify Admin Password for Sensitive Settings Access
+      description: Verifies admin password against Argon2id credentials with progressive rate limiting, returning a short-lived signed grant token for settings modifications.
+      operationId: verifySettingsAccess
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - password
+              properties:
+                password:
+                  type: string
+                  format: password
+      responses:
+        "200":
+          description: Password verified and settings grant token issued.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - verified
+                  - token
+                  - expiresIn
+                properties:
+                  verified:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    description: 15-minute Ed25519 signed JWT with scope 'settings'
+                  expiresIn:
+                    type: integer
+                    example: 900
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+        "429":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/roles:
+    get:
+      summary: List Admin Roles and Permission Matrix
+      description: Returns all administrative roles and permission profiles with their module-action capability matrix.
+      operationId: getAdminRoles
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: List of roles and permission profiles.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - roles
+                properties:
+                  roles:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        isSystem:
+                          type: boolean
+                        permissions:
+                          type: array
+                          items:
+                            type: string
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/staff:
+    get:
+      summary: List Staff Members (Paginated)
+      description: Queries all admin accounts with role assignments, status, and activity tracking.
+      operationId: getAdminStaff
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ACTIVE, SUSPENDED, DEACTIVATED]
+        - name: profile
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated staff list.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - pagination
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - fullName
+                        - email
+                        - status
+                      properties:
+                        id:
+                          type: string
+                        fullName:
+                          type: string
+                        email:
+                          type: string
+                        phone:
+                          type: string
+                        status:
+                          type: string
+                        role:
+                          type: string
+                        profile:
+                          type: string
+                        lastLogin:
+                          type: string
+                        createdAt:
+                          type: string
+                  pagination:
+                    type: object
+                    required:
+                      - page
+                      - limit
+                      - total
+                      - totalPages
+                    properties:
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      total:
+                        type: integer
+                      totalPages:
+                        type: integer
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/staff/invite:
+    post:
+      summary: Invite New Admin Staff Member
+      description: Creates an AdminInvitation token record and triggers invitation lifecycle.
+      operationId: inviteAdminStaff
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - fullName
+                - roleId
+              properties:
+                email:
+                  type: string
+                  format: email
+                fullName:
+                  type: string
+                roleId:
+                  type: string
+                profileId:
+                  type: string
+      responses:
+        "201":
+          description: Staff invitation created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - email
+                  - roleId
+                  - expiresAt
+                properties:
+                  id:
+                    type: string
+                  email:
+                    type: string
+                  fullName:
+                    type: string
+                  roleId:
+                    type: string
+                  profileId:
+                    type: string
+                  expiresAt:
+                    type: string
+                    format: date-time
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/staff/{id}/status:
+    patch:
+      summary: Update Staff Active/Inactive Status
+      description: Activates, suspends, or deactivates an admin staff member. Enforces self-deactivation and last Super Admin protections.
+      operationId: updateStaffStatus
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [ACTIVE, SUSPENDED, DEACTIVATED]
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Staff status updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - status
+                properties:
+                  id:
+                    type: string
+                  status:
+                    type: string
+                  suspensionReason:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
   /health:
     get:
       summary: Root Liveness Probe
@@ -238,6 +533,11 @@ paths:
 
 components:
   securitySchemes:
+    AdminBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Asymmetric Ed25519 JWT access token issued by Central Auth with aud 'admin-backend' and accountType 'ADMIN'.
     S2SAssertion:
       type: http
       scheme: bearer
