@@ -18,8 +18,8 @@ const LayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         }}
         className={`flex-1 min-w-0 w-full max-w-full h-full min-h-0 flex flex-col pt-3 pb-3 pr-3 sm:pt-4 sm:pb-4 sm:pr-4 md:pr-5 lg:pr-6 box-border bg-white ${
           isExpanded
-            ? 'pl-3 sm:pl-4 md:pl-[88px] lg:pl-[288px]'
-            : 'pl-3 sm:pl-4 md:pl-[88px] lg:pl-[88px]'
+            ? 'pl-3 sm:pl-4 md:pl-[288px]'
+            : 'pl-3 sm:pl-4 md:pl-[88px]'
         }`}
       >
         {/* Global Header */}

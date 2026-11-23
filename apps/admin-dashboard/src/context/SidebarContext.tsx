@@ -12,12 +12,14 @@ interface SidebarContextType {
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Restore persisted state from localStorage, default to false (collapsed)
+  // Restore persisted state from localStorage, default to true (expanded so nav links text names appear)
   const [isExpanded, setIsExpanded] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('sidebar-expanded') === 'true';
+      const stored = localStorage.getItem('sidebar-expanded');
+      if (stored !== null) return stored === 'true';
+      return true;
     } catch {
-      return false;
+      return true;
     }
   });
 
@@ -38,18 +40,14 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
         e.preventDefault();
         setIsExpanded((prev) => !prev);
       }
-      // Close on Esc if in overlay/mobile mode
+      // Close on Esc if in mobile mode
       if (e.key === 'Escape') {
         setIsMobileOpen(false);
-        // If screen width is < 1024px and expanded, collapse it
-        if (window.innerWidth < 1024 && isExpanded) {
-          setIsExpanded(false);
-        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isExpanded]);
+  }, []);
 
   const toggleExpanded = () => setIsExpanded((prev) => !prev);
   const toggleMobileOpen = () => setIsMobileOpen((prev) => !prev);

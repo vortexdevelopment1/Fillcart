@@ -160,7 +160,7 @@ export const Sidebar: React.FC = () => {
     name: string,
     badge?: number | string
   ) => {
-    if (isExpanded || isTouchDevice) return;
+    if (isExpanded) return;
     const rect = e.currentTarget.getBoundingClientRect();
 
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
@@ -207,10 +207,6 @@ export const Sidebar: React.FC = () => {
   const handleNavClick = () => {
     handleMouseLeave();
     closeMobile();
-    // On tablet (< 1024px), close expanded overlay on navigation
-    if (typeof window !== 'undefined' && window.innerWidth < 1024 && isExpanded) {
-      toggleExpanded();
-    }
   };
 
   // Render individual nav item
@@ -298,14 +294,11 @@ export const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* ──────────── Overlay for Mobile / Tablet (< 1024px) ──────────── */}
-      {(isMobileOpen || (isExpanded && typeof window !== 'undefined' && window.innerWidth < 1024)) && (
+      {/* ──────────── Overlay for Mobile (< 768px) ──────────── */}
+      {isMobileOpen && (
         <div
-          onClick={() => {
-            closeMobile();
-            if (isExpanded && window.innerWidth < 1024) toggleExpanded();
-          }}
-          className="fixed inset-0 z-40 bg-primary/30 backdrop-blur-[6px] transition-opacity duration-200"
+          onClick={closeMobile}
+          className="fixed inset-0 z-40 bg-primary/30 backdrop-blur-[6px] transition-opacity duration-200 md:hidden"
           aria-hidden="true"
         />
       )}
