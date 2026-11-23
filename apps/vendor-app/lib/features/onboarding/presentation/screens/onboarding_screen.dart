@@ -1,4 +1,4 @@
-import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
+import 'package:fillcart_vendor/features/authentication/authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/onboarding_item.dart';
@@ -21,7 +21,7 @@ class OnboardingScreen extends StatefulWidget {
   final List<OnboardingItem>? items;
 
   /// Destination screen after onboarding is completed or skipped.
-  /// Defaults to [MainVendorScreen].
+  /// Defaults to [LoginScreen].
   final Widget? nextScreen;
 
   /// Optional callback invoked when onboarding completes or is skipped.
@@ -77,8 +77,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
 
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => widget.nextScreen ?? const MainVendorScreen(),
+      MaterialPageRoute<void>(
+        builder: (_) => widget.nextScreen ?? const LoginScreen(),
       ),
     );
   }
