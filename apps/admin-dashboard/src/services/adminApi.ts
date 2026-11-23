@@ -122,7 +122,11 @@ adminClient.interceptors.response.use(
       } catch {
         sessionStorage.removeItem('fillkart_admin_token');
         sessionStorage.removeItem('fillkart_admin_refresh_token');
+        sessionStorage.removeItem('fillkart_admin_user');
         localStorage.removeItem('fillkart_admin_token');
+        if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(parseApiError(error));

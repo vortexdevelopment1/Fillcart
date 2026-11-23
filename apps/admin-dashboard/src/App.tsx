@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { MainLayout } from './components/layout/MainLayout';
 import { HomePage } from './pages/HomePage';
@@ -22,14 +22,29 @@ import { ModuleName } from './data/staffData';
 import { adminApi } from './services/adminApi';
 
 /**
- * Ensures user is authenticated before accessing the console.
- * Redirects unauthenticated requests to /login while preserving location state.
+ * Strict Global AuthGuard:
+ * Completely blocks all console pages if the admin is not authenticated.
+ * Immediately redirects to /login.
  */
 const AuthGuard: React.FC<{ children: React.ReactElement }> = ({ children }) => {
-  const isAuth = adminApi.isAuthenticated();
   const location = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => adminApi.isAuthenticated());
 
-  if (!isAuth) {
+  useEffect(() => {
+    const checkAuth = () => {
+      setIsAuthenticated(adminApi.isAuthenticated());
+    };
+
+    // React to storage changes or tab logout
+    window.addEventListener('storage', checkAuth);
+    const interval = setInterval(checkAuth, 800);
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      clearInterval(interval);
+    };
+  }, []);
+
+  if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
