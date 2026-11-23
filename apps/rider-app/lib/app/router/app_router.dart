@@ -6,6 +6,10 @@ import '../../features/authentication/bloc/auth_state.dart';
 import '../../features/authentication/presentation/otp_success_screen.dart';
 import '../../features/authentication/presentation/otp_verification_screen.dart';
 import '../../features/authentication/presentation/phone_number_input_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/orders/presentation/screens/orders_screen.dart';
+import '../../features/earnings/presentation/screens/earnings_screen.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/kyc/presentation/screens/aadhaar_details_screen.dart';
 import '../../features/kyc/presentation/screens/aadhaar_otp_verification_screen.dart';
 import '../../features/kyc/presentation/screens/aadhaar_verify_success_screen.dart';
@@ -109,6 +113,22 @@ abstract final class AppRouter {
           GoRoute(
             path: '/kyc/permissions',
             builder: (context, state) => const PermissionsScreen(),
+          ),
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/orders',
+            builder: (context, state) => const OrdersScreen(),
+          ),
+          GoRoute(
+            path: '/earnings',
+            builder: (context, state) => const EarningsScreen(),
+          ),
+          GoRoute(
+            path: '/dashboard',
+            builder: (context, state) => const DashboardScreen(),
           ),
         ],
       );
