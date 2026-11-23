@@ -69,6 +69,26 @@ model User {
   auditLogsTargeted       AuthAuditLog[]           @relation("TargetUserAudit")
   auditLogsActed          AuthAuditLog[]           @relation("ActorUserAudit")
   adminBootstrapMarker    AdminBootstrapMarker?
+  adminAuditLogs          AdminAuditLog[]
+  systemSettingsUpdated   SystemSetting[]
+  opsPoliciesUpdated      OpsPolicy[]
+  productsModerated       Product[]                @relation("ProductModerator")
+  vendorProfile           Vendor?                  @relation("VendorUser")
+  riderProfile            Rider?                   @relation("RiderUser")
+  vendorsStatusChanged    Vendor[]                 @relation("VendorStatusAdmin")
+  ridersStatusChanged     Rider[]                  @relation("RiderStatusAdmin")
+  uploadedAssets          FileAsset[]              @relation("AssetUploader")
+  reviewedDocuments       Document[]               @relation("DocumentReviewer")
+  documentReviewsAuthored DocumentReview[]         @relation("ReviewHistoryUser")
+  customerProfile         CustomerProfile?         @relation("CustomerUser")
+  orderStatusTransitions  OrderStatusHistory[]     @relation("OrderStatusActor")
+  dispatchAssignmentsAssigned DeliveryAssignment[] @relation("DispatchAdminUser")
+  ordersCancelled         OrderCancellation[]      @relation("OrderCancelUser")
+  refundsProcessed        RefundRecord[]           @relation("RefundAdminUser")
+  settlementBatchesCreated SettlementBatch[]       @relation("SettlementBatchCreator")
+  payoutsInitiated        Payout[]                 @relation("PayoutInitiator")
+  commissionRulesCreated  CommissionRule[]         @relation("CommissionRuleAdmin")
+  walletAdjustmentsPerformed WalletTransaction[]   @relation("WalletAdminAdjuster")
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt
 
@@ -355,4 +375,1132 @@ model RateLimitRecord {
   timestamp DateTime @default(now())
 
   @@index([key, timestamp])
+}
+
+// -------------------------------------------------------------
+// 7. Core Platform: Admin Governance & Configuration (Module 1)
+// -------------------------------------------------------------
+
+enum SettingsTabId {
+  GENERAL
+  ORDERS
+  ONBOARDING
+  FINANCE
+  NOTIFICATIONS
+  SECURITY
+}
+
+enum AuditTargetType {
+  STAFF
+  VENDOR
+  RIDER
+  ORDER
+  CATALOG
+  SETTING
+  FINANCE
+  DOCUMENT
+}
+
+enum AdminAuditAction {
+  CREATE
+  UPDATE
+  DELETE_SOFT
+  APPROVE
+  REJECT
+  SUSPEND
+  REINSTATE
+  OVERRIDE
+  CONFIG_CHANGE
+}
+
+model AdminAuditLog {
+  id             String           @id @default(uuid())
+  adminUserId    String
+  targetType     AuditTargetType
+  targetId       String
+  action         AdminAuditAction
+  changesSummary Json?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime         @default(now())
+
+  adminUser      User             @relation(fields: [adminUserId], references: [id], onDelete: Restrict)
+
+  @@index([adminUserId])
+  @@index([targetType, targetId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  id              String        @id @default(uuid())
+  tabId           SettingsTabId
+  key             String        @unique
+  value           Json
+  isEncrypted     Boolean       @default(false)
+  updatedByUserId String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  updatedByUser   User          @relation(fields: [updatedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([tabId])
+}
+
+model OpsPolicy {
+  id              String    @id @default(uuid())
+  policyKey       String    @unique
+  policyName      String
+  config          Json
+  effectiveFrom   DateTime  @default(now())
+  effectiveTo     DateTime?
+  updatedByUserId String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  updatedByUser   User      @relation(fields: [updatedByUserId], references: [id], onDelete: Restrict)
+}
+
+// -------------------------------------------------------------
+// 8. Core Platform: Catalogue & Taxonomy (Module 1)
+// -------------------------------------------------------------
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum ProductModerationStatus {
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
+}
+
+enum UnitType {
+  GRAM
+  KG
+  MILLILITER
+  LITER
+  PIECE
+  PACK
+  METER
+}
+
+model Category {
+  id               String      @id @default(uuid())
+  name             String
+  slug             String      @unique
+  description      String?
+  iconName         String
+  parentCategoryId String?
+  displayOrder     Int         @default(0)
+  isActive         Boolean     @default(true)
+  isDeleted        Boolean     @default(false)
+  deletedAt        DateTime?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  parentCategory   Category?   @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id], onDelete: Restrict)
+  subCategories    Category[]  @relation("CategoryHierarchy")
+  products         Product[]
+  commissionRules  CommissionRule[]
+  taxSlabs         TaxSlab[]
+
+  @@index([parentCategoryId])
+  @@index([isActive, isDeleted])
+}
+
+model Brand {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  slug      String    @unique
+  logoUrl   String?
+  isActive  Boolean   @default(true)
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  products  Product[]
+
+  @@index([isActive, isDeleted])
+}
+
+model Product {
+  id                 String                  @id @default(uuid())
+  name               String
+  slug               String                  @unique
+  description        String?
+  categoryId         String
+  brandId            String?
+  hsnCode            String?
+  status             ProductStatus           @default(DRAFT)
+  moderationStatus   ProductModerationStatus @default(PENDING_APPROVAL)
+  rejectReason       String?
+  moderatedByUserId  String?
+  moderatedAt        DateTime?
+  isActive           Boolean                 @default(true)
+  isDeleted          Boolean                 @default(false)
+  deletedAt          DateTime?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  category           Category                @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  brand              Brand?                  @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  moderatedBy        User?                   @relation("ProductModerator", fields: [moderatedByUserId], references: [id], onDelete: Restrict)
+  variants           ProductVariant[]
+
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([status, moderationStatus])
+  @@index([isActive, isDeleted])
+}
+
+model ProductVariant {
+  id                String             @id @default(uuid())
+  productId         String
+  sku               String             @unique
+  barcode           String?            @unique
+  variantName       String
+  unitQuantity      Decimal            @db.Decimal(10, 3)
+  unitType          UnitType
+  mrpPaisa          BigInt
+  salePricePaisa    BigInt
+  discountPct       Int                @default(0)
+  isDefault         Boolean            @default(false)
+  isActive          Boolean            @default(true)
+  isDeleted         Boolean            @default(false)
+  deletedAt         DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  product           Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  inventoryBalances InventoryBalance[]
+  orderItems        OrderItem[]
+
+  @@index([productId])
+  @@index([sku])
+  @@index([isActive, isDeleted])
+}
+
+model InventoryBalance {
+  id               String         @id @default(uuid())
+  storeId          String
+  variantId        String
+  quantityOnHand   Int            @default(0)
+  reservedQuantity Int            @default(0)
+  reorderThreshold Int            @default(5)
+  lastRestockedAt  DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  variant          ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  store            Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, variantId])
+  @@index([storeId])
+  @@index([variantId])
+  @@index([quantityOnHand])
+}
+
+// -------------------------------------------------------------
+// 9. Core Platform: Vendors & Stores (Module 2)
+// -------------------------------------------------------------
+
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_ONBOARDING
+}
+
+enum VerificationStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  REUPLOAD_REQUESTED
+}
+
+enum BankVerificationStatus {
+  PENDING
+  PENNY_DROP_VERIFIED
+  REJECTED
+}
+
+model Vendor {
+  id                    String              @id @default(uuid())
+  userId                String              @unique
+  businessName          String
+  ownerName             String
+  businessCategory      String
+  city                  String
+  shopAddress           String
+  gstin                 String?
+  licenceNumber         String?
+  status                VendorStatus        @default(PENDING_ONBOARDING)
+  verificationStatus    VerificationStatus  @default(PENDING)
+  statusReason          String?
+  statusRemarks         String?
+  statusChangedAt       DateTime?
+  statusChangedByUserId String?
+  joinedDate            DateTime            @default(now())
+  isDeleted             Boolean             @default(false)
+  deletedAt             DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  user                  User                @relation("VendorUser", fields: [userId], references: [id], onDelete: Restrict)
+  statusChangedBy       User?               @relation("VendorStatusAdmin", fields: [statusChangedByUserId], references: [id], onDelete: Restrict)
+  stores                Store[]
+  bankAccounts          VendorBankAccount[]
+  documents             Document[]
+  payouts               Payout[]
+  commissionRules       CommissionRule[]
+
+  @@index([status, verificationStatus])
+  @@index([city])
+  @@index([gstin])
+  @@index([isDeleted])
+}
+
+model Store {
+  id                String             @id @default(uuid())
+  vendorId          String
+  storeName         String
+  storeCode         String             @unique
+  phone             String
+  email             String?
+  addressLine1      String
+  addressLine2      String?
+  city              String
+  state             String
+  postalCode        String
+  latitude          Float
+  longitude         Float
+  serviceRadiusKm   Decimal            @default(5.0) @db.Decimal(4, 1)
+  isOpen            Boolean            @default(true)
+  openingTime       String             @default("07:00")
+  closingTime       String             @default("23:00")
+  isActive          Boolean            @default(true)
+  isDeleted         Boolean            @default(false)
+  deletedAt         DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  vendor            Vendor             @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  inventoryBalances InventoryBalance[]
+  orders            Order[]
+
+  @@index([vendorId])
+  @@index([city, state])
+  @@index([latitude, longitude])
+  @@index([isOpen, isActive, isDeleted])
+}
+
+model VendorBankAccount {
+  id                     String                 @id @default(uuid())
+  vendorId               String
+  accountHolderName      String
+  bankName               String
+  accountNumberEncrypted String
+  accountNumberMasked    String
+  ifscCode               String
+  isPrimary              Boolean                @default(true)
+  verificationStatus     BankVerificationStatus @default(PENDING)
+  isDeleted              Boolean                @default(false)
+  deletedAt              DateTime?
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+
+  vendor                 Vendor                 @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  payouts                Payout[]
+
+  @@index([vendorId])
+  @@index([isPrimary])
+}
+
+// -------------------------------------------------------------
+// 10. Core Platform: Riders & Fleets (Module 2)
+// -------------------------------------------------------------
+
+enum RiderStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_ONBOARDING
+}
+
+enum RiderAvailability {
+  ONLINE
+  OFFLINE
+  ON_DELIVERY
+}
+
+enum VehicleType {
+  MOTORCYCLE
+  SCOOTER
+  ELECTRIC_VEHICLE
+  BICYCLE
+  ON_FOOT
+}
+
+model Rider {
+  id                      String             @id @default(uuid())
+  userId                  String             @unique
+  fullName                String
+  phone                   String
+  email                   String?
+  city                    String
+  address                 String
+  emergencyContactName    String
+  emergencyContactRelation String
+  emergencyContactPhone   String
+  availability            RiderAvailability  @default(OFFLINE)
+  verificationStatus      VerificationStatus @default(PENDING)
+  status                  RiderStatus        @default(PENDING_ONBOARDING)
+  statusReason            String?
+  statusRemarks           String?
+  statusChangedAt         DateTime?
+  statusChangedByUserId   String?
+  ratingAverage           Decimal            @default(5.00) @db.Decimal(3, 2)
+  deliveriesCompleted     Int                @default(0)
+  onTimePct               Decimal            @default(100.0) @db.Decimal(5, 2)
+  joinedDate              DateTime           @default(now())
+  isDeleted               Boolean            @default(false)
+  deletedAt               DateTime?
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+
+  user                    User               @relation("RiderUser", fields: [userId], references: [id], onDelete: Restrict)
+  statusChangedBy         User?              @relation("RiderStatusAdmin", fields: [statusChangedByUserId], references: [id], onDelete: Restrict)
+  vehicles                Vehicle[]
+  bankAccounts            RiderBankAccount[]
+  locations               RiderLocation[]
+  documents               Document[]
+  deliveryAssignments     DeliveryAssignment[]
+  payouts                 Payout[]
+
+  @@index([status, verificationStatus])
+  @@index([availability])
+  @@index([city])
+  @@index([isDeleted])
+}
+
+model Vehicle {
+  id                 String      @id @default(uuid())
+  riderId            String
+  vehicleType        VehicleType
+  model              String?
+  registrationNumber String?
+  isPrimary          Boolean     @default(true)
+  isActive           Boolean     @default(true)
+  isDeleted          Boolean     @default(false)
+  deletedAt          DateTime?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  rider              Rider       @relation(fields: [riderId], references: [id], onDelete: Cascade)
+
+  @@index([riderId])
+  @@index([registrationNumber])
+}
+
+model RiderBankAccount {
+  id                     String                 @id @default(uuid())
+  riderId                String
+  accountHolderName      String
+  bankName               String
+  accountNumberEncrypted String
+  accountNumberMasked    String
+  ifscCode               String
+  isPrimary              Boolean                @default(true)
+  verificationStatus     BankVerificationStatus @default(PENDING)
+  isDeleted              Boolean                @default(false)
+  deletedAt              DateTime?
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+
+  rider                  Rider                  @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  payouts                Payout[]
+
+  @@index([riderId])
+  @@index([isPrimary])
+}
+
+model RiderLocation {
+  id             String    @id @default(uuid())
+  riderId        String
+  latitude       Float
+  longitude      Float
+  heading        Float?
+  accuracyMeters Float?
+  speedKmph      Float?
+  recordedAt     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+
+  rider          Rider     @relation(fields: [riderId], references: [id], onDelete: Cascade)
+
+  @@index([riderId, recordedAt])
+  @@index([latitude, longitude])
+}
+
+// -------------------------------------------------------------
+// 11. Core Platform: Documents & Verification (Module 2)
+// -------------------------------------------------------------
+
+enum ApplicantType {
+  VENDOR
+  RIDER
+}
+
+enum RequirementType {
+  REQUIRED
+  OPTIONAL
+  CONDITIONAL
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REUPLOAD_REQUESTED
+}
+
+enum DocumentReviewAction {
+  APPROVED
+  REJECTED
+  REUPLOAD_REQUESTED
+}
+
+model FileAsset {
+  id               String     @id @default(uuid())
+  storageKey       String     @unique
+  bucketName       String
+  fileUrl          String
+  mimeType         String
+  fileSizeBytes    Int
+  checksumSha256   String
+  uploadedByUserId String
+  createdAt        DateTime   @default(now())
+
+  uploadedByUser   User       @relation("AssetUploader", fields: [uploadedByUserId], references: [id], onDelete: Restrict)
+  documents        Document[]
+
+  @@index([uploadedByUserId])
+}
+
+model DocumentType {
+  id                 String          @id @default(uuid())
+  code               String          @unique
+  name               String
+  purpose            String
+  appliesTo          ApplicantType
+  requirementLevel   RequirementType @default(REQUIRED)
+  isCategorySpecific Boolean         @default(false)
+  applicableCategory String?
+  isVehicleRequired  Boolean         @default(false)
+  displayOrder       Int             @default(0)
+  isActive           Boolean         @default(true)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  documents          Document[]
+
+  @@index([appliesTo, isActive])
+}
+
+model Document {
+  id               String          @id @default(uuid())
+  entityType       ApplicantType
+  vendorId         String?
+  riderId          String?
+  documentTypeId   String
+  fileAssetId      String?
+  documentNumber   String?
+  status           DocumentStatus  @default(PENDING)
+  rejectReason     String?
+  rejectRemarks    String?
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+  isDeleted        Boolean         @default(false)
+  deletedAt        DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  vendor           Vendor?         @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  rider            Rider?          @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  documentType     DocumentType    @relation(fields: [documentTypeId], references: [id], onDelete: Restrict)
+  fileAsset        FileAsset?      @relation(fields: [fileAssetId], references: [id], onDelete: SetNull)
+  reviewedBy       User?           @relation("DocumentReviewer", fields: [reviewedByUserId], references: [id], onDelete: Restrict)
+  reviews          DocumentReview[]
+
+  @@index([vendorId])
+  @@index([riderId])
+  @@index([status])
+  @@index([documentTypeId])
+}
+
+model DocumentReview {
+  id               String               @id @default(uuid())
+  documentId       String
+  reviewedByUserId String
+  action           DocumentReviewAction
+  reason           String?
+  remarks          String?
+  createdAt        DateTime             @default(now())
+
+  document         Document             @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  reviewedBy       User                 @relation("ReviewHistoryUser", fields: [reviewedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([documentId])
+  @@index([reviewedByUserId])
+  @@index([createdAt])
+}
+
+// -------------------------------------------------------------
+// 12. Core Platform: Customers & Addresses (Module 3)
+// -------------------------------------------------------------
+
+enum AddressType {
+  HOME
+  WORK
+  OTHER
+}
+
+model CustomerProfile {
+  id                String         @id @default(uuid())
+  userId            String         @unique
+  dateOfBirth       DateTime?
+  alternatePhone    String?
+  isVip             Boolean        @default(false)
+  totalOrdersPlaced Int            @default(0)
+  isDeleted         Boolean        @default(false)
+  deletedAt         DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  user              User           @relation("CustomerUser", fields: [userId], references: [id], onDelete: Restrict)
+  addresses         Address[]
+  orders            Order[]
+  refunds           RefundRecord[]
+  wallet            Wallet?
+  couponUsages      CouponUsage[]
+
+  @@index([isVip])
+  @@index([isDeleted])
+}
+
+model Address {
+  id                String          @id @default(uuid())
+  customerProfileId String
+  addressType       AddressType     @default(HOME)
+  recipientName     String
+  recipientPhone    String
+  flatHouseNumber   String
+  streetAddress     String
+  landmark          String?
+  city              String
+  state             String
+  postalCode        String
+  latitude          Float
+  longitude         Float
+  isDefault         Boolean         @default(false)
+  isDeleted         Boolean         @default(false)
+  deletedAt         DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  customerProfile   CustomerProfile @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+  orders            Order[]
+
+  @@index([customerProfileId])
+  @@index([latitude, longitude])
+}
+
+// -------------------------------------------------------------
+// 13. Core Platform: Orders & Logistics (Module 3)
+// -------------------------------------------------------------
+
+enum OrderStatus {
+  PLACED
+  ACCEPTED
+  PREPARING
+  READY_FOR_PICKUP
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+  UPI
+  CARD
+  NET_BANKING
+  COD
+  WALLET
+}
+
+enum DeliveryAssignmentStatus {
+  PENDING_ACCEPTANCE
+  ACCEPTED
+  REJECTED
+  TIMED_OUT
+  ARRIVED_AT_STORE
+  PICKED_UP
+  DELIVERED
+  CANCELLED
+}
+
+enum AssignmentMode {
+  MANUAL
+  AUTO_DISPATCH
+}
+
+enum CancellationReasonCode {
+  CUSTOMER_REQUESTED
+  ITEM_OUT_OF_STOCK
+  NO_RIDER_AVAILABLE
+  OUTSIDE_SERVICEABLE_ZONE
+  SUSPECTED_FRAUD
+  OPERATIONAL_DELAY
+  ADMIN_OVERRIDE
+}
+
+enum RefundStatus {
+  INITIATED
+  PROCESSING
+  SUCCESS
+  FAILED
+}
+
+enum RefundReason {
+  ORDER_CANCELLED
+  ITEM_MISSING_DAMAGED
+  QUALITY_ISSUE
+  DELIVERY_DELAY
+  ADMIN_DISCRETIONARY
+}
+
+model Order {
+  id                  String               @id @default(uuid())
+  orderNumber         String               @unique
+  customerProfileId   String
+  storeId             String
+  deliveryAddressId   String
+  status              OrderStatus          @default(PLACED)
+  paymentStatus       PaymentStatus        @default(PENDING)
+  paymentMethod       PaymentMethod
+  itemTotalPaisa      BigInt
+  deliveryFeePaisa    BigInt               @default(0)
+  taxPaisa            BigInt               @default(0)
+  discountPaisa       BigInt               @default(0)
+  tipPaisa            BigInt               @default(0)
+  totalAmountPaisa    BigInt
+  couponId            String?
+  specialInstructions String?
+  placedAt            DateTime             @default(now())
+  acceptedAt          DateTime?
+  preparingAt         DateTime?
+  readyForPickupAt    DateTime?
+  outForDeliveryAt    DateTime?
+  deliveredAt         DateTime?
+  cancelledAt         DateTime?
+  cancelReason        String?
+  cancelRemarks       String?
+  isRefunded          Boolean              @default(false)
+  isDeleted           Boolean              @default(false)
+  deletedAt           DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  customerProfile     CustomerProfile      @relation(fields: [customerProfileId], references: [id], onDelete: Restrict)
+  store               Store                @relation(fields: [storeId], references: [id], onDelete: Restrict)
+  deliveryAddress     Address              @relation(fields: [deliveryAddressId], references: [id], onDelete: Restrict)
+  coupon              Coupon?              @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  items               OrderItem[]
+  statusHistory       OrderStatusHistory[]
+  deliveryAssignments DeliveryAssignment[]
+  payment             Payment?
+  cancellationRecord  OrderCancellation?
+  refundRecord        RefundRecord?
+
+  @@index([orderNumber])
+  @@index([customerProfileId])
+  @@index([storeId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([placedAt])
+}
+
+model OrderItem {
+  id             String         @id @default(uuid())
+  orderId        String
+  variantId      String
+  productName    String
+  variantName    String
+  unitPricePaisa BigInt
+  quantity       Int
+  subtotalPaisa  BigInt
+  taxPaisa       BigInt         @default(0)
+  totalPaisa     BigInt
+  specialNotes   String?
+  createdAt      DateTime       @default(now())
+
+  order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([variantId])
+}
+
+model OrderStatusHistory {
+  id                   String            @id @default(uuid())
+  orderId              String
+  fromStatus           OrderStatus?
+  toStatus             OrderStatus
+  triggeredByActorType AuditActorType
+  triggeredByUserId    String?
+  reason               String?
+  metadata             Json?
+  createdAt            DateTime          @default(now())
+
+  order                Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  triggeredByUser      User?             @relation("OrderStatusActor", fields: [triggeredByUserId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([toStatus])
+  @@index([createdAt])
+}
+
+model DeliveryAssignment {
+  id                 String                   @id @default(uuid())
+  orderId            String
+  riderId            String
+  status             DeliveryAssignmentStatus @default(PENDING_ACCEPTANCE)
+  assignedByMode     AssignmentMode           @default(AUTO_DISPATCH)
+  assignedByUserId   String?
+  assignedAt         DateTime                 @default(now())
+  acceptedAt         DateTime?
+  arrivedAtStoreAt   DateTime?
+  pickedUpAt         DateTime?
+  arrivedAtCustomerAt DateTime?
+  completedAt        DateTime?
+  cancelledAt        DateTime?
+  cancelReason       String?
+  distanceMeters     Int?
+  riderEarningsPaisa BigInt                   @default(0)
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  order              Order                    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  rider              Rider                    @relation(fields: [riderId], references: [id], onDelete: Restrict)
+  assignedByUser     User?                    @relation("DispatchAdminUser", fields: [assignedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([riderId])
+  @@index([status])
+}
+
+model OrderCancellation {
+  id                   String                 @id @default(uuid())
+  orderId              String                 @unique
+  cancelledByActorType AuditActorType
+  cancelledByUserId    String?
+  reasonCode           CancellationReasonCode
+  customReason         String?
+  isAutoCancelled      Boolean                @default(false)
+  feeAppliedPaisa      BigInt                 @default(0)
+  createdAt            DateTime               @default(now())
+
+  order                Order                  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  cancelledByUser      User?                  @relation("OrderCancelUser", fields: [cancelledByUserId], references: [id], onDelete: Restrict)
+}
+
+model RefundRecord {
+  id                 String          @id @default(uuid())
+  orderId            String          @unique
+  paymentId          String?
+  customerProfileId  String
+  amountPaisa        BigInt
+  status             RefundStatus    @default(INITIATED)
+  reason             RefundReason
+  processedByUserId  String?
+  gatewayRefundId    String?
+  processedAt        DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  order              Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  payment            Payment?        @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  customerProfile    CustomerProfile @relation(fields: [customerProfileId], references: [id], onDelete: Restrict)
+  processedByUser    User?           @relation("RefundAdminUser", fields: [processedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([status])
+  @@index([customerProfileId])
+}
+
+// -------------------------------------------------------------
+// 14. Core Platform: Finance, Settlements & Promotions (Module 4)
+// -------------------------------------------------------------
+
+enum SettlementBatchStatus {
+  DRAFT
+  GENERATED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  PROCESSING
+  PAID
+  FAILED
+  ON_HOLD
+}
+
+enum WalletStatus {
+  ACTIVE
+  FROZEN
+}
+
+enum WalletTxType {
+  CREDIT
+  DEBIT
+  REFUND
+  CASHBACK
+}
+
+enum CouponType {
+  PERCENTAGE
+  FLAT
+}
+
+enum CouponAudience {
+  ALL_CUSTOMERS
+  NEW_CUSTOMERS_ONLY
+  VIP_CUSTOMERS_ONLY
+}
+
+enum CouponStatus {
+  ACTIVE
+  EXPIRED
+  DISABLED
+}
+
+model Payment {
+  id                   String        @id @default(uuid())
+  orderId              String        @unique
+  customerProfileId    String
+  gatewayTransactionId String?       @unique
+  gatewayName          String
+  method               PaymentMethod
+  amountPaisa          BigInt
+  currency             String        @default("INR")
+  status               PaymentStatus @default(PENDING)
+  failureReason        String?
+  gatewayResponse      Json?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  order                Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  refunds              RefundRecord[]
+
+  @@index([status])
+  @@index([gatewayTransactionId])
+}
+
+model SettlementBatch {
+  id                    String                @id @default(uuid())
+  batchNumber           String                @unique
+  entityType            ApplicantType
+  periodStart           DateTime
+  periodEnd             DateTime
+  totalGrossAmountPaisa BigInt
+  totalCommissionPaisa  BigInt
+  totalGstPaisa         BigInt
+  totalNetPayoutPaisa   BigInt
+  totalCount            Int
+  status                SettlementBatchStatus @default(DRAFT)
+  createdByUserId       String
+  processedAt           DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  createdByUser         User                  @relation("SettlementBatchCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  payouts               Payout[]
+
+  @@index([status])
+  @@index([periodStart, periodEnd])
+}
+
+model Payout {
+  id                    String           @id @default(uuid())
+  settlementBatchId     String?
+  entityType            ApplicantType
+  vendorId              String?
+  riderId               String?
+  periodLabel           String
+  grossAmountPaisa      BigInt
+  commissionPct         Decimal          @db.Decimal(5, 2)
+  commissionAmountPaisa BigInt
+  gstOnCommissionPaisa  BigInt
+  deductionsPaisa       BigInt           @default(0)
+  netPayoutPaisa        BigInt
+  status                PayoutStatus     @default(PENDING)
+  vendorBankAccountId   String?
+  riderBankAccountId    String?
+  utrNumber             String?
+  failureReason         String?
+  initiatedByUserId     String?
+  processedAt           DateTime?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  settlementBatch       SettlementBatch? @relation(fields: [settlementBatchId], references: [id], onDelete: SetNull)
+  vendor                Vendor?          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  rider                 Rider?           @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  vendorBankAccount     VendorBankAccount? @relation(fields: [vendorBankAccountId], references: [id], onDelete: SetNull)
+  riderBankAccount      RiderBankAccount?  @relation(fields: [riderBankAccountId], references: [id], onDelete: SetNull)
+  initiatedByUser       User?            @relation("PayoutInitiator", fields: [initiatedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([vendorId])
+  @@index([riderId])
+  @@index([status])
+  @@index([settlementBatchId])
+}
+
+model CommissionRule {
+  id              String    @id @default(uuid())
+  name            String
+  categoryId      String?
+  vendorId        String?
+  ratePct         Decimal   @db.Decimal(5, 2)
+  effectiveFrom   DateTime
+  effectiveTo     DateTime?
+  reason          String?
+  createdByUserId String
+  isActive        Boolean   @default(true)
+  isDeleted       Boolean   @default(false)
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  vendor          Vendor?   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  createdByUser   User      @relation("CommissionRuleAdmin", fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@index([categoryId])
+  @@index([vendorId])
+  @@index([isActive, isDeleted])
+}
+
+model Wallet {
+  id                String              @id @default(uuid())
+  customerProfileId String              @unique
+  balancePaisa      BigInt              @default(0)
+  totalSpentPaisa   BigInt              @default(0)
+  currency          String              @default("INR")
+  status            WalletStatus        @default(ACTIVE)
+  isDeleted         Boolean             @default(false)
+  deletedAt         DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  customerProfile   CustomerProfile     @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+  transactions      WalletTransaction[]
+
+  @@index([status])
+}
+
+model WalletTransaction {
+  id                String       @id @default(uuid())
+  walletId          String
+  type              WalletTxType
+  amountPaisa       BigInt
+  balanceAfterPaisa BigInt
+  referenceOrderId  String?
+  reason            String
+  performedByUserId String?
+  createdAt         DateTime     @default(now())
+
+  wallet            Wallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  performedByUser   User?        @relation("WalletAdminAdjuster", fields: [performedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([walletId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Coupon {
+  id                 String         @id @default(uuid())
+  code               String         @unique
+  type               CouponType
+  valuePaisaOrPct    BigInt
+  minOrderValuePaisa BigInt         @default(0)
+  maxDiscountPaisa   BigInt?
+  totalUsageLimit    Int            @default(1000)
+  currentUsageCount  Int            @default(0)
+  perUserLimit       Int            @default(1)
+  applicableAudience CouponAudience @default(ALL_CUSTOMERS)
+  validFrom          DateTime
+  validTo            DateTime
+  status             CouponStatus   @default(ACTIVE)
+  isDeleted          Boolean        @default(false)
+  deletedAt          DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  orders             Order[]
+  usages             CouponUsage[]
+
+  @@index([code])
+  @@index([status])
+  @@index([validFrom, validTo])
+}
+
+model CouponUsage {
+  id                   String          @id @default(uuid())
+  couponId             String
+  customerProfileId    String
+  orderId              String
+  discountAppliedPaisa BigInt
+  usedAt               DateTime        @default(now())
+
+  coupon               Coupon          @relation(fields: [couponId], references: [id], onDelete: Restrict)
+  customerProfile      CustomerProfile @relation(fields: [customerProfileId], references: [id], onDelete: Restrict)
+
+  @@index([couponId, customerProfileId])
+  @@index([orderId])
+}
+
+model TaxSlab {
+  id             String    @id @default(uuid())
+  name           String
+  categoryId     String?
+  hsnCode        String
+  slabPercentage Int
+  cessPercentage Decimal   @default(0.00) @db.Decimal(5, 2)
+  effectiveFrom  DateTime  @default(now())
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([hsnCode])
+  @@index([isActive])
 }
