@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { BrowserRouter, useLocation } from "react-router-dom";
+import { CartProvider } from "../lib/context/CartContext.jsx";
+import { WishlistProvider } from "../lib/context/WishlistContext.jsx";
 import AppRoutes from "./routes.jsx";
 
 function ScrollToTop() {
@@ -16,9 +18,13 @@ function ScrollToTop() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <AppRoutes />
-    </BrowserRouter>
+    <CartProvider>
+      <WishlistProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <AppRoutes />
+        </BrowserRouter>
+      </WishlistProvider>
+    </CartProvider>
   );
 }
