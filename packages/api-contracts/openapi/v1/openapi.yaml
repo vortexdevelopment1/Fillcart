@@ -791,3 +791,151 @@ components:
       properties:
         error:
           $ref: "#/components/schemas/ErrorDetail"
+
+    CategoryTreeItem:
+      type: object
+      required: [id, name, slug, iconName, displayOrder, isActive]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        iconName:
+          type: string
+        parentCategoryId:
+          type: string
+          format: uuid
+        displayOrder:
+          type: integer
+        isActive:
+          type: boolean
+        subCategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryTreeItem"
+
+    CreateCategoryRequest:
+      type: object
+      required: [name, iconName]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        iconName:
+          type: string
+        parentCategoryId:
+          type: string
+          format: uuid
+        displayOrder:
+          type: integer
+          default: 0
+        isActive:
+          type: boolean
+          default: true
+
+    UpdateCategoryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        iconName:
+          type: string
+        parentCategoryId:
+          type: string
+          format: uuid
+        displayOrder:
+          type: integer
+        isActive:
+          type: boolean
+
+    CreateVariantInput:
+      type: object
+      required: [sku, variantName, unitQuantity, unitType, mrpPaisa, salePricePaisa]
+      properties:
+        sku:
+          type: string
+        barcode:
+          type: string
+        variantName:
+          type: string
+        unitQuantity:
+          type: number
+        unitType:
+          type: string
+          enum: [GRAM, KG, MILLILITER, LITER, PIECE, PACK, METER]
+        mrpPaisa:
+          type: string
+          description: String of paisa (e.g. "19900" for INR 199.00)
+        salePricePaisa:
+          type: string
+          description: String of paisa (e.g. "17900" for INR 179.00)
+        discountPct:
+          type: integer
+          default: 0
+        isDefault:
+          type: boolean
+          default: false
+
+    CreateProductRequest:
+      type: object
+      required: [name, categoryId, variants]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        categoryId:
+          type: string
+          format: uuid
+        brandId:
+          type: string
+          format: uuid
+        hsnCode:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, DRAFT, ARCHIVED]
+          default: DRAFT
+        variants:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateVariantInput"
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        categoryId:
+          type: string
+          format: uuid
+        brandId:
+          type: string
+          format: uuid
+        hsnCode:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, DRAFT, ARCHIVED]
+        variants:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateVariantInput"

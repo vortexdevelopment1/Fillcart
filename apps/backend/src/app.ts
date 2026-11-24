@@ -24,10 +24,31 @@ import {
 } from "./modules/auth/services/index.js";
 import { AuthController } from "./modules/auth/controllers/auth.controller.js";
 import { createAuthRouter } from "./modules/auth/routes/auth.routes.js";
-import { createAdminAuthMiddleware } from "./modules/admin/middleware/index.js";
-import { AdminAuthService, StaffService } from "./modules/admin/services/index.js";
-import { AdminAuthController, StaffController } from "./modules/admin/controllers/index.js";
+import {
+  createAdminAuthMiddleware,
+  createRequireSettingsAccessMiddleware,
+} from "./modules/admin/middleware/index.js";
+import {
+  AdminAuthService,
+  StaffService,
+} from "./modules/admin/services/index.js";
+import {
+  AdminAuthController,
+  StaffController,
+} from "./modules/admin/controllers/index.js";
 import { createAdminRouter } from "./modules/admin/routes/index.js";
+import { CategoriesService } from "./modules/admin/catalogue/services/categories.service.js";
+import { BrandsService } from "./modules/admin/catalogue/services/brands.service.js";
+import { ProductsService } from "./modules/admin/catalogue/services/products.service.js";
+import { InventoryService } from "./modules/admin/catalogue/services/inventory.service.js";
+import { CategoriesController } from "./modules/admin/catalogue/controllers/categories.controller.js";
+import { BrandsController } from "./modules/admin/catalogue/controllers/brands.controller.js";
+import { ProductsController } from "./modules/admin/catalogue/controllers/products.controller.js";
+import { InventoryController } from "./modules/admin/catalogue/controllers/inventory.controller.js";
+import { SettingsService } from "./modules/admin/settings/services/settings.service.js";
+import { SettingsController } from "./modules/admin/settings/controllers/settings.controller.js";
+import { AuditLogsService } from "./modules/admin/audit-logs/services/audit-logs.service.js";
+import { AuditLogsController } from "./modules/admin/audit-logs/controllers/audit-logs.controller.js";
 
 /**
  * Express application factory.
@@ -83,14 +104,38 @@ export function createApp(config: AppConfig): Express {
   // Super Admin Module Dependencies & Services
   // ---------------------------------------------------------------------------
   const adminAuthMiddleware = createAdminAuthMiddleware(prisma, cryptoService);
+  const requireSettingsAccessMiddleware = createRequireSettingsAccessMiddleware(cryptoService);
   const adminAuthService = new AdminAuthService(prisma, cryptoService);
   const staffService = new StaffService(prisma, cryptoService);
   const adminAuthController = new AdminAuthController(adminAuthService);
   const staffController = new StaffController(staffService);
+
+  const categoriesService = new CategoriesService(prisma);
+  const brandsService = new BrandsService(prisma);
+  const productsService = new ProductsService(prisma);
+  const inventoryService = new InventoryService(prisma);
+  const categoriesController = new CategoriesController(categoriesService);
+  const brandsController = new BrandsController(brandsService);
+  const productsController = new ProductsController(productsService);
+  const inventoryController = new InventoryController(inventoryService);
+
+  const settingsService = new SettingsService(prisma);
+  const settingsController = new SettingsController(settingsService);
+
+  const auditLogsService = new AuditLogsService(prisma);
+  const auditLogsController = new AuditLogsController(auditLogsService);
+
   const adminRouter = createAdminRouter({
     adminAuthMiddleware,
     adminAuthController,
     staffController,
+    categoriesController,
+    brandsController,
+    productsController,
+    inventoryController,
+    settingsController,
+    auditLogsController,
+    requireSettingsAccessMiddleware,
   });
 
   // 6. Root Endpoints & Well-Known
