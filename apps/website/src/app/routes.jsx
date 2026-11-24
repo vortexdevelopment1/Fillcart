@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useSearchParams } from "react-router-dom";
 import AppKartHome from "../features/home/AppKartHome.jsx";
 import StoresListingPage from "../features/stores/StoresListingPage.jsx";
@@ -13,6 +14,20 @@ import ProfileOrders from "../features/profile/ProfileOrders.jsx";
 import ProfileAddresses from "../features/profile/ProfileAddresses.jsx";
 import ProfilePrescriptions from "../features/profile/ProfilePrescriptions.jsx";
 import ProfileAccount from "../features/profile/ProfileAccount.jsx";
+import AboutPage from "../features/about/AboutPage.jsx";
+import ContactPage from "../features/contact/ContactPage.jsx";
+import SupportPage from "../features/support/SupportPage.jsx";
+import LegalPage from "../features/legal/LegalPage.jsx";
+import FeaturesPage from "../features/misc/FeaturesPage.jsx";
+import HowItWorksPage from "../features/misc/HowItWorksPage.jsx";
+import BecomeVendorPage from "../features/vendors/BecomeVendorPage.jsx";
+import BecomeRiderPage from "../features/services/BecomeRiderPage.jsx";
+import CareersPage from "../features/careers/CareersPage.jsx";
+import BlogPage from "../features/misc/BlogPage.jsx";
+import SubscriptionPage from "../features/misc/SubscriptionPage.jsx";
+import NotFoundPage from "../features/misc/NotFoundPage.jsx";
+
+const StyleguidePage = lazy(() => import("../features/misc/StyleguidePage.jsx"));
 
 function CategoriesRedirect() {
   const [searchParams] = useSearchParams();
@@ -32,10 +47,10 @@ function CategoriesRedirect() {
  * - Phase 6: feat/website-cart (/cart, /wishlist)
  * - Phase 7: feat/website-offers (/offers/payment, /payment-offers)
  * - Phase 8: feat/website-profile (/profile, /profile/orders, /profile/addresses, /profile/prescriptions, /profile/account, /profile/:tab)
+ * - Phase 9: feat/website-pages (/about, /contact, /support, /faq, /help, /terms, /privacy, /how-it-works, /features, /careers, /blog, /subscriptions, /become-vendor, /partner/vendor, /become-rider, /partner/rider, /styleguide, *)
  *
- * Upcoming feature routes (Phases 9 - 10):
- * - Phase 9: feat/website-pages (/about, /contact, /support, /terms, /privacy, etc.)
- * - Phase 10: feat/website-auth (/login, /register)
+ * Upcoming feature route (Phase 10):
+ * - Phase 10: feat/website-auth (/login, /register, /login/customer)
  */
 export default function AppRoutes() {
   return (
@@ -75,15 +90,38 @@ export default function AppRoutes() {
       <Route path="/profile/account" element={<ProfileAccount />} />
       <Route path="/profile/:tab" element={<UserProfilePage />} />
 
-      {/* Fallback */}
-      <Route
-        path="*"
-        element={
-          <div className="min-h-screen flex items-center justify-center text-gray-600">
-            Page pending feature migration
-          </div>
-        }
-      />
+      {/* Content & Legal Pages (Phase 9) */}
+      <Route path="/features" element={<FeaturesPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/support" element={<SupportPage />} />
+      <Route path="/faq" element={<Navigate to="/support" replace />} />
+      <Route path="/help" element={<Navigate to="/support" replace />} />
+      <Route path="/subscriptions" element={<SubscriptionPage />} />
+      <Route path="/careers" element={<CareersPage />} />
+      <Route path="/blog" element={<BlogPage />} />
+      <Route path="/terms" element={<LegalPage />} />
+      <Route path="/privacy" element={<LegalPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/how-it-works" element={<HowItWorksPage />} />
+      <Route path="/become-vendor" element={<BecomeVendorPage />} />
+      <Route path="/partner/vendor" element={<BecomeVendorPage />} />
+      <Route path="/become-rider" element={<BecomeRiderPage />} />
+      <Route path="/partner/rider" element={<BecomeRiderPage />} />
+
+      {/* Dev-only styleguide route */}
+      {(import.meta.env.DEV || import.meta.env.MODE !== "production") && (
+        <Route
+          path="/styleguide"
+          element={
+            <Suspense fallback={<div className="p-8 text-center text-sm font-bold text-[#101828]">Loading styleguide...</div>}>
+              <StyleguidePage />
+            </Suspense>
+          }
+        />
+      )}
+
+      {/* 404 Not Found Page */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
