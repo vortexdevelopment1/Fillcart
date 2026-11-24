@@ -5,6 +5,8 @@ import StoreDetailPage from "../features/stores/StoreDetailPage.jsx";
 import CategoryListingPage from "../features/catalog/CategoryListingPage.jsx";
 import SearchResultsPage from "../features/catalog/SearchResultsPage.jsx";
 import ProductDetailPage from "../features/product/ProductDetailPage.jsx";
+import CartPage from "../features/cart/CartPage.jsx";
+import WishlistPage from "../features/wishlist/WishlistPage.jsx";
 
 function CategoriesRedirect() {
   const [searchParams] = useSearchParams();
@@ -21,9 +23,9 @@ function CategoriesRedirect() {
  * - Phase 3: feat/website-home (/)
  * - Phase 4: feat/website-stores (/stores, /store/:slug, /shops)
  * - Phase 5: feat/website-catalog (/category/:slug, /categories, /groceries, /category, /search, /product/:slug, /product/:id)
- *
- * Upcoming feature routes (Phases 6 - 10):
  * - Phase 6: feat/website-cart (/cart, /wishlist)
+ *
+ * Upcoming feature routes (Phases 7 - 10):
  * - Phase 7: feat/website-offers (/offers/payment, /payment-offers)
  * - Phase 8: feat/website-profile (/profile/*)
  * - Phase 9: feat/website-pages (/about, /contact, /support, /terms, /privacy, etc.)
@@ -50,6 +52,10 @@ export default function AppRoutes() {
       {/* Product Detail */}
       <Route path="/product/:slug" element={<ProductDetailPage />} />
       <Route path="/product/:id" element={<ProductDetailPage />} />
+
+      {/* Cart & Wishlist */}
+      <Route path="/cart" element={<CartPage />} />
+      <Route path="/wishlist" element={<WishlistPage />} />
 
       {/* Fallback */}
       <Route
