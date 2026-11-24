@@ -9,8 +9,34 @@ import type {
   InviteStaffResponse,
   UpdateStaffStatusPayload,
   UpdateStaffStatusResponse,
+  BackendCategoryItem,
+  CreateCategoryPayload,
+  UpdateCategoryPayload,
+  ReorderCategoryItem,
+  BackendBrandItem,
+  CreateBrandPayload,
+  UpdateBrandPayload,
+  BackendProductItem,
+  GetProductsParams,
+  GetProductsResponse,
+  CreateProductPayload,
+  UpdateProductPayload,
+  ModerateProductPayload,
+  BulkUpdateProductStatusPayload,
+  BackendInventoryItem,
+  GetInventoryParams,
+  GetInventoryResponse,
+  AdjustInventoryPayload,
+  SettingsTabId,
+  BackendSettingsGroupResponse,
+  BackendAuditLogItem,
+  GetAuditLogsParams,
+  GetAuditLogsResponse,
 } from '../types/adminApi';
 import { initialStaff, initialRolePermissions } from '../data/staffData';
+import { initialCategories, initialProducts } from '../data/products';
+import { initialSettings } from '../data/settingsData';
+import { initialAuditLogs } from '../data/auditData';
 
 export class AdminApiError extends Error {
   public code: string;
@@ -403,6 +429,638 @@ export const adminApi = {
 
     try {
       const res = await adminClient.patch<UpdateStaffStatusResponse>(`/staff/${id}/status`, payload);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Categories Module
+  // ---------------------------------------------------------------------------
+
+  /**
+   * GET /api/v1/admin/categories
+   */
+  getCategories: async (includeInactive = true): Promise<{ items: BackendCategoryItem[] }> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      const items: BackendCategoryItem[] = initialCategories.map((c, idx) => ({
+        id: c.id,
+        name: c.name,
+        slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        description: `${c.name} category`,
+        iconName: c.iconName,
+        parentCategoryId: null,
+        displayOrder: idx + 1,
+        isActive: c.isActive,
+        subCategories: [],
+        _count: { products: c.productCount },
+      }));
+      return { items };
+    }
+
+    try {
+      const res = await adminClient.get<{ items: BackendCategoryItem[] }>('/categories', {
+        params: { includeInactive },
+      });
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/categories
+   */
+  createCategory: async (payload: CreateCategoryPayload): Promise<BackendCategoryItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 300));
+      return {
+        id: `cat-${Date.now()}`,
+        name: payload.name,
+        slug: payload.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        description: payload.description || null,
+        iconName: payload.iconName || 'Package',
+        parentCategoryId: payload.parentCategoryId || null,
+        displayOrder: payload.displayOrder || 1,
+        isActive: payload.isActive ?? true,
+        subCategories: [],
+        _count: { products: 0 },
+      };
+    }
+
+    try {
+      const res = await adminClient.post<BackendCategoryItem>('/categories', payload);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/categories/:id
+   */
+  updateCategory: async (id: string, payload: UpdateCategoryPayload): Promise<BackendCategoryItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      return {
+        id,
+        name: payload.name || 'Updated Category',
+        slug: (payload.name || 'category').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        description: payload.description || null,
+        iconName: payload.iconName || 'Package',
+        parentCategoryId: payload.parentCategoryId || null,
+        displayOrder: payload.displayOrder || 1,
+        isActive: payload.isActive ?? true,
+        subCategories: [],
+        _count: { products: 0 },
+      };
+    }
+
+    try {
+      const res = await adminClient.put<BackendCategoryItem>(`/categories/${id}`, payload);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * PATCH /api/v1/admin/categories/:id/status
+   */
+  updateCategoryStatus: async (id: string, isActive: boolean): Promise<BackendCategoryItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 150));
+      return {
+        id,
+        name: 'Toggled Category',
+        slug: 'toggled-category',
+        displayOrder: 1,
+        isActive,
+        subCategories: [],
+      };
+    }
+
+    try {
+      const res = await adminClient.patch<BackendCategoryItem>(`/categories/${id}/status`, { isActive });
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/categories/reorder
+   */
+  reorderCategories: async (items: ReorderCategoryItem[]): Promise<{ reordered: ReorderCategoryItem[] }> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      return { reordered: items };
+    }
+
+    try {
+      const res = await adminClient.put<{ reordered: ReorderCategoryItem[] }>('/categories/reorder', { items });
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Brands Module
+  // ---------------------------------------------------------------------------
+
+  /**
+   * GET /api/v1/admin/brands
+   */
+  getBrands: async (params?: { page?: number; limit?: number; search?: string; isActive?: boolean }): Promise<{ items: BackendBrandItem[]; pagination: any }> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      return {
+        items: [
+          { id: 'b-1', name: 'Aashirvaad', slug: 'aashirvaad', logoUrl: null, isActive: true },
+          { id: 'b-2', name: 'Amul', slug: 'amul', logoUrl: null, isActive: true },
+          { id: 'b-3', name: 'Fortune', slug: 'fortune', logoUrl: null, isActive: true },
+          { id: 'b-4', name: 'Tata', slug: 'tata', logoUrl: null, isActive: true },
+          { id: 'b-5', name: 'Nestle', slug: 'nestle', logoUrl: null, isActive: true },
+        ],
+        pagination: { page: 1, limit: 10, total: 5, totalPages: 1 },
+      };
+    }
+
+    try {
+      const res = await adminClient.get<{ items: BackendBrandItem[]; pagination: any }>('/brands', { params });
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/brands
+   */
+  createBrand: async (payload: CreateBrandPayload): Promise<BackendBrandItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      return {
+        id: `brand-${Date.now()}`,
+        name: payload.name,
+        slug: payload.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        logoUrl: payload.logoUrl || null,
+        isActive: payload.isActive ?? true,
+      };
+    }
+
+    try {
+      const res = await adminClient.post<BackendBrandItem>('/brands', payload);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/brands/:id
+   */
+  updateBrand: async (id: string, payload: UpdateBrandPayload): Promise<BackendBrandItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      return {
+        id,
+        name: payload.name || 'Brand',
+        slug: 'brand',
+        logoUrl: payload.logoUrl || null,
+        isActive: payload.isActive ?? true,
+      };
+    }
+
+    try {
+      const res = await adminClient.put<BackendBrandItem>(`/brands/${id}`, payload);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * PATCH /api/v1/admin/brands/:id/status
+   */
+  updateBrandStatus: async (id: string, isActive: boolean): Promise<BackendBrandItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 150));
+      return { id, name: 'Brand', slug: 'brand', isActive };
+    }
+
+    try {
+      const res = await adminClient.patch<BackendBrandItem>(`/brands/${id}/status`, { isActive });
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Products Module
+  // ---------------------------------------------------------------------------
+
+  /**
+   * GET /api/v1/admin/products
+   */
+  getProducts: async (params?: GetProductsParams): Promise<GetProductsResponse> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 300));
+      const items: BackendProductItem[] = initialProducts.map((p, idx) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        description: p.description || null,
+        categoryId: `cat-${idx + 1}`,
+        brandId: null,
+        hsnCode: null,
+        status: p.isActive ? 'ACTIVE' : 'INACTIVE',
+        moderationStatus: p.status === 'Pending approval' ? 'PENDING' : p.status === 'Rejected' ? 'REJECTED' : 'APPROVED',
+        rejectionReason: p.rejectReason || null,
+        isActive: p.isActive,
+        category: { id: `cat-${idx + 1}`, name: p.category },
+        brand: { id: `brand-${idx + 1}`, name: p.brand },
+        variants: [
+          {
+            id: `var-${p.id}`,
+            productId: p.id,
+            sku: p.sku,
+            variantName: p.unit,
+            unitQuantity: 1,
+            unitType: 'UNIT',
+            mrpPaisa: Math.round(p.mrp * 100).toString(),
+            salePricePaisa: Math.round(p.salePrice * 100).toString(),
+            discountPct: p.discountPct,
+            isDefault: true,
+          },
+        ],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }));
+
+      return {
+        items,
+        pagination: { page: 1, limit: 50, total: items.length, totalPages: 1 },
+      };
+    }
+
+    try {
+      const res = await adminClient.get<GetProductsResponse>('/products', { params });
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * GET /api/v1/admin/products/:id
+   */
+  getProductById: async (id: string): Promise<BackendProductItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      const p = initialProducts.find((i) => i.id === id) || initialProducts[0];
+      return {
+        id: p.id,
+        name: p.name,
+        slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        description: p.description || null,
+        categoryId: 'cat-1',
+        brandId: null,
+        hsnCode: null,
+        status: p.isActive ? 'ACTIVE' : 'INACTIVE',
+        moderationStatus: 'APPROVED',
+        rejectionReason: null,
+        isActive: p.isActive,
+        category: { id: 'cat-1', name: p.category },
+        brand: { id: 'brand-1', name: p.brand },
+        variants: [
+          {
+            id: `var-${p.id}`,
+            productId: p.id,
+            sku: p.sku,
+            variantName: p.unit,
+            unitQuantity: 1,
+            unitType: 'UNIT',
+            mrpPaisa: Math.round(p.mrp * 100).toString(),
+            salePricePaisa: Math.round(p.salePrice * 100).toString(),
+            discountPct: p.discountPct,
+            isDefault: true,
+          },
+        ],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    try {
+      const res = await adminClient.get<BackendProductItem>(`/products/${id}`);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/products
+   */
+  createProduct: async (payload: CreateProductPayload): Promise<BackendProductItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 300));
+      const newId = `prod-${Date.now()}`;
+      return {
+        id: newId,
+        name: payload.name,
+        slug: payload.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        description: payload.description || null,
+        categoryId: payload.categoryId,
+        brandId: payload.brandId || null,
+        hsnCode: payload.hsnCode || null,
+        status: payload.status || 'ACTIVE',
+        moderationStatus: 'APPROVED',
+        rejectionReason: null,
+        isActive: true,
+        variants: payload.variants.map((v, i) => ({
+          id: `var-${newId}-${i}`,
+          productId: newId,
+          sku: v.sku,
+          variantName: v.variantName,
+          unitQuantity: v.unitQuantity,
+          unitType: v.unitType || 'UNIT',
+          mrpPaisa: v.mrpPaisa,
+          salePricePaisa: v.salePricePaisa,
+          discountPct: v.discountPct || 0,
+          isDefault: v.isDefault ?? true,
+        })),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    try {
+      const res = await adminClient.post<BackendProductItem>('/products', payload);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/products/:id
+   */
+  updateProduct: async (id: string, payload: UpdateProductPayload): Promise<BackendProductItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 300));
+      return {
+        id,
+        name: payload.name || 'Updated Product',
+        slug: 'updated-product',
+        description: payload.description || null,
+        categoryId: payload.categoryId || 'cat-1',
+        brandId: payload.brandId || null,
+        hsnCode: payload.hsnCode || null,
+        status: payload.status || 'ACTIVE',
+        moderationStatus: 'APPROVED',
+        rejectionReason: null,
+        isActive: true,
+        variants: (payload.variants || []).map((v, i) => ({
+          id: `var-${id}-${i}`,
+          productId: id,
+          sku: v.sku,
+          variantName: v.variantName,
+          unitQuantity: v.unitQuantity,
+          unitType: v.unitType || 'UNIT',
+          mrpPaisa: v.mrpPaisa,
+          salePricePaisa: v.salePricePaisa,
+          discountPct: v.discountPct || 0,
+          isDefault: v.isDefault ?? true,
+        })),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    try {
+      const res = await adminClient.put<BackendProductItem>(`/products/${id}`, payload);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * PATCH /api/v1/admin/products/:id/status
+   */
+  updateProductStatus: async (id: string, status: 'ACTIVE' | 'INACTIVE' | 'DRAFT' | 'ARCHIVED'): Promise<BackendProductItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      return {
+        id,
+        name: 'Product',
+        slug: 'product',
+        categoryId: 'cat-1',
+        status,
+        moderationStatus: 'APPROVED',
+        isActive: status === 'ACTIVE',
+        variants: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    try {
+      const res = await adminClient.patch<BackendProductItem>(`/products/${id}/status`, { status });
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/products/:id/moderate
+   */
+  moderateProduct: async (id: string, payload: ModerateProductPayload): Promise<BackendProductItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 250));
+      const modStatus = payload.action === 'APPROVE' ? 'APPROVED' : payload.action === 'REJECT' ? 'REJECTED' : 'CHANGES_REQUESTED';
+      return {
+        id,
+        name: 'Moderated Product',
+        slug: 'moderated-product',
+        categoryId: 'cat-1',
+        status: payload.action === 'APPROVE' ? 'ACTIVE' : 'INACTIVE',
+        moderationStatus: modStatus,
+        rejectionReason: payload.reason || null,
+        isActive: payload.action === 'APPROVE',
+        variants: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    try {
+      const res = await adminClient.post<BackendProductItem>(`/products/${id}/moderate`, payload);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/products/bulk-status
+   */
+  bulkUpdateProductStatus: async (payload: BulkUpdateProductStatusPayload): Promise<{ affectedCount: number; status: string }> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 300));
+      return { affectedCount: payload.productIds.length, status: payload.status };
+    }
+
+    try {
+      const res = await adminClient.post<{ affectedCount: number; status: string }>('/products/bulk-status', payload);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Inventory Module
+  // ---------------------------------------------------------------------------
+
+  /**
+   * GET /api/v1/admin/inventory
+   */
+  getInventory: async (params?: GetInventoryParams): Promise<GetInventoryResponse> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      return {
+        items: [],
+        pagination: { page: 1, limit: 10, total: 0, totalPages: 0 },
+      };
+    }
+
+    try {
+      const res = await adminClient.get<GetInventoryResponse>('/inventory', { params });
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/inventory/adjust
+   */
+  adjustInventory: async (payload: AdjustInventoryPayload): Promise<BackendInventoryItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 250));
+      return {
+        id: `inv-${Date.now()}`,
+        storeId: payload.storeId,
+        variantId: payload.variantId,
+        quantityOnHand: payload.adjustmentQuantity,
+        reservedQuantity: 0,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    try {
+      const res = await adminClient.post<BackendInventoryItem>('/inventory/adjust', payload);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Settings Module
+  // ---------------------------------------------------------------------------
+
+  /**
+   * GET /api/v1/admin/settings/:group
+   */
+  getSettingsGroup: async (group: SettingsTabId): Promise<BackendSettingsGroupResponse> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      const groupKey = group.toLowerCase() as keyof typeof initialSettings;
+      return {
+        group,
+        settings: (initialSettings as any)[groupKey] || {},
+      };
+    }
+
+    try {
+      const grantToken = sessionStorage.getItem('fillkart_settings_grant_token');
+      const res = await adminClient.get<BackendSettingsGroupResponse>(`/settings/${group}`, {
+        headers: grantToken ? { 'x-settings-grant': grantToken } : {},
+      });
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/settings/:group
+   */
+  updateSettingsGroup: async (group: SettingsTabId, settings: Record<string, any>): Promise<BackendSettingsGroupResponse> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 300));
+      return { group, settings };
+    }
+
+    try {
+      const grantToken = sessionStorage.getItem('fillkart_settings_grant_token');
+      const res = await adminClient.put<BackendSettingsGroupResponse>(
+        `/settings/${group}`,
+        { settings },
+        {
+          headers: grantToken ? { 'x-settings-grant': grantToken } : {},
+        }
+      );
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Audit Logs Module
+  // ---------------------------------------------------------------------------
+
+  /**
+   * GET /api/v1/admin/audit-logs
+   */
+  getAuditLogs: async (params?: GetAuditLogsParams): Promise<GetAuditLogsResponse> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 250));
+      const items: BackendAuditLogItem[] = initialAuditLogs.map((l) => ({
+        id: l.id,
+        adminUserId: 'mock-admin-1',
+        action: l.action,
+        targetType: l.module,
+        targetId: l.target,
+        changesSummary: l.diff ? { before: {}, after: {} } : null,
+        ipAddress: l.ip,
+        userAgent: l.browser,
+        createdAt: new Date().toISOString(),
+        adminUser: {
+          id: 'mock-admin-1',
+          email: l.admin.email,
+          fullName: l.admin.name,
+        },
+      }));
+
+      return {
+        items,
+        pagination: { page: 1, limit: 50, total: items.length, totalPages: 1 },
+      };
+    }
+
+    try {
+      const res = await adminClient.get<GetAuditLogsResponse>('/audit-logs', { params });
       return res.data;
     } catch (err) {
       throw parseApiError(err);

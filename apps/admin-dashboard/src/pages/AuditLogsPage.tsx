@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AuditLogEntry, AuditAction, ApiLogEntry, initialApiLogs } from '../data/auditData';
+import { auditService } from '../services/auditService';
 import { CustomSelect } from '../components/common/CustomSelect';
 import { SearchInput } from '../components/common/SearchInput';
 import {
@@ -45,7 +46,27 @@ const RETENTION_DAYS: Record<AuditTab, number> = {
 
 export const AuditLogsPage: React.FC = () => {
   const { auditLogs, currentRole } = useApp();
+  const [liveLogs, setLiveLogs] = useState<AuditLogEntry[]>(auditLogs);
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Fetch live audit logs from backend on mount
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLiveLogs = async () => {
+      try {
+        const res = await auditService.getAuditLogs();
+        if (isMounted && res.success && res.data && res.data.length > 0) {
+          setLiveLogs(res.data);
+        }
+      } catch (err) {
+        console.warn('Audit logs fetch error:', err);
+      }
+    };
+    fetchLiveLogs();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Role-based allowed tabs
   const allowedTabs = useMemo<AuditTab[]>(() => {
@@ -122,18 +143,18 @@ export const AuditLogsPage: React.FC = () => {
 
   // Distinct admins and modules for filter dropdowns
   const adminNames = useMemo<string[]>(() => {
-    const set = new Set(auditLogs.map((l) => l.admin.name));
+    const set = new Set(liveLogs.map((l) => l.admin.name));
     return Array.from(set);
-  }, [auditLogs]);
+  }, [liveLogs]);
 
   const moduleNames = useMemo<string[]>(() => {
-    const set = new Set(auditLogs.map((l) => l.module));
+    const set = new Set(liveLogs.map((l) => l.module));
     return Array.from(set);
-  }, [auditLogs]);
+  }, [liveLogs]);
 
   // Filtered standard audit logs
   const filteredAuditLogs = useMemo(() => {
-    return auditLogs.filter((log) => {
+    return liveLogs.filter((log) => {
       // Role constraint: Finance Admin sees only Payments module under Admin Audit
       if (currentRole === 'Finance Admin' && activeTab === 'Admin Audit') {
         if (log.module !== 'Payments' && log.module !== 'Settlements' && log.module !== 'Finance') {

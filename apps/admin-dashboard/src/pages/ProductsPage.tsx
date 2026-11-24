@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, Upload, FileText } from 'lucide-react';
 import {
   initialProducts,
@@ -6,6 +6,7 @@ import {
   Product,
   Category,
 } from '../data/products';
+import { productsService, categoriesService } from '../services/productsService';
 import { StatCardBlack } from '../components/products/StatCardBlack';
 import { StatCardPrimary } from '../components/products/StatCardPrimary';
 import { TopCategoriesChart } from '../components/products/TopCategoriesChart';
@@ -58,8 +59,40 @@ export const ProductsPage: React.FC = () => {
     }, 2800);
   };
 
+  // Fetch real catalogue data on mount
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCatalogue = async () => {
+      try {
+        const [catsRes, prodsRes] = await Promise.all([
+          categoriesService.getCategories(),
+          productsService.getProducts(),
+        ]);
+        if (isMounted) {
+          if (catsRes.success && catsRes.data && catsRes.data.length > 0) {
+            setCategories(catsRes.data);
+          }
+          if (prodsRes.success && prodsRes.data && prodsRes.data.length > 0) {
+            setProducts(prodsRes.data);
+          }
+        }
+      } catch (err) {
+        console.warn('Catalogue load error:', err);
+      }
+    };
+    fetchCatalogue();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Status handlers
-  const handleApproveProduct = (product: Product) => {
+  const handleApproveProduct = async (product: Product) => {
+    try {
+      await productsService.approveProduct(product.id);
+    } catch (err: any) {
+      console.warn('Approve error:', err);
+    }
     setProducts((prev) =>
       prev.map((p) => (p.id === product.id ? { ...p, status: 'Active', isActive: true } : p))
     );
@@ -67,7 +100,12 @@ export const ProductsPage: React.FC = () => {
     logAudit?.('Approve', 'Products', product.name, 'Approved vendor product listing', 'Admin Audit');
   };
 
-  const handleRejectProduct = (product: Product, reason: string) => {
+  const handleRejectProduct = async (product: Product, reason: string) => {
+    try {
+      await productsService.rejectProduct(product.id, reason);
+    } catch (err: any) {
+      console.warn('Reject error:', err);
+    }
     setProducts((prev) =>
       prev.map((p) => (p.id === product.id ? { ...p, status: 'Rejected', rejectReason: reason, isActive: false } : p))
     );
@@ -75,8 +113,17 @@ export const ProductsPage: React.FC = () => {
     logAudit?.('Update', 'Products', product.name, `Rejected listing: ${reason}`, 'Admin Audit');
   };
 
-  const handleToggleProductStatus = (product: Product) => {
+  const handleToggleProductStatus = async (product: Product) => {
     const nextStatus = product.status === 'Active' ? 'Inactive' : 'Active';
+    try {
+      if (nextStatus === 'Active') {
+        await productsService.enableProduct(product.id);
+      } else {
+        await productsService.disableProduct(product.id);
+      }
+    } catch (err: any) {
+      console.warn('Toggle status error:', err);
+    }
     setProducts((prev) =>
       prev.map((p) => (p.id === product.id ? { ...p, status: nextStatus, isActive: nextStatus === 'Active' } : p))
     );
@@ -108,18 +155,36 @@ export const ProductsPage: React.FC = () => {
     });
   };
 
-  const handleSaveProduct = (productData: Partial<Product>) => {
+  const handleSaveProduct = async (productData: Partial<Product>) => {
+    const matchedCategory = categories.find((c) => c.name === productData.category);
+    const categoryId = matchedCategory?.id || categories[0]?.id || 'cat-1';
+
     if (editingProduct) {
+      try {
+        await productsService.updateProduct(editingProduct.id, productData, categoryId);
+      } catch (err: any) {
+        console.warn('Update product error:', err);
+      }
       setProducts((prev) =>
         prev.map((p) => (p.id === editingProduct.id ? ({ ...p, ...productData } as Product) : p))
       );
       showToast(`Updated "${productData.name || editingProduct.name}"`);
     } else {
+      let createdProduct: Product | null = null;
+      try {
+        const res = await productsService.createProduct(productData, categoryId);
+        if (res.success && res.data) {
+          createdProduct = res.data;
+        }
+      } catch (err: any) {
+        console.warn('Create product error:', err);
+      }
+
       const mrpVal = productData.mrp ?? 100;
       const saleVal = productData.salePrice ?? mrpVal;
       const discount = mrpVal > 0 ? Math.round(((mrpVal - saleVal) / mrpVal) * 100) : 0;
 
-      const newProduct: Product = {
+      const newProduct: Product = createdProduct || {
         id: `prod-${Date.now()}`,
         name: productData.name || 'New Item',
         category: productData.category || (categories[0]?.name ?? 'Grocery & Staples'),
@@ -152,11 +217,17 @@ export const ProductsPage: React.FC = () => {
     setIsCategoryModalOpen(true);
   };
 
-  const handleToggleCategoryStatus = (categoryId: string) => {
+  const handleToggleCategoryStatus = async (categoryId: string) => {
+    const cat = categories.find((c) => c.id === categoryId);
+    const nextActive = cat ? !cat.isActive : true;
+    try {
+      await categoriesService.toggleCategoryStatus(categoryId, nextActive);
+    } catch (err: any) {
+      console.warn('Toggle category status error:', err);
+    }
     setCategories((prev) =>
       prev.map((c) => {
         if (c.id === categoryId) {
-          const nextActive = !c.isActive;
           showToast(`Marked "${c.name}" as ${nextActive ? 'Active' : 'Inactive'}`);
           return { ...c, isActive: nextActive };
         }
@@ -165,14 +236,34 @@ export const ProductsPage: React.FC = () => {
     );
   };
 
-  const handleSaveCategory = (categoryData: Partial<Category>) => {
+  const handleSaveCategory = async (categoryData: Partial<Category>) => {
     if (editingCategory) {
+      try {
+        await categoriesService.updateCategory(editingCategory.id, categoryData);
+      } catch (err: any) {
+        console.warn('Update category error:', err);
+      }
       setCategories((prev) =>
         prev.map((c) => (c.id === editingCategory.id ? ({ ...c, ...categoryData } as Category) : c))
       );
       showToast(`Updated category "${categoryData.name || editingCategory.name}"`);
     } else {
-      const newCat: Category = {
+      let createdCat: Category | null = null;
+      try {
+        const res = await categoriesService.createCategory({
+          name: categoryData.name || 'New Category',
+          iconName: categoryData.iconName || 'ShoppingBag',
+          isActive: categoryData.isActive ?? true,
+          parentCategory: categoryData.parentCategory,
+        });
+        if (res.success && res.data) {
+          createdCat = res.data;
+        }
+      } catch (err: any) {
+        console.warn('Create category error:', err);
+      }
+
+      const newCat: Category = createdCat || {
         id: `cat-${Date.now()}`,
         name: categoryData.name || 'New Category',
         iconName: categoryData.iconName || 'ShoppingBag',
@@ -186,13 +277,23 @@ export const ProductsPage: React.FC = () => {
   };
 
   // Confirm delete handler
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!deleteItem) return;
 
     if (deleteItem.type === 'product') {
+      try {
+        await productsService.disableProduct(deleteItem.id);
+      } catch (err: any) {
+        console.warn('Delete product error:', err);
+      }
       setProducts((prev) => prev.filter((p) => p.id !== deleteItem.id));
       showToast(`Deleted "${deleteItem.name}"`);
     } else {
+      try {
+        await categoriesService.deleteCategory(deleteItem.id);
+      } catch (err: any) {
+        console.warn('Delete category error:', err);
+      }
       setCategories((prev) => prev.filter((c) => c.id !== deleteItem.id));
       showToast(`Deleted category "${deleteItem.name}"`);
     }
