@@ -21,8 +21,7 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
   let isDbAvailable = false;
 
   beforeAll(async () => {
-    const authPriv = crypto.generateKeyPairSync("ed25519").privateKey;
-    const authPub = crypto.generateKeyPairSync("ed25519").publicKey;
+    const { privateKey: authPriv, publicKey: authPub } = crypto.generateKeyPairSync("ed25519");
     const jwtActivePrivateKeyPem = authPriv.export({ type: "pkcs8", format: "pem" }) as string;
     const jwtActivePublicKeyPem = authPub.export({ type: "spki", format: "pem" }) as string;
 
@@ -45,8 +44,8 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
     try {
       await prisma.$queryRaw`SELECT 1`;
       isDbAvailable = true;
-    } catch {
-      // Database not reachable in current environment
+    } catch (err: any) {
+      console.error("DB connection error in live test:", err?.message || err);
       return;
     }
 
@@ -65,7 +64,7 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
     });
 
     // 2. Create test admin user
-    adminUserId = "adm_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+    adminUserId = crypto.randomUUID();
     const adminEmail = `admin_probe_${Date.now()}@fillcart.internal`;
     await prisma.user.create({
       data: {
@@ -149,7 +148,7 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
         .post("/api/v1/admin/categories")
         .set("Authorization", `Bearer ${adminToken}`)
         .send({
-          name: "Groceries & Staples",
+          name: "Groceries & Staples " + Date.now(),
           description: "Fresh pantry, rice, flour, spices",
           iconName: "shopping-bag",
           displayOrder: 1,
@@ -157,7 +156,7 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
         });
 
       expect(res.status).toBe(201);
-      expect(res.body.name).toBe("Groceries & Staples");
+      expect(res.body.name).toContain("Groceries & Staples");
       parentCatId = res.body.id;
     });
 
@@ -166,7 +165,7 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
         .post("/api/v1/admin/categories")
         .set("Authorization", `Bearer ${adminToken}`)
         .send({
-          name: "Dairy & Eggs",
+          name: "Dairy & Eggs " + Date.now(),
           description: "Fresh milk, paneer, curd, eggs",
           iconName: "milk",
           parentCategoryId: parentCatId,
@@ -262,8 +261,11 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
     let productId: string;
     let variantId: string;
 
+    let productName: string;
+
     beforeAll(async () => {
       if (!isDbAvailable) return;
+      productName = "Organic Farm Whole Milk " + Date.now();
       const cat = await prisma.category.create({
         data: {
           name: "Fresh Produce " + Date.now(),
@@ -280,7 +282,7 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
         .post("/api/v1/admin/products")
         .set("Authorization", `Bearer ${adminToken}`)
         .send({
-          name: "Organic Farm Whole Milk",
+          name: productName,
           description: "Fresh pasteurized milk 3.5% fat",
           categoryId,
           status: "DRAFT",
@@ -299,7 +301,7 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
         });
 
       expect(res.status).toBe(201);
-      expect(res.body.name).toBe("Organic Farm Whole Milk");
+      expect(res.body.name).toBe(productName);
       expect(res.body.submittedByUserId).toBe(adminUserId);
       expect(res.body.variants).toHaveLength(1);
       expect(res.body.variants[0].mrpPaisa).toBe("7500");
@@ -384,7 +386,7 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
         expect(res.status).toBe(200);
         expect(res.body.items).toHaveLength(1);
         expect(res.body.items[0].quantityOnHand).toBe(50);
-        expect(res.body.items[0].productName).toBe("Organic Farm Whole Milk");
+        expect(res.body.items[0].productName).toBe(productName);
       });
     });
   });

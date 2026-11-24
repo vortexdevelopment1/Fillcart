@@ -531,6 +531,522 @@ paths:
               schema:
                 $ref: "#/components/schemas/DegradedResponse"
 
+  /api/v1/admin/categories:
+    get:
+      summary: Get Category Hierarchy Tree
+      operationId: getAdminCategories
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: includeInactive
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Hierarchical category tree
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+    post:
+      summary: Create Category
+      operationId: createAdminCategory
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategoryRequest"
+      responses:
+        "201":
+          description: Category created
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/categories/reorder:
+    put:
+      summary: Reorder Categories
+      operationId: reorderAdminCategories
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [id, displayOrder]
+                    properties:
+                      id: { type: string, format: uuid }
+                      displayOrder: { type: integer }
+                      parentCategoryId: { type: string, format: uuid, nullable: true }
+      responses:
+        "200":
+          description: Categories reordered
+
+  /api/v1/admin/categories/{id}:
+    get:
+      summary: Get Category Details
+      operationId: getAdminCategoryById
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Category details
+    put:
+      summary: Update Category
+      operationId: updateAdminCategory
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCategoryRequest"
+      responses:
+        "200":
+          description: Category updated
+
+  /api/v1/admin/categories/{id}/status:
+    patch:
+      summary: Toggle Category Active Status
+      operationId: toggleAdminCategoryStatus
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isActive]
+              properties:
+                isActive: { type: boolean }
+      responses:
+        "200":
+          description: Category status updated
+
+  /api/v1/admin/brands:
+    get:
+      summary: List Brands (Paginated)
+      operationId: getAdminBrands
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: isActive
+          in: query
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: Paginated brands list
+    post:
+      summary: Create Brand
+      operationId: createAdminBrand
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                slug: { type: string }
+                description: { type: string }
+                logoUrl: { type: string }
+                website: { type: string }
+                isActive: { type: boolean, default: true }
+      responses:
+        "201":
+          description: Brand created
+
+  /api/v1/admin/brands/{id}:
+    get:
+      summary: Get Brand Details
+      operationId: getAdminBrandById
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Brand details
+    put:
+      summary: Update Brand
+      operationId: updateAdminBrand
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                slug: { type: string }
+                description: { type: string }
+                logoUrl: { type: string }
+                website: { type: string }
+                isActive: { type: boolean }
+      responses:
+        "200":
+          description: Brand updated
+
+  /api/v1/admin/brands/{id}/status:
+    patch:
+      summary: Toggle Brand Status
+      operationId: toggleAdminBrandStatus
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isActive]
+              properties:
+                isActive: { type: boolean }
+      responses:
+        "200":
+          description: Brand status updated
+
+  /api/v1/admin/products:
+    get:
+      summary: List Products (Paginated & Filterable)
+      operationId: getAdminProducts
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: categoryId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: brandId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { type: string, enum: [ACTIVE, INACTIVE, DRAFT, ARCHIVED] }
+        - name: moderationStatus
+          in: query
+          schema: { type: string, enum: [PENDING_APPROVAL, APPROVED, REJECTED, CHANGES_REQUESTED] }
+        - name: lowStock
+          in: query
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: Paginated products list
+    post:
+      summary: Create Product with Variants
+      operationId: createAdminProduct
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductRequest"
+      responses:
+        "201":
+          description: Product created
+
+  /api/v1/admin/products/bulk-status:
+    post:
+      summary: Bulk Update Product Status
+      operationId: bulkUpdateAdminProductStatus
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productIds, status]
+              properties:
+                productIds:
+                  type: array
+                  items: { type: string, format: uuid }
+                status:
+                  type: string
+                  enum: [ACTIVE, INACTIVE, DRAFT, ARCHIVED]
+      responses:
+        "200":
+          description: Bulk status updated
+
+  /api/v1/admin/products/{id}:
+    get:
+      summary: Get Product Details
+      operationId: getAdminProductById
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Product details with string paisa
+    put:
+      summary: Update Product
+      operationId: updateAdminProduct
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProductRequest"
+      responses:
+        "200":
+          description: Product updated
+
+  /api/v1/admin/products/{id}/status:
+    patch:
+      summary: Toggle Product Status
+      operationId: toggleAdminProductStatus
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [ACTIVE, INACTIVE, DRAFT, ARCHIVED]
+      responses:
+        "200":
+          description: Product status updated
+
+  /api/v1/admin/products/{id}/moderate:
+    post:
+      summary: Moderate Product
+      operationId: moderateAdminProduct
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [APPROVE, REJECT, REQUEST_CHANGES]
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Moderation action applied
+
+  /api/v1/admin/inventory:
+    get:
+      summary: Read Inventory Balances
+      operationId: getAdminInventory
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: storeId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: variantId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: lowStock
+          in: query
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: Inventory balances list
+
+  /api/v1/admin/inventory/adjust:
+    post:
+      summary: Adjust Stock Balance
+      operationId: adjustAdminInventory
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [storeId, variantId, adjustmentQuantity, reason]
+              properties:
+                storeId: { type: string, format: uuid }
+                variantId: { type: string, format: uuid }
+                adjustmentQuantity: { type: integer }
+                reason: { type: string, minLength: 3 }
+      responses:
+        "200":
+          description: Stock adjusted
+
+  /api/v1/admin/settings/{group}:
+    get:
+      summary: Get Settings Group
+      description: Returns configuration for one of the 6 settings tabs with secrets masked.
+      operationId: getAdminSettingsGroup
+      security:
+        - AdminBearerAuth: []
+        - SettingsGrantHeader: []
+      parameters:
+        - name: group
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/SettingsTabId"
+      responses:
+        "200":
+          description: Settings group configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [group, settings]
+                properties:
+                  group:
+                    $ref: "#/components/schemas/SettingsTabId"
+                  settings:
+                    type: object
+    put:
+      summary: Update Settings Group
+      description: Updates configuration for one of the 6 settings tabs. Requires x-settings-grant header.
+      operationId: updateAdminSettingsGroup
+      security:
+        - AdminBearerAuth: []
+        - SettingsGrantHeader: []
+      parameters:
+        - name: group
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/SettingsTabId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSettingsGroupRequest"
+      responses:
+        "200":
+          description: Settings updated successfully
+
+  /api/v1/admin/audit-logs:
+    get:
+      summary: List Admin Audit Logs
+      description: Queries append-only admin audit log with filters and pagination.
+      operationId: getAdminAuditLogs
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: adminUserId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: targetType
+          in: query
+          schema: { type: string }
+        - name: targetId
+          in: query
+          schema: { type: string }
+        - name: action
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paginated audit logs
+
 components:
   securitySchemes:
     AdminBearerAuth:
@@ -939,3 +1455,21 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/CreateVariantInput"
+
+    SettingsTabId:
+      type: string
+      enum:
+        - GENERAL
+        - ORDERS
+        - ONBOARDING
+        - FINANCE
+        - NOTIFICATIONS
+        - SECURITY
+
+    UpdateSettingsGroupRequest:
+      type: object
+      required: [settings]
+      properties:
+        settings:
+          type: object
+          description: Key-value settings matching the target SettingsTabId structure
