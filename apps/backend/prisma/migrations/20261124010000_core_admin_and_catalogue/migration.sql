@@ -107,6 +107,8 @@ CREATE TABLE "Product" (
     "rejectReason" TEXT,
     "moderatedByUserId" TEXT,
     "moderatedAt" TIMESTAMP(3),
+    "submittedByUserId" TEXT,
+    "submittedAt" TIMESTAMP(3),
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "deletedAt" TIMESTAMP(3),
@@ -205,6 +207,9 @@ CREATE INDEX "Product_brandId_idx" ON "Product"("brandId");
 CREATE INDEX "Product_status_moderationStatus_idx" ON "Product"("status", "moderationStatus");
 
 -- CreateIndex
+CREATE INDEX "Product_submittedByUserId_idx" ON "Product"("submittedByUserId");
+
+-- CreateIndex
 CREATE INDEX "Product_isActive_isDeleted_idx" ON "Product"("isActive", "isDeleted");
 
 -- CreateIndex
@@ -254,6 +259,9 @@ ALTER TABLE "Product" ADD CONSTRAINT "Product_brandId_fkey" FOREIGN KEY ("brandI
 
 -- AddForeignKey
 ALTER TABLE "Product" ADD CONSTRAINT "Product_moderatedByUserId_fkey" FOREIGN KEY ("moderatedByUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_submittedByUserId_fkey" FOREIGN KEY ("submittedByUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ProductVariant" ADD CONSTRAINT "ProductVariant_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;

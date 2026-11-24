@@ -122,6 +122,8 @@ Master product definition independent of vendor-specific pricing or stock.
 * `rejectReason`: `String?`
 * `moderatedByUserId`: `String?` (Foreign key to Admin `User.id`)
 * `moderatedAt`: `DateTime?`
+* `submittedByUserId`: `String?` (Foreign key to User who proposed product - vendor or admin)
+* `submittedAt`: `DateTime?`
 * `isActive`: `Boolean @default(true)`
 * `isDeleted`: `Boolean @default(false)`
 * `deletedAt`: `DateTime?`
@@ -131,11 +133,13 @@ Master product definition independent of vendor-specific pricing or stock.
   * `category`: `Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)`
   * `brand`: `Brand? @relation(fields: [brandId], references: [id], onDelete: Restrict)`
   * `moderatedBy`: `User? @relation("ProductModerator", fields: [moderatedByUserId], references: [id], onDelete: Restrict)`
+  * `submittedBy`: `User? @relation("ProductSubmitter", fields: [submittedByUserId], references: [id], onDelete: Restrict)`
   * `variants`: `ProductVariant[]`
 * **Indexes & Constraints:**
   * `@@index([categoryId])`
   * `@@index([brandId])`
   * `@@index([status, moderationStatus])`
+  * `@@index([submittedByUserId])`
   * `@@index([isActive, isDeleted])`
 
 #### Model: `ProductVariant`
@@ -288,19 +292,14 @@ Disbursement account details for merchant settlement processing.
 #### Model: `Rider`
 Delivery fleet personnel profile linked 1-to-1 with a central `User` identity.
 * `id`: `String` `@id @default(uuid())`
-* `userId`: `String @unique` (Links to Central `User.id`)
+* `userId`: `String @unique` (Links to Central `User.id`; personal phone and email are canonically sourced from `User.phone` and `User.displayEmail`, maintaining single-source consistency with `Vendor`)
 * `fullName`: `String`
-* `phone`: `String`
-* `email`: `String?`
 * `city`: `String`
 * `address`: `String`
 * `emergencyContactName`: `String`
 * `emergencyContactRelation`: `String`
 * `emergencyContactPhone`: `String`
 * `availability`: `RiderAvailability @default(OFFLINE)`
-* `currentLatitude`: `Float?`
-* `currentLongitude`: `Float?`
-* `lastLocationUpdatedAt`: `DateTime?`
 * `verificationStatus`: `VerificationStatus @default(PENDING)`
 * `status`: `RiderStatus @default(PENDING_ONBOARDING)`
 * `statusReason`: `String?`
@@ -420,7 +419,8 @@ Concrete compliance document instance uploaded by an applicant.
 * `riderId`: `String?`
 * `documentTypeId`: `String`
 * `fileAssetId`: `String?`
-* `documentNumber`: `String?` (Masked/encrypted identifier, e.g. `ABCDE1234F`)
+* `documentNumberEncrypted`: `String?` (AES-256-GCM encrypted identifier, e.g. PAN, Driving License, RC)
+* `documentNumberMasked`: `String?` (Masked display token, e.g. `••••••1234F`)
 * `status`: `DocumentStatus @default(PENDING)`
 * `rejectReason`: `String?` (Standardized reject taxonomy from admin UI)
 * `rejectRemarks`: `String?` (Custom instructions for applicant resubmission)
@@ -1051,16 +1051,41 @@ In strict alignment with migration `20261118120000_revoke_runtime_delete`:
   3. Super Admin operations themselves require non-repudiable audit logs. Deletions in e-commerce (e.g. deleting a product or staff member) must always retain relational integrity with past orders, settlements, and tax filings.
   4. The existing `fillcart_user` role (migration schema owner) is reserved strictly for CLI migrations and offline maintenance scripts (`cleanup.ts`).
 
-### 5.3 Sensitive Data Protection & Field-Level Encryption
+### 5.3 Sensitive Data Protection, KMS & Key Rotation Plan
 
-The platform processes sensitive identity and banking data governed by RBI and Indian data privacy standards.
+The platform processes sensitive identity and banking data governed by RBI, IT Act 2000, and Indian Digital Personal Data Protection (DPDP) Act standards.
+
+#### Sensitive Data Columns & Masking Strategy
 
 | Table | Sensitive Fields | Storage Format | Masking & Display Strategy |
 | :--- | :--- | :--- | :--- |
 | **`VendorBankAccount`** | `accountNumberEncrypted` | AES-256-GCM encrypted string (IV + Ciphertext + Auth Tag) | `accountNumberMasked` (`•••• 4892`) stored for rapid UI display without decrypting. |
 | **`RiderBankAccount`** | `accountNumberEncrypted` | AES-256-GCM encrypted string | `accountNumberMasked` (`•••• 8841`) for display. |
-| **`Document`** | `documentNumber` | Deterministic HMAC-SHA256 for deduplication lookup; AES-256-GCM for storage | Masked in UI (e.g. `••••••1234F`). |
+| **`Document`** | `documentNumberEncrypted` | AES-256-GCM encrypted string (PAN, Driving License, RC) | `documentNumberMasked` (`••••••1234F`) stored for rapid UI display. |
 | **`SystemSetting`** | Secrets in `value` (e.g. MSG91 API key, Razorpay webhook secret) | Field-level AES-256-GCM when `isEncrypted = true` | Masked in admin UI as `••••••••••••`. |
+
+#### Enterprise Key Management (KMS / Secrets Manager Mandate)
+- **Zero Plaintext Secrets in `.env`:** Master encryption keys must **never** be stored in `.env` files, source code, or application container images.
+- **Envelope Encryption Pattern:** In production, application services fetch a Key Encryption Key (KEK) or call an enterprise Key Management Service (AWS KMS, GCP Cloud KMS, or HashiCorp Vault) to encrypt/decrypt Data Encryption Keys (DEKs).
+- **In-Memory Lifespan:** Decrypted DEKs are held in memory with strict TTL cache and wiped upon process shutdown.
+
+#### Key Rotation Plan
+1. **Version-Prefixed Ciphertext Serialization:**
+   All encrypted database fields follow a versioned envelope format:
+   ```text
+   v{key_version}:{iv_base64}:{ciphertext_base64}:{auth_tag_base64}
+   # Example: v1:a3b9...:f7e1...:8c2d...
+   ```
+2. **Multi-Version Decryption Engine:**
+   The backend crypto service maintains access to previous active key versions (`v1`, `v2`, etc.). When decrypting a record, the service extracts the prefix `v{N}` and decrypts using that specific historical key.
+3. **Active Write Key (Primary Version):**
+   All new `INSERT` and `UPDATE` operations always encrypt using the latest primary key version (`v{current}`).
+4. **Zero-Downtime Rotation Lifecycle:**
+   - **Step 1 (Generate):** Provision new key version `v{N+1}` in KMS/Secrets Manager.
+   - **Step 2 (Deploy):** Application services load `v{N+1}` as the primary encryption key while keeping `v{N}` in the decryption keyring. New writes immediately use `v{N+1}`.
+   - **Step 3 (Lazy Migration):** Normal business updates automatically re-encrypt records under `v{N+1}`.
+   - **Step 4 (Maintenance Sweep):** A standalone background CLI script sweeps legacy `v{N}` records and re-encrypts them to `v{N+1}` in batches.
+   - **Step 5 (Retire):** Once `COUNT(*) WHERE field LIKE 'v{N}:%' = 0`, the legacy version `v{N}` is safely archived.
 
 ---
 

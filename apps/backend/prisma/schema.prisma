@@ -73,6 +73,7 @@ model User {
   systemSettingsUpdated   SystemSetting[]
   opsPoliciesUpdated      OpsPolicy[]
   productsModerated       Product[]                @relation("ProductModerator")
+  productsSubmitted       Product[]                @relation("ProductSubmitter")
   vendorProfile           Vendor?                  @relation("VendorUser")
   riderProfile            Rider?                   @relation("RiderUser")
   vendorsStatusChanged    Vendor[]                 @relation("VendorStatusAdmin")
@@ -542,6 +543,8 @@ model Product {
   rejectReason       String?
   moderatedByUserId  String?
   moderatedAt        DateTime?
+  submittedByUserId  String?
+  submittedAt        DateTime?
   isActive           Boolean                 @default(true)
   isDeleted          Boolean                 @default(false)
   deletedAt          DateTime?
@@ -551,11 +554,13 @@ model Product {
   category           Category                @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   brand              Brand?                  @relation(fields: [brandId], references: [id], onDelete: Restrict)
   moderatedBy        User?                   @relation("ProductModerator", fields: [moderatedByUserId], references: [id], onDelete: Restrict)
+  submittedBy        User?                   @relation("ProductSubmitter", fields: [submittedByUserId], references: [id], onDelete: Restrict)
   variants           ProductVariant[]
 
   @@index([categoryId])
   @@index([brandId])
   @@index([status, moderationStatus])
+  @@index([submittedByUserId])
   @@index([isActive, isDeleted])
 }
 
@@ -752,8 +757,6 @@ model Rider {
   id                      String             @id @default(uuid())
   userId                  String             @unique
   fullName                String
-  phone                   String
-  email                   String?
   city                    String
   address                 String
   emergencyContactName    String
@@ -919,9 +922,10 @@ model Document {
   vendorId         String?
   riderId          String?
   documentTypeId   String
-  fileAssetId      String?
-  documentNumber   String?
-  status           DocumentStatus  @default(PENDING)
+  fileAssetId             String?
+  documentNumberEncrypted String?
+  documentNumberMasked    String?
+  status                  DocumentStatus  @default(PENDING)
   rejectReason     String?
   rejectRemarks    String?
   reviewedByUserId String?
