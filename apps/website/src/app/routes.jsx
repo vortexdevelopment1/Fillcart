@@ -26,6 +26,8 @@ import CareersPage from "../features/careers/CareersPage.jsx";
 import BlogPage from "../features/misc/BlogPage.jsx";
 import SubscriptionPage from "../features/misc/SubscriptionPage.jsx";
 import NotFoundPage from "../features/misc/NotFoundPage.jsx";
+import CustomerLoginPage from "../features/auth/CustomerLoginPage.jsx";
+import CustomerRegistrationPage from "../features/auth/CustomerRegistrationPage.jsx";
 
 const StyleguidePage = lazy(() => import("../features/misc/StyleguidePage.jsx"));
 
@@ -47,9 +49,7 @@ function CategoriesRedirect() {
  * - Phase 6: feat/website-cart (/cart, /wishlist)
  * - Phase 7: feat/website-offers (/offers/payment, /payment-offers)
  * - Phase 8: feat/website-profile (/profile, /profile/orders, /profile/addresses, /profile/prescriptions, /profile/account, /profile/:tab)
- * - Phase 9: feat/website-pages (/about, /contact, /support, /faq, /help, /terms, /privacy, /how-it-works, /features, /careers, /blog, /subscriptions, /become-vendor, /partner/vendor, /become-rider, /partner/rider, /styleguide, *)
- *
- * Upcoming feature route (Phase 10):
+ * - Phase 9: feat/website-pages (/about, /contact, /support, /faq, /help, /terms, /privacy, /how-it-works, /features, /careers, /blog, /subscriptions, /become-vendor, /partner/vendor, /become-rider, /partner/rider, /styleguide)
  * - Phase 10: feat/website-auth (/login, /register, /login/customer)
  */
 export default function AppRoutes() {
@@ -90,7 +90,12 @@ export default function AppRoutes() {
       <Route path="/profile/account" element={<ProfileAccount />} />
       <Route path="/profile/:tab" element={<UserProfilePage />} />
 
-      {/* Content & Legal Pages (Phase 9) */}
+      {/* Auth */}
+      <Route path="/login" element={<CustomerLoginPage />} />
+      <Route path="/register" element={<CustomerRegistrationPage />} />
+      <Route path="/login/customer" element={<CustomerLoginPage />} />
+
+      {/* Content & Policy Pages */}
       <Route path="/features" element={<FeaturesPage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/support" element={<SupportPage />} />
