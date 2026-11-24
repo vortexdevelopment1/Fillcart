@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/inventory_product.dart';
 
 /// Card widget rendering an individual inventory product item matching Image 1.
@@ -55,54 +56,86 @@ class ProductItemCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
 
-                // Details Column
+                // Main Details Column
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Product Title
-                      Text(
-                        product.name,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF0F172A),
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-
-                      // Category Hierarchy
-                      Text(
-                        '${product.category}  ›  ${product.subCategory}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF64748B),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-
-                      // Price and Discount Row
+                      // Top Row: Product Title & Category on left, Stock Badge & 3-dots on right
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '₹${product.price.toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF0F172A),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'MRP ₹${product.mrp.toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF94A3B8),
-                              decoration: TextDecoration.lineThrough,
+                          // Title & Category
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product.name,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF0F172A),
+                                    height: 1.25,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  '${product.category}  ›  ${product.subCategory}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: const Color(0xFF64748B),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 8),
+
+                          // Right Column: Stock Badge & 3-dots Menu
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              _buildStockBadge(product),
+                              const SizedBox(height: 8),
+                              GestureDetector(
+                                onTap: onMoreOptionsTap,
+                                child: const Icon(
+                                  Icons.more_vert,
+                                  size: 20,
+                                  color: Color(0xFF94A3B8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Price and Discount Row: Spans full remaining width with auto-wrap
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          Text(
+                            '₹${product.price.toStringAsFixed(0)}',
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF0F172A),
+                            ),
+                          ),
+                          Text(
+                            'MRP ₹${product.mrp.toStringAsFixed(0)}',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xFF94A3B8),
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
@@ -114,10 +147,10 @@ class ProductItemCard extends StatelessWidget {
                             ),
                             child: Text(
                               '${product.discountPercent.toStringAsFixed(product.discountPercent.truncateToDouble() == product.discountPercent ? 0 : 1)}% off',
-                              style: const TextStyle(
+                              style: GoogleFonts.inter(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF059669),
+                                color: const Color(0xFF059669),
                               ),
                             ),
                           ),
@@ -125,23 +158,6 @@ class ProductItemCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
-
-                // Right Column: Stock Badge & 3-dots Menu
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    _buildStockBadge(product),
-                    const SizedBox(height: 12),
-                    GestureDetector(
-                      onTap: onMoreOptionsTap,
-                      child: const Icon(
-                        Icons.more_vert,
-                        size: 20,
-                        color: Color(0xFF94A3B8),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
@@ -159,12 +175,12 @@ class ProductItemCard extends StatelessWidget {
           color: const Color(0xFFFEF2F2),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Text(
+        child: Text(
           'Out of Stock',
-          style: TextStyle(
+          style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Color(0xFFDC2626),
+            color: const Color(0xFFDC2626),
           ),
         ),
       );
@@ -179,10 +195,10 @@ class ProductItemCard extends StatelessWidget {
         ),
         child: Text(
           'Low Stock: ${product.currentStock}',
-          style: const TextStyle(
+          style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Color(0xFFD97706),
+            color: const Color(0xFFD97706),
           ),
         ),
       );
@@ -196,10 +212,10 @@ class ProductItemCard extends StatelessWidget {
       ),
       child: Text(
         'Qty: ${product.currentStock}',
-        style: const TextStyle(
+        style: GoogleFonts.inter(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF334155),
+          color: const Color(0xFF334155),
         ),
       ),
     );

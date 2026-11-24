@@ -9,6 +9,8 @@ import '../widgets/product_item_card.dart';
 import '../widgets/quick_action_card.dart';
 import '../widgets/segmented_tab_switch.dart';
 import '../widgets/stock_availability_card.dart';
+import '../widgets/add_product_bottom_sheet.dart';
+import 'bulk_update_stock_screen.dart';
 import 'inventory_product_selection_screen.dart';
 import 'stock_alert_settings_screen.dart';
 import 'stock_history_screen.dart';
@@ -148,10 +150,9 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
   }
 
   void _onQuickActionBulkUpdate() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Bulk stock update mode selected.'),
-        backgroundColor: Color(0xFF0F172A),
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const BulkUpdateStockScreen(),
       ),
     );
   }
@@ -269,14 +270,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
           ? Padding(
               padding: const EdgeInsets.only(bottom: 72),
               child: FloatingActionButton.extended(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Add product flow opened.'),
-                      backgroundColor: Color(0xFF0F172A),
-                    ),
-                  );
-                },
+                onPressed: () => AddProductBottomSheet.show(context),
                 backgroundColor: const Color(0xFFD4F932),
                 foregroundColor: const Color(0xFF0F172A),
                 elevation: 4,
@@ -292,6 +286,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                 label: const Text(
                   'Add Product',
                   style: TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF0F172A),
@@ -595,7 +590,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
             children: [
               Expanded(
                 child: InventoryOverviewCard(
-                  svgPath: 'assets/svg/out_of_stock.svg',
+                  svgPath: 'assets/svg/Ban Icon.svg',
                   title: 'Out of Stock',
                   count: '${_metrics.outOfStockCount}',
                   backgroundColor: const Color(0xFFFEF2F2),

@@ -1,11 +1,17 @@
 export 'models/inventory_metrics.dart';
 export 'models/inventory_product.dart';
 export 'models/stock_history_entry.dart';
+export 'presentation/screens/bulk_update_stock_screen.dart';
 export 'presentation/screens/inventory_product_selection_screen.dart';
+export 'presentation/screens/product_details_screen.dart';
+export 'presentation/screens/review_and_update_screen.dart';
+export 'presentation/screens/scan_barcode_screen.dart';
 export 'presentation/screens/stock_alert_settings_screen.dart';
 export 'presentation/screens/stock_history_screen.dart';
 export 'presentation/screens/update_stock_screen.dart';
+export 'presentation/screens/upload_photos_screen.dart';
 export 'presentation/screens/vendor_inventory_screen.dart';
+export 'presentation/widgets/add_product_bottom_sheet.dart';
 export 'presentation/widgets/inventory_overview_card.dart';
 export 'presentation/widgets/product_item_card.dart';
 export 'presentation/widgets/quick_action_card.dart';

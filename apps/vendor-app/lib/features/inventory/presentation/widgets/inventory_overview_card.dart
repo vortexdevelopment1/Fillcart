@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Single metric overview card for the 2x2 inventory summary dashboard (Image 2).
 class InventoryOverviewCard extends StatelessWidget {
@@ -45,6 +46,13 @@ class InventoryOverviewCard extends StatelessWidget {
                   child: SvgPicture.asset(
                     svgPath,
                     fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      final fallback = svgPath.replaceAll(' ', '_').toLowerCase();
+                      if (fallback != svgPath) {
+                        return SvgPicture.asset(fallback, fit: BoxFit.contain);
+                      }
+                      return const SizedBox();
+                    },
                   ),
                 ),
                 if (title != null) ...[
@@ -54,7 +62,7 @@ class InventoryOverviewCard extends StatelessWidget {
                       title!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: titleColor ?? const Color(0xFF0F172A),
@@ -66,7 +74,7 @@ class InventoryOverviewCard extends StatelessWidget {
             ),
             Text(
               count,
-              style: TextStyle(
+              style: GoogleFonts.inter(
                 fontSize: 26,
                 fontWeight: FontWeight.w600,
                 color: countColor,
