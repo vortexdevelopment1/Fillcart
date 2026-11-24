@@ -1,32 +1,24 @@
 import { Routes, Route } from "react-router-dom";
+import AppKartHome from "../features/home/AppKartHome.jsx";
 
 /**
  * Route table for Fillcart Storefront.
- * In Phase 1, feature pages have not yet been migrated into src/features/.
- * The routes will be connected phase by phase as features are migrated:
- * - Phase 3: feat/website-home (AppKartHome)
- * - Phase 4: feat/website-stores (StoresListingPage, StoreDetailPage)
- * - Phase 5: feat/website-catalog (CategoriesPage, CategoryListingPage, SearchResultsPage, ProductDetailPage)
- * - Phase 6: feat/website-cart (CartPage, WishlistPage)
- * - Phase 7: feat/website-offers (PaymentOffersPage)
- * - Phase 8: feat/website-profile (UserProfilePage, ProfileOrders, ProfileAddresses, ProfilePrescriptions, ProfileAccount)
- * - Phase 9: feat/website-pages (AboutPage, ContactPage, SupportPage, LegalPage, FeaturesPage, HowItWorksPage, BecomeVendorPage, BecomeRiderPage, CareersPage, BlogPage, SubscriptionPage, NotFoundPage)
- * - Phase 10: feat/website-auth (CustomerLoginPage, CustomerRegistrationPage)
+ * Connected routes:
+ * - Phase 3: feat/website-home (AppKartHome -> /)
+ *
+ * Upcoming feature routes (Phases 4 - 10):
+ * - Phase 4: feat/website-stores (/stores, /store/:slug, /shops)
+ * - Phase 5: feat/website-catalog (/category/:slug, /categories, /search, /product/:slug)
+ * - Phase 6: feat/website-cart (/cart, /wishlist)
+ * - Phase 7: feat/website-offers (/offers/payment, /payment-offers)
+ * - Phase 8: feat/website-profile (/profile/*)
+ * - Phase 9: feat/website-pages (/about, /contact, /support, /terms, /privacy, etc.)
+ * - Phase 10: feat/website-auth (/login, /register)
  */
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-800">
-            <div className="text-center p-8 bg-white shadow-md rounded-2xl max-w-md">
-              <h1 className="text-2xl font-bold mb-2">Fillcart Storefront</h1>
-              <p className="text-sm text-gray-500">Website setup and foundation initialized (Phase 1).</p>
-            </div>
-          </div>
-        }
-      />
+      <Route path="/" element={<AppKartHome />} />
       <Route
         path="*"
         element={
