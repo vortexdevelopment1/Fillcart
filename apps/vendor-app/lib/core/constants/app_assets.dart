@@ -68,6 +68,14 @@ class AppAssets {
   static const String svgWallet = '$_svgPath/wallet.svg';
   static const String svgTotalStocks = '$_svgPath/total_stocks.svg';
   static const String svgGst = '$_svgPath/GST.svg';
+  static const String svgdelete = '$_svgPath/delete.svg';
+  static const String svgDelete = '$_svgPath/delete.svg';
+  static const String svgexportlist = '$_svgPath/export_list.svg';
+  static const String svgExportList = '$_svgPath/export_list.svg';
+  static const String svgdeactivate = '$_svgPath/Deactivate.svg';
+  static const String svgDeactivate = '$_svgPath/Deactivate.svg';
+  static const String svgbulkupload = '$_svgPath/bulk_upload.svg';
+  static const String svgBulkUpload = '$_svgPath/bulk_upload.svg';
 
   // Illustrations & Avatar
   static const String vendorAvatar = '$_illustrationsPath/vendor_avatar.png';

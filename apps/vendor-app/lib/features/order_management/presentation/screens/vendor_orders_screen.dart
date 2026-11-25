@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import 'package:fillcart_vendor/features/order_flow/presentation/screens/order_details_screen.dart';
@@ -124,7 +124,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
         .toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: isSearching
           ? null
           : AppBar(

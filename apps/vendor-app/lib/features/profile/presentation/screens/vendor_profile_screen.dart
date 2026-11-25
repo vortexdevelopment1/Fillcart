@@ -56,8 +56,8 @@ class VendorProfileScreen extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF4444),
-              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFFC8F169),
+              foregroundColor: const Color(0xFF111827),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -67,6 +67,7 @@ class VendorProfileScreen extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w600,
+                color: Color(0xFF111827),
               ),
             ),
           ),
@@ -78,7 +79,7 @@ class VendorProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF0F0F0),
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(

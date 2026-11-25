@@ -51,7 +51,7 @@ class _PrepareTimeModalState extends State<PrepareTimeModal> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFFF4F5F7),
+        color: Color(0xFFF0F0F0),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -318,8 +318,8 @@ class _PrepareTimeModalState extends State<PrepareTimeModal> {
               height: 52,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF000000),
-                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFFC8F169),
+                  foregroundColor: const Color(0xFF111827),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),

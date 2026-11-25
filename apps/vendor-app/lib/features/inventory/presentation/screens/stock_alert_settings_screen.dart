@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/inventory_product.dart';
@@ -59,13 +59,15 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 52,
         leadingWidth: 52,
+        centerTitle: false,
+        titleSpacing: 12,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Center(
@@ -106,10 +108,10 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 20,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             color: Color(0xFF111827),
             height: 28 / 20,
-            letterSpacing: 0,
+            letterSpacing: -0.2,
           ),
         ),
       ),
@@ -134,12 +136,12 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
               // Bottom Save Settings Button
               SizedBox(
                 width: double.infinity,
-                height: 54,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: _saveSettings,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4F932),
-                    foregroundColor: const Color(0xFF0F172A),
+                    backgroundColor: const Color(0xFFC8F169),
+                    foregroundColor: const Color(0xFF111827),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -148,9 +150,10 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                   child: const Text(
                     'Save Settings',
                     style: TextStyle(
-                      fontSize: 17,
+                      fontFamily: 'Inter',
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF0F172A),
+                      color: Color(0xFF111827),
                     ),
                   ),
                 ),
@@ -167,11 +170,15 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -182,15 +189,22 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
             width: 54,
             height: 54,
             decoration: BoxDecoration(
-              color: const Color(0xFFF0F9FF),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFBAE6FD)),
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
-            child: const Center(
-              child: Icon(
-                Icons.local_drink_outlined,
-                color: Color(0xFF0284C7),
-                size: 28,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                widget.product.imageUrl ?? 'assets/cardsicon/amul_milk.png',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Center(
+                  child: Icon(
+                    Icons.local_drink_outlined,
+                    color: Color(0xFF0284C7),
+                    size: 28,
+                  ),
+                ),
               ),
             ),
           ),
@@ -202,17 +216,19 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                 Text(
                   widget.product.name,
                   style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F172A),
+                    color: Color(0xFF111827),
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   widget.product.categoryPath,
                   style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 13,
-                    color: Color(0xFF64748B),
+                    color: Color(0xFF6B7280),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -226,14 +242,18 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
 
   Widget _buildLowStockAlertCard() {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -247,9 +267,10 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
               const Text(
                 'Low Stock Alert',
                 style: TextStyle(
+                  fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF0F172A),
+                  color: Color(0xFF111827),
                 ),
               ),
               Switch(
@@ -257,7 +278,7 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                 activeThumbColor: Colors.white,
                 activeTrackColor: const Color(0xFF84CC16),
                 inactiveThumbColor: Colors.white,
-                inactiveTrackColor: const Color(0xFFE2E8F0),
+                inactiveTrackColor: const Color(0xFFE5E7EB),
                 onChanged: (val) {
                   setState(() => _lowStockAlertEnabled = val);
                 },
@@ -268,8 +289,9 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
           const Text(
             'Get notified when stock goes below the set limit.',
             style: TextStyle(
+              fontFamily: 'Inter',
               fontSize: 13,
-              color: Color(0xFF64748B),
+              color: Color(0xFF6B7280),
               height: 1.3,
             ),
           ),
@@ -277,9 +299,10 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
           const Text(
             'Alert Threshold *',
             style: TextStyle(
+              fontFamily: 'Inter',
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF0F172A),
+              color: Color(0xFF111827),
             ),
           ),
           const SizedBox(height: 8),
@@ -288,7 +311,7 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -313,9 +336,10 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                       keyboardType: TextInputType.number,
                       textAlignVertical: TextAlignVertical.center,
                       style: const TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF0F172A),
+                        color: Color(0xFF111827),
                       ),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
@@ -335,8 +359,9 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                 const Text(
                   'units',
                   style: TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 14,
-                    color: Color(0xFF64748B),
+                    color: Color(0xFF6B7280),
                   ),
                 ),
               ],
@@ -349,14 +374,18 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
 
   Widget _buildExpiryAlertCard() {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -370,9 +399,10 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
               const Text(
                 'Expiry Alert',
                 style: TextStyle(
+                  fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF0F172A),
+                  color: Color(0xFF111827),
                 ),
               ),
               Switch(
@@ -380,7 +410,7 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                 activeThumbColor: Colors.white,
                 activeTrackColor: const Color(0xFF84CC16),
                 inactiveThumbColor: Colors.white,
-                inactiveTrackColor: const Color(0xFFE2E8F0),
+                inactiveTrackColor: const Color(0xFFE5E7EB),
                 onChanged: (val) {
                   setState(() => _expiryAlertEnabled = val);
                 },
@@ -391,8 +421,9 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
           const Text(
             'Get notified before the product expires.',
             style: TextStyle(
+              fontFamily: 'Inter',
               fontSize: 13,
-              color: Color(0xFF64748B),
+              color: Color(0xFF6B7280),
               height: 1.3,
             ),
           ),
@@ -400,9 +431,10 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
           const Text(
             'Notify Before *',
             style: TextStyle(
+              fontFamily: 'Inter',
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF0F172A),
+              color: Color(0xFF111827),
             ),
           ),
           const SizedBox(height: 8),
@@ -411,7 +443,7 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: DropdownButtonHideUnderline(
@@ -422,7 +454,7 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                 borderRadius: BorderRadius.circular(14),
                 icon: const Icon(
                   Icons.keyboard_arrow_down,
-                  color: Color(0xFF64748B),
+                  color: Color(0xFF6B7280),
                 ),
                 items: _notifyPeriodOptions.map((period) {
                   return DropdownMenuItem<String>(
@@ -430,9 +462,10 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                     child: Text(
                       period,
                       style: const TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF0F172A),
+                        color: Color(0xFF111827),
                       ),
                     ),
                   );

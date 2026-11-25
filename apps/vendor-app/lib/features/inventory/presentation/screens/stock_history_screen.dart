@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/inventory_product.dart';
@@ -37,13 +37,15 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 52,
         leadingWidth: 52,
+        centerTitle: false,
+        titleSpacing: 12,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Center(
@@ -84,10 +86,10 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 20,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             color: Color(0xFF111827),
             height: 28 / 20,
-            letterSpacing: 0,
+            letterSpacing: -0.2,
           ),
         ),
       ),
@@ -133,11 +135,15 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -149,15 +155,22 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
             width: 54,
             height: 54,
             decoration: BoxDecoration(
-              color: const Color(0xFFF0F9FF),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFBAE6FD)),
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
-            child: const Center(
-              child: Icon(
-                Icons.local_drink_outlined,
-                color: Color(0xFF0284C7),
-                size: 28,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                widget.product.imageUrl ?? 'assets/cardsicon/amul_milk.png',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Center(
+                  child: Icon(
+                    Icons.local_drink_outlined,
+                    color: Color(0xFF0284C7),
+                    size: 28,
+                  ),
+                ),
               ),
             ),
           ),
@@ -171,17 +184,19 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
                 Text(
                   widget.product.name,
                   style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F172A),
+                    color: Color(0xFF111827),
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   'SKU: ${widget.product.sku}',
                   style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 13,
-                    color: Color(0xFF64748B),
+                    color: Color(0xFF6B7280),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -200,6 +215,10 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -216,7 +235,7 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
           icon: const Icon(
             Icons.keyboard_arrow_down,
             size: 18,
-            color: Color(0xFF64748B),
+            color: Color(0xFF6B7280),
           ),
           items: _periodOptions.map((opt) {
             return DropdownMenuItem<String>(
@@ -224,9 +243,10 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
               child: Text(
                 opt,
                 style: const TextStyle(
+                  fontFamily: 'Inter',
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF0F172A),
+                  color: Color(0xFF111827),
                 ),
               ),
             );
@@ -252,10 +272,14 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -273,6 +297,7 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
             child: Text(
               entry.formattedChange,
               style: TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: badgeTextColor,
@@ -289,25 +314,28 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
                 Text(
                   entry.actionTitle,
                   style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F172A),
+                    color: Color(0xFF111827),
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   entry.reason,
                   style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 13,
-                    color: Color(0xFF64748B),
+                    color: Color(0xFF6B7280),
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   entry.timestamp,
                   style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 12,
-                    color: Color(0xFF94A3B8),
+                    color: Color(0xFF9CA3AF),
                   ),
                 ),
               ],

@@ -56,7 +56,7 @@ class _ProcessingWithdrawalScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -103,8 +103,8 @@ class _ProcessingWithdrawalScreenState
                 child: ElevatedButton(
                   onPressed: _proceedToSuccess,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE5E7EB),
-                    foregroundColor: const Color(0xFF6B7280),
+                    backgroundColor: const Color(0xFFC8F169),
+                    foregroundColor: const Color(0xFF111827),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),

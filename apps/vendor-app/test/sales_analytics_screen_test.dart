@@ -124,7 +124,7 @@ void main() {
       expect(find.byType(SalesAnalyticsScreen), findsOneWidget);
     });
 
-    testWidgets('tapping Product Management on Dashboard navigates to ProductInsightsScreen', (
+    testWidgets('verify Product Management is removed from Dashboard and FAB navigates to ProductInsightsScreen', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -134,8 +134,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.ensureVisible(find.text('Product Management'));
-      await tester.tap(find.text('Product Management'));
+      expect(find.text('Product Management'), findsNothing);
+
+      await tester.tap(find.byKey(const Key('dashboard_add_product_fab')));
       await tester.pumpAndSettle();
 
       expect(find.byType(ProductInsightsScreen), findsOneWidget);

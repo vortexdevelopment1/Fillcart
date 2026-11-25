@@ -25,7 +25,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFFF1EEE6);
+    const bgColor = Color(0xFFF0F0F0);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -160,8 +160,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                                     const SizedBox(height: 12),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFF133E2B),
-                                        foregroundColor: Colors.white,
+                                        backgroundColor: const Color(0xFFC8F169),
+                                        foregroundColor: const Color(0xFF111827),
                                         elevation: 0,
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 14,
@@ -186,6 +186,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                                           fontFamily: 'Inter',
                                           fontSize: 12.5,
                                           fontWeight: FontWeight.w700,
+                                          color: Color(0xFF111827),
                                         ),
                                       ),
                                     ),
@@ -228,7 +229,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
 
                     // Section Heading: Your Promotions
                     const Text(
-                      'Your Promotions (4)',
+                      'Your Promotions',
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 15,

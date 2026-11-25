@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../../../sales&analystics/presentation/widgets/sales_hero_card.dart';
@@ -20,7 +20,7 @@ class _RevenueAnalyticsScreenState extends State<RevenueAnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFFF1EEE6);
+    const bgColor = Color(0xFFF0F0F0);
 
     return Scaffold(
       backgroundColor: bgColor,

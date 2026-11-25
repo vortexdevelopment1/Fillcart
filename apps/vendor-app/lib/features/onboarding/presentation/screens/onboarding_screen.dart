@@ -244,8 +244,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: ElevatedButton(
                   onPressed: isLastPage ? _completeOnboarding : _nextPage,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF000000),
-                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFFC8F169),
+                    foregroundColor: const Color(0xFF111827),
                     elevation: 0,
                     shape: const StadiumBorder(),
                   ),
@@ -255,7 +255,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 17.0,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: const Color(0xFF111827),
                           ),
                         )
                       : Row(
@@ -267,7 +267,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               style: GoogleFonts.inter(
                                 fontSize: 17.0,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: const Color(0xFF111827),
                               ),
                             ),
                             const SizedBox(width: 8.0),
@@ -277,7 +277,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               child: Icon(
                                 Icons.arrow_forward_rounded,
                                 size: 20.0,
-                                color: Colors.white,
+                                color: Color(0xFF111827),
                               ),
                             ),
                           ],

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/vendor_notification.dart';
@@ -90,7 +90,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFFF3F4F6);
+    const bgColor = Color(0xFFF0F0F0);
 
     return Scaffold(
       backgroundColor: bgColor,

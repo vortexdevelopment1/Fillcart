@@ -48,7 +48,7 @@ class _StoreBusinessDetailsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -210,8 +210,8 @@ class _StoreBusinessDetailsScreenState
                 child: ElevatedButton(
                   onPressed: _onSaveChanges,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFFC8F169),
+                    foregroundColor: const Color(0xFF111827),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),
                     ),
@@ -223,7 +223,7 @@ class _StoreBusinessDetailsScreenState
                       fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: Color(0xFF111827),
                     ),
                   ),
                 ),

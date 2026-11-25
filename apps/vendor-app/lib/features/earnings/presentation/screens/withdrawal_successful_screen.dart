@@ -13,7 +13,7 @@ class WithdrawalSuccessfulScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: const Color(0xFFF0F0F0),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -103,8 +103,8 @@ class WithdrawalSuccessfulScreen extends StatelessWidget {
                     Navigator.of(context).popUntil((route) => route.isFirst);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: textBlack,
-                    foregroundColor: Colors.white,
+                    backgroundColor: brandLime,
+                    foregroundColor: textBlack,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),

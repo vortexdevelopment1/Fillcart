@@ -27,7 +27,7 @@ void main() {
     expect(find.text('1,420'), findsOneWidget);
     expect(find.text('Promo Revenue'), findsOneWidget);
     expect(find.text('₹1.24L'), findsOneWidget);
-    expect(find.text('Your Promotions (4)'), findsOneWidget);
+    expect(find.text('Your Promotions'), findsOneWidget);
     expect(find.text('Flat 10% Off'), findsOneWidget);
     expect(find.text('Buy 2 Get 1 Free'), findsOneWidget);
     expect(find.text('Weekend Deal'), findsOneWidget);
@@ -142,5 +142,61 @@ void main() {
     expect(find.text('Products'), findsOneWidget);
     expect(find.text('Details'), findsOneWidget);
     expect(find.text('Review'), findsOneWidget);
+  });
+
+  testWidgets(
+      'Tapping three dots on PromotionCardTile in PromotionsScreen opens options (Edit, Deactivate, Delete)',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PromotionsScreen(),
+      ),
+    );
+
+    // Tap the first three-dots icon in the promotions cards list
+    final threeDots = find.byIcon(Icons.more_vert).first;
+    expect(threeDots, findsOneWidget);
+    await tester.ensureVisible(threeDots);
+    await tester.pumpAndSettle();
+    await tester.tap(threeDots);
+    await tester.pumpAndSettle();
+
+    // Verify Edit, Deactivate, and Delete options appear
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Deactivate'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
+
+    // Tap Deactivate
+    await tester.tap(find.text('Deactivate'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('deactivated'), findsOneWidget);
+  });
+
+  testWidgets(
+      'Tapping three dots on PromotionPerformanceScreen opens options (Edit, Deactivate, Delete)',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PromotionPerformanceScreen(),
+      ),
+    );
+
+    // Tap the three dots icon in top bar
+    final threeDots = find.byIcon(Icons.more_vert);
+    expect(threeDots, findsOneWidget);
+    await tester.tap(threeDots);
+    await tester.pumpAndSettle();
+
+    // Verify options appear
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Deactivate'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
+
+    // Tap Delete
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('deleted'), findsOneWidget);
   });
 }

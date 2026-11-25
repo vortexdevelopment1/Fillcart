@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/category_checklist_tile.dart';
@@ -82,7 +82,7 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFFF1EEE6);
+    const bgColor = Color(0xFFF0F0F0);
 
     final filteredCategories = _categories.where((cat) {
       final query = _searchController.text.trim().toLowerCase();

@@ -18,7 +18,7 @@ class OrderDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -417,8 +417,8 @@ class OrderDetailsScreen extends StatelessWidget {
                       height: 52,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF000000),
-                          foregroundColor: Colors.white,
+                          backgroundColor: const Color(0xFFC8F169),
+                          foregroundColor: const Color(0xFF111827),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(26),
@@ -444,13 +444,14 @@ class OrderDetailsScreen extends StatelessWidget {
                                 fontFamily: 'Inter',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
+                                color: Color(0xFF111827),
                               ),
                             ),
                             SizedBox(width: 8),
                             Icon(
                               Icons.arrow_forward_rounded,
                               size: 18,
-                              color: Colors.white,
+                              color: Color(0xFF111827),
                             ),
                           ],
                         ),

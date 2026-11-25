@@ -5,6 +5,7 @@ import '../../models/inventory_metrics.dart';
 import '../../models/inventory_product.dart';
 import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
 import '../widgets/inventory_overview_card.dart';
+import '../widgets/inventory_options_menu.dart';
 import '../widgets/product_item_card.dart';
 import '../widgets/quick_action_card.dart';
 import '../widgets/segmented_tab_switch.dart';
@@ -12,6 +13,7 @@ import '../widgets/stock_availability_card.dart';
 import '../widgets/add_product_bottom_sheet.dart';
 import 'bulk_update_stock_screen.dart';
 import 'inventory_product_selection_screen.dart';
+import 'product_details_screen.dart';
 import 'stock_alert_settings_screen.dart';
 import 'stock_history_screen.dart';
 import 'update_stock_screen.dart';
@@ -179,13 +181,15 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 52,
         leadingWidth: 52,
+        centerTitle: false,
+        titleSpacing: 12,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Center(
@@ -205,6 +209,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                 ],
               ),
               child: IconButton(
+                key: const Key('inventory_back_button'),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 icon: SvgPicture.asset(
@@ -229,37 +234,60 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
             fontWeight: FontWeight.w600,
             color: Color(0xFF111827),
             height: 28 / 20,
-            letterSpacing: 0,
+            letterSpacing: -0.2,
           ),
         ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Center(
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(255, 255, 255, 0.36),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: const [
-                    BoxShadow(
-                      offset: Offset(0, 1),
-                      blurRadius: 2,
-                      spreadRadius: 0,
-                      color: Color(0x1A000000),
+              child: InventoryHeaderOptionsMenuButton(
+                offset: const Offset(0, 48),
+                onManageCategories: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Manage Categories',
+                        style: TextStyle(fontFamily: 'Inter'),
+                      ),
+                      backgroundColor: Color(0xFF111827),
                     ),
-                  ],
-                ),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(
+                  );
+                },
+                onBulkUpload: _onQuickActionBulkUpdate,
+                onExportList: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Exporting product list...',
+                        style: TextStyle(fontFamily: 'Inter'),
+                      ),
+                      backgroundColor: Color(0xFF111827),
+                    ),
+                  );
+                },
+                onInventorySettings: () =>
+                    _navigateToAlertSettings(_products.first),
+                customTrigger: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(255, 255, 255, 0.36),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(
+                        offset: Offset(0, 1),
+                        blurRadius: 2,
+                        spreadRadius: 0,
+                        color: Color(0x1A000000),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
                     Icons.more_vert,
                     color: Color(0xFF111827),
                     size: 20,
                   ),
-                  onPressed: () {},
                 ),
               ),
             ),
@@ -268,20 +296,16 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
       ),
       floatingActionButton: _selectedTabIndex == 0
           ? Padding(
-              padding: const EdgeInsets.only(bottom: 72),
+              padding: const EdgeInsets.only(bottom: 76),
               child: FloatingActionButton.extended(
                 onPressed: () => AddProductBottomSheet.show(context),
-                backgroundColor: const Color(0xFFD4F932),
-                foregroundColor: const Color(0xFF0F172A),
-                elevation: 4,
-                icon: SvgPicture.asset(
-                  AppAssets.svgAddStock,
-                  width: 20,
-                  height: 20,
-                  colorFilter: const ColorFilter.mode(
-                    Color(0xFF0F172A),
-                    BlendMode.srcIn,
-                  ),
+                backgroundColor: const Color(0xFFC8F169),
+                foregroundColor: const Color(0xFF111827),
+                elevation: 3,
+                icon: const Icon(
+                  Icons.add_circle_outline_rounded,
+                  size: 21,
+                  color: Color(0xFF111827),
                 ),
                 label: const Text(
                   'Add Product',
@@ -289,7 +313,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                     fontFamily: 'Inter',
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F172A),
+                    color: Color(0xFF111827),
                   ),
                 ),
                 shape: const StadiumBorder(),
@@ -307,7 +331,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
             children: [
               // Top Dual-Tab Switcher
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
                 child: SegmentedTabSwitch(
                   selectedIndex: _selectedTabIndex,
                   onTabChanged: (index) {
@@ -340,7 +364,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
         // Filter Chips Row
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+          padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
           child: Row(
             children: ProductFilter.values.map((filter) {
               final isSelected = filter == _activeFilter;
@@ -350,8 +374,14 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                   margin: const EdgeInsets.only(right: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFFD4F932) : Colors.white,
+                    color: isSelected ? const Color(0xFFC8F169) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
+                    border: isSelected
+                        ? null
+                        : Border.all(
+                            color: const Color(0xFFE5E7EB),
+                            width: 1,
+                          ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.03),
@@ -365,8 +395,8 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                     children: [
                       if (filter == ProductFilter.lowStock) ...[
                         Container(
-                          width: 8,
-                          height: 8,
+                          width: 7,
+                          height: 7,
                           margin: const EdgeInsets.only(right: 6),
                           decoration: const BoxDecoration(
                             color: Color(0xFFF59E0B),
@@ -376,10 +406,13 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                       ],
                       Text(
                         filter.label,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF0F172A),
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 13.5,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                          color: isSelected
+                              ? const Color(0xFF111827)
+                              : const Color(0xFF4B5563),
                         ),
                       ),
                     ],
@@ -419,7 +452,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                   width: 20,
                   height: 20,
                   colorFilter: const ColorFilter.mode(
-                    Color(0xFF4B5563),
+                    Color(0xFF6B7280),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -454,7 +487,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                         hintText: 'Search products...',
                         hintStyle: TextStyle(
                           fontFamily: 'Inter',
-                          color: Color(0xFF4B5563),
+                          color: Color(0xFF9CA3AF),
                           fontSize: 14.5,
                           fontWeight: FontWeight.w400,
                         ),
@@ -482,7 +515,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                       child: Icon(
                         Icons.close,
                         size: 18,
-                        color: Color(0xFF94A3B8),
+                        color: Color(0xFF9CA3AF),
                       ),
                     ),
                   ),
@@ -492,7 +525,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Barcode scanner active.'),
-                        backgroundColor: Color(0xFF0F172A),
+                        backgroundColor: Color(0xFF111827),
                       ),
                     );
                   },
@@ -500,10 +533,10 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                     padding: const EdgeInsets.all(4),
                     child: SvgPicture.asset(
                       AppAssets.svgCamera,
-                      width: 22,
-                      height: 22,
+                      width: 20,
+                      height: 20,
                       colorFilter: const ColorFilter.mode(
-                        Color(0xFF0F172A),
+                        Color(0xFF6B7280),
                         BlendMode.srcIn,
                       ),
                     ),
@@ -521,7 +554,8 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                   child: Text(
                     'No products match your filter criteria.',
                     style: TextStyle(
-                      color: Color(0xFF64748B),
+                      fontFamily: 'Inter',
+                      color: Color(0xFF6B7280),
                       fontSize: 15,
                     ),
                   ),
@@ -535,6 +569,39 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                       product: product,
                       onTap: () => _navigateToUpdateStock(product),
                       onMoreOptionsTap: () => _showProductActionsModal(product),
+                      onEditProduct: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => ProductDetailsScreen(
+                              initialProductName: product.name,
+                              initialCategory: product.category,
+                            ),
+                          ),
+                        );
+                      },
+                      onUpdateStock: () => _navigateToUpdateStock(product),
+                      onDeactivateProduct: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '${product.name} deactivated',
+                              style: const TextStyle(fontFamily: 'Inter'),
+                            ),
+                            backgroundColor: const Color(0xFF111827),
+                          ),
+                        );
+                      },
+                      onDeleteProduct: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '${product.name} deleted',
+                              style: const TextStyle(fontFamily: 'Inter'),
+                            ),
+                            backgroundColor: const Color(0xFFEF4444),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -554,9 +621,10 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
           const Text(
             'Inventory Overview',
             style: TextStyle(
+              fontFamily: 'Inter',
               fontSize: 17,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF0F172A),
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF111827),
             ),
           ),
           const SizedBox(height: 12),
@@ -568,8 +636,8 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                 child: InventoryOverviewCard(
                   svgPath: 'assets/svg/diagonal_box.svg',
                   count: '${_metrics.totalProducts}',
-                  backgroundColor: const Color(0xFFF0FDF4),
-                  countColor: const Color(0xFF0F172A),
+                  backgroundColor: Colors.white,
+                  countColor: const Color(0xFF111827),
                 ),
               ),
               const SizedBox(width: 12),
@@ -578,9 +646,9 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                   svgPath: 'assets/svg/low_stock.svg',
                   title: 'Low Stock',
                   count: '${_metrics.lowStockCount}',
-                  backgroundColor: const Color(0xFFFEFCE8),
+                  backgroundColor: Colors.white,
                   countColor: const Color(0xFFD97706),
-                  titleColor: const Color(0xFF0F172A),
+                  titleColor: const Color(0xFF111827),
                 ),
               ),
             ],
@@ -593,9 +661,9 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                   svgPath: 'assets/svg/Ban Icon.svg',
                   title: 'Out of Stock',
                   count: '${_metrics.outOfStockCount}',
-                  backgroundColor: const Color(0xFFFEF2F2),
+                  backgroundColor: Colors.white,
                   countColor: const Color(0xFFDC2626),
-                  titleColor: const Color(0xFF0F172A),
+                  titleColor: const Color(0xFF111827),
                 ),
               ),
               const SizedBox(width: 12),
@@ -604,9 +672,9 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                   svgPath: 'assets/svg/expiring_soon.svg',
                   title: 'Expiring Soon',
                   count: '${_metrics.expiringSoonCount}',
-                  backgroundColor: const Color(0xFFEFF6FF),
+                  backgroundColor: Colors.white,
                   countColor: const Color(0xFF2563EB),
-                  titleColor: const Color(0xFF0F172A),
+                  titleColor: const Color(0xFF111827),
                 ),
               ),
             ],
@@ -628,9 +696,10 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
           const Text(
             'Quick Actions',
             style: TextStyle(
+              fontFamily: 'Inter',
               fontSize: 17,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF0F172A),
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF111827),
             ),
           ),
           const SizedBox(height: 12),
@@ -700,7 +769,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                     width: 22,
                     height: 22,
                     colorFilter: const ColorFilter.mode(
-                      Color(0xFF0F172A),
+                      Color(0xFF111827),
                       BlendMode.srcIn,
                     ),
                   ),
@@ -716,7 +785,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                     width: 22,
                     height: 22,
                     colorFilter: const ColorFilter.mode(
-                      Color(0xFF0F172A),
+                      Color(0xFF111827),
                       BlendMode.srcIn,
                     ),
                   ),
@@ -732,7 +801,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                     width: 22,
                     height: 22,
                     colorFilter: const ColorFilter.mode(
-                      Color(0xFF0F172A),
+                      Color(0xFF111827),
                       BlendMode.srcIn,
                     ),
                   ),

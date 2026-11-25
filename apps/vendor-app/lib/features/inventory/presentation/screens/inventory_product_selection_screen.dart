@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/inventory_product.dart';
@@ -58,13 +58,15 @@ class _InventoryProductSelectionScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 52,
         leadingWidth: 52,
+        centerTitle: false,
+        titleSpacing: 12,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Center(
@@ -105,10 +107,10 @@ class _InventoryProductSelectionScreenState
           style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 20,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             color: Color(0xFF111827),
             height: 28 / 20,
-            letterSpacing: 0,
+            letterSpacing: -0.2,
           ),
         ),
       ),
@@ -143,7 +145,7 @@ class _InventoryProductSelectionScreenState
                       width: 20,
                       height: 20,
                       colorFilter: const ColorFilter.mode(
-                        Color(0xFF4B5563),
+                        Color(0xFF6B7280),
                         BlendMode.srcIn,
                       ),
                     ),
@@ -176,7 +178,7 @@ class _InventoryProductSelectionScreenState
                             hintText: 'Search products by name or SKU...',
                             hintStyle: TextStyle(
                               fontFamily: 'Inter',
-                              color: Color(0xFF4B5563),
+                              color: Color(0xFF9CA3AF),
                               fontSize: 14.5,
                               fontWeight: FontWeight.w400,
                             ),
@@ -201,7 +203,7 @@ class _InventoryProductSelectionScreenState
                         },
                         child: const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Icon(Icons.close, color: Color(0xFF94A3B8), size: 18),
+                          child: Icon(Icons.close, color: Color(0xFF9CA3AF), size: 18),
                         ),
                       ),
                   ],
@@ -216,7 +218,8 @@ class _InventoryProductSelectionScreenState
                       child: Text(
                         'No products match your search.',
                         style: TextStyle(
-                          color: Color(0xFF64748B),
+                          fontFamily: 'Inter',
+                          color: Color(0xFF6B7280),
                           fontSize: 15,
                         ),
                       ),

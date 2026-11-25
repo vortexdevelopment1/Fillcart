@@ -26,7 +26,7 @@ class OrderCancelledScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F5F7),
+      backgroundColor: const Color(0xFFF0F0F0),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -132,8 +132,8 @@ class OrderCancelledScreen extends StatelessWidget {
                 height: 54,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF000000),
-                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFFC8F169),
+                    foregroundColor: const Color(0xFF111827),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(27),
@@ -148,6 +148,7 @@ class OrderCancelledScreen extends StatelessWidget {
                       fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
+                      color: Color(0xFF111827),
                     ),
                   ),
                 ),

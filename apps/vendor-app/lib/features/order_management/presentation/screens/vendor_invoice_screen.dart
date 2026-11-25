@@ -20,7 +20,7 @@ class VendorInvoiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -435,8 +435,8 @@ class VendorInvoiceScreen extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: darkBg,
-                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFFC8F169),
+                        foregroundColor: const Color(0xFF111827),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(26),
                         ),
@@ -450,7 +450,7 @@ class VendorInvoiceScreen extends StatelessWidget {
                             width: 20,
                             height: 20,
                             colorFilter: const ColorFilter.mode(
-                              Colors.white,
+                              Color(0xFF111827),
                               BlendMode.srcIn,
                             ),
                           ),
@@ -461,6 +461,7 @@ class VendorInvoiceScreen extends StatelessWidget {
                               fontFamily: 'Inter',
                               fontSize: 15.5,
                               fontWeight: FontWeight.w700,
+                              color: Color(0xFF111827),
                             ),
                           ),
                         ],

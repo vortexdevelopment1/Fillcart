@@ -13,22 +13,19 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Home & New Order Flow End-to-End Tests', () {
-    testWidgets('VendorDashboardScreen renders all components correctly',
+    testWidgets('VendorDashboardScreen renders clean dashboard and shows New Order POP when triggered',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: VendorDashboardScreen(),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Verify Header
       expect(find.text('Rahul Mart'), findsOneWidget);
       expect(find.text('Store is Online'), findsOneWidget);
       expect(find.text('Search Products etc.'), findsOneWidget);
-
-      // Verify New Orders Banner
-      expect(find.text('3 new orders waiting'), findsOneWidget);
-      expect(find.text('#FC2841 · Anita K.'), findsOneWidget);
 
       // Verify Today's sales
       expect(find.text("Today's sales"), findsOneWidget);
@@ -40,6 +37,25 @@ void main() {
       expect(find.text('Packing'), findsOneWidget);
       expect(find.text('Ready'), findsOneWidget);
 
+      // Initially, the static banner is not visible
+      expect(find.text('3 new orders waiting'), findsNothing);
+
+      // Tap 'New' filter to trigger New Order POP
+      await tester.tap(find.text('New'));
+      await tester.pumpAndSettle();
+
+      // Verify New Orders POP is visible
+      expect(find.text('3 new orders waiting'), findsOneWidget);
+      expect(find.text('#FC2841 · Anita K.'), findsOneWidget);
+      expect(find.text('Accept in 2:45'), findsOneWidget);
+
+      // Dismiss POP via close button
+      await tester.tap(find.byKey(const Key('close_new_order_popup_button')));
+      await tester.pumpAndSettle();
+
+      // Verify POP is dismissed
+      expect(find.text('3 new orders waiting'), findsNothing);
+
       // Verify Manage Store
       expect(find.text('Manage Store'), findsOneWidget);
       expect(find.text('Add\nProducts'), findsOneWidget);
@@ -48,6 +64,22 @@ void main() {
       expect(find.text('Business Overview'), findsOneWidget);
       expect(find.text('Sales Analytics'), findsOneWidget);
       expect(find.text('Promotions'), findsOneWidget);
+    });
+
+    testWidgets('Tapping order card inside New Order POP navigates to OrderDetailsScreen',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: VendorDashboardScreen(initialShowNewOrderPopup: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('3 new orders waiting'), findsOneWidget);
+      await tester.tap(find.text('#FC2841 · Anita K.'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(OrderDetailsScreen), findsOneWidget);
     });
 
     testWidgets('OrderDetailsScreen renders order receipt and note',

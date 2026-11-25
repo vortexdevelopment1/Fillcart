@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import 'package:fillcart_vendor/features/order_flow/models/order_flow_model.dart';
@@ -48,7 +48,7 @@ class VendorCompletedOrderDetailsScreen extends StatelessWidget {
     final earned = order.earnedAmount ?? (customerPaid - commission);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

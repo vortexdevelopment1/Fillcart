@@ -39,7 +39,7 @@ class _WithdrawEarningsScreenState extends State<WithdrawEarningsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -179,8 +179,8 @@ class _WithdrawEarningsScreenState extends State<WithdrawEarningsScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: textBlack,
-                    foregroundColor: Colors.white,
+                    backgroundColor: brandLime,
+                    foregroundColor: textBlack,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),
@@ -370,7 +370,7 @@ class _WithdrawEarningsScreenState extends State<WithdrawEarningsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
+              color: const Color(0xFFF0F0F0),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: borderColor),
             ),

@@ -26,7 +26,7 @@ class VendorEarningsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -397,8 +397,8 @@ class VendorEarningsScreen extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: textBlack,
-                      foregroundColor: Colors.white,
+                      backgroundColor: brandLime,
+                      foregroundColor: textBlack,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       shape: RoundedRectangleBorder(

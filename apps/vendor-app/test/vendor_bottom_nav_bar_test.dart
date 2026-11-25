@@ -134,7 +134,8 @@ void main() {
       expect(find.byType(VendorInventoryScreen), findsOneWidget);
 
       // Tap top-left back arrow in Products & Inventory screen -> should return to Home
-      await tester.tap(find.byType(IconButton).first);
+      // Tap top-left back arrow in Products & Inventory screen -> should return to Home
+      await tester.tap(find.byKey(const Key('inventory_back_button')), warnIfMissed: false);
       await tester.pumpAndSettle();
       expect(find.byType(VendorDashboardScreen), findsOneWidget);
 

@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/promotion_daily_chart.dart';
+import '../widgets/promotion_options_menu.dart';
 
 /// Screen 6: Promotion Performance Analytics Screen - Matching Figma Image 4 exactly.
 class PromotionPerformanceScreen extends StatelessWidget {
@@ -11,16 +12,22 @@ class PromotionPerformanceScreen extends StatelessWidget {
     this.subtitle = 'On Dairy & Snacks',
     this.dateRange = '10 Nov – 20 Nov',
     this.iconAsset = 'assets/cardsicon/promo_percent.png',
+    this.onEdit,
+    this.onDeactivate,
+    this.onDelete,
   });
 
   final String title;
   final String subtitle;
   final String dateRange;
   final String iconAsset;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDeactivate;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFFF1EEE6);
+    const bgColor = Color(0xFFF0F0F0);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -73,23 +80,16 @@ class PromotionPerformanceScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        PopupMenuButton<String>(
-                          borderRadius: BorderRadius.circular(12),
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'edit',
-                              child: Text('Edit Promotion'),
-                            ),
-                            const PopupMenuItem(
-                              value: 'pause',
-                              child: Text('Pause Promotion'),
-                            ),
-                            const PopupMenuItem(
-                              value: 'end',
-                              child: Text('End Promotion'),
-                            ),
-                          ],
-                          child: Container(
+                        PromotionOptionsMenuButton(
+                          promotionTitle: title,
+                          offset: const Offset(0, 48),
+                          onEdit: onEdit,
+                          onDeactivate: onDeactivate,
+                          onDelete: onDelete ??
+                              () {
+                                Navigator.maybePop(context);
+                              },
+                          customTrigger: Container(
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(

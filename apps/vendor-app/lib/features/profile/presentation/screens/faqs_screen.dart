@@ -1,4 +1,4 @@
-import 'package:fillcart_vendor/core/constants/app_assets.dart';
+﻿import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -81,7 +81,7 @@ class _FaqsScreenState extends State<FaqsScreen> {
     final faqs = _filteredFaqs;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

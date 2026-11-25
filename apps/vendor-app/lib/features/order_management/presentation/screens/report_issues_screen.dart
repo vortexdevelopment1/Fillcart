@@ -29,8 +29,6 @@ class _ReportIssuesScreenState extends State<ReportIssuesScreen> {
 
   late String _selectedIssue;
 
-  static const Color darkCharcoal = Color(0xFF000000);
-
   @override
   void initState() {
     super.initState();
@@ -65,7 +63,7 @@ class _ReportIssuesScreenState extends State<ReportIssuesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -300,8 +298,8 @@ class _ReportIssuesScreenState extends State<ReportIssuesScreen> {
                 child: ElevatedButton(
                   onPressed: _submitReport,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: darkCharcoal,
-                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFFC8F169),
+                    foregroundColor: const Color(0xFF111827),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),
                     ),

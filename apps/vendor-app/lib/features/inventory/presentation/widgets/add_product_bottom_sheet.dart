@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../screens/product_details_screen.dart';
 import '../screens/scan_barcode_screen.dart';
 import '../screens/upload_photos_screen.dart';
@@ -37,7 +36,7 @@ class AddProductBottomSheet extends StatelessWidget {
               width: 44,
               height: 4,
               decoration: BoxDecoration(
-                color: const Color(0xFFCBD5E1),
+                color: const Color(0xFFE5E7EB),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -45,26 +44,28 @@ class AddProductBottomSheet extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Title
-          Text(
+          const Text(
             'Add Product',
-            style: GoogleFonts.inter(
+            style: TextStyle(
+              fontFamily: 'Inter',
               fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF0F172A),
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF111827),
             ),
           ),
           const SizedBox(height: 8),
 
           // Subtitle
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               'Upload a photo or scan the barcode to fetch product details automatically.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 13,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 13.5,
                 fontWeight: FontWeight.w400,
-                color: const Color(0xFF64748B),
+                color: Color(0xFF6B7280),
                 height: 1.4,
               ),
             ),
@@ -118,7 +119,10 @@ class AddProductBottomSheet extends StatelessWidget {
               Navigator.of(context).pop();
               Navigator.of(context).push(
                 MaterialPageRoute<void>(
-                  builder: (_) => const ProductDetailsScreen(),
+                  builder: (_) => const ProductDetailsScreen(
+                    buttonText: 'Continue',
+                    showPreviewCard: false,
+                  ),
                 ),
               );
             },
@@ -140,7 +144,7 @@ class AddProductBottomSheet extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -186,19 +190,21 @@ class AddProductBottomSheet extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF0F172A),
+                          color: Color(0xFF111827),
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12.5,
                           fontWeight: FontWeight.w400,
-                          color: const Color(0xFF64748B),
+                          color: Color(0xFF6B7280),
                         ),
                       ),
                     ],
@@ -208,7 +214,7 @@ class AddProductBottomSheet extends StatelessWidget {
                 // Right Arrow
                 const Icon(
                   Icons.chevron_right,
-                  color: Color(0xFF94A3B8),
+                  color: Color(0xFF6B7280),
                   size: 22,
                 ),
               ],

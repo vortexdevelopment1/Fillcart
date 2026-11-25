@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
+import 'package:fillcart_vendor/features/dashboard/presentation/widgets/new_order_waiting_popup.dart';
 import 'package:fillcart_vendor/features/notifications/presentation/screens/notification_screen.dart';
 import 'package:fillcart_vendor/features/analytics/revenue_analytics/presentation/screens/revenue_analytics_screen.dart';
 import 'package:fillcart_vendor/features/order_flow/presentation/screens/order_details_screen.dart';
@@ -15,15 +16,27 @@ import 'package:fillcart_vendor/features/sales&analystics/presentation/screens/s
 /// Vendor Dashboard Screen (Home Tab) displaying store status, sales metrics,
 /// incoming orders flow, and store management shortcuts.
 class VendorDashboardScreen extends StatefulWidget {
-  const VendorDashboardScreen({super.key});
+  const VendorDashboardScreen({
+    super.key,
+    this.initialShowNewOrderPopup = false,
+  });
+
+  final bool initialShowNewOrderPopup;
 
   @override
   State<VendorDashboardScreen> createState() => _VendorDashboardScreenState();
 }
 
 class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
+  late bool _showNewOrderPopup;
   bool _isStoreOnline = true;
   final String _selectedPeriod = 'Today';
+
+  @override
+  void initState() {
+    super.initState();
+    _showNewOrderPopup = widget.initialShowNewOrderPopup;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +44,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
     const darkBg = Color(0xFF111827);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F5F7),
+      backgroundColor: const Color(0xFFF0F0F0),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -285,131 +298,15 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                 // 2. MAIN BODY CONTENT
                 // ==========================================
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    14,
+                    16,
+                    20 + MediaQuery.paddingOf(context).bottom,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ------------------------------------------
-                      // NEW ORDERS WAITING BANNER (Image 2)
-                      // ------------------------------------------
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFC8F169),
-                          borderRadius: BorderRadius.all(Radius.circular(24)),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  '3 new orders waiting',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF111827),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: darkBg,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: const Text(
-                                    'Accept in 2:45',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 14),
-
-                            // Order 1 (Tappable -> Opens Order Details Flow)
-                            _buildNewOrderCard(
-                              orderTitle: '#FC2841 · Anita K.',
-                              subtitle: '6 items · ₹386 · Paid online',
-                              timeLeft: '2:45',
-                              timeLeftColor: const Color(0xFFDC2626),
-                              onTap: () {
-                                Navigator.push<void>(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const OrderDetailsScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 10),
-
-                            // Order 2
-                            _buildNewOrderCard(
-                              orderTitle: '#FC2840 · Mohit S.',
-                              subtitle: '4 items · ₹210 · COD',
-                              timeLeft: '4:10',
-                              timeLeftColor: const Color(0xFFB45309),
-                              onTap: () {
-                                Navigator.push<void>(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const OrderDetailsScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 12),
-
-                            // View All New Orders Link
-                            InkWell(
-                              onTap: () {
-                                Navigator.push<void>(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const VendorOrdersScreen(
-                                      initialTab: VendorOrderTab.newOrders,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 4),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'View all new orders',
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFF111827),
-                                      ),
-                                    ),
-                                    SizedBox(width: 6),
-                                    Icon(
-                                      Icons.arrow_forward_rounded,
-                                      size: 16,
-                                      color: Color(0xFF111827),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-
                       // ------------------------------------------
                       // TODAY'S SALES CARD (Dark Container)
                       // ------------------------------------------
@@ -542,14 +439,9 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                               isDark: true,
                               countColor: brandLime,
                               onTap: () {
-                                Navigator.push<void>(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const VendorOrdersScreen(
-                                      initialTab: VendorOrderTab.newOrders,
-                                    ),
-                                  ),
-                                );
+                                setState(() {
+                                  _showNewOrderPopup = true;
+                                });
                               },
                             ),
                           ),
@@ -618,8 +510,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                               Navigator.push<void>(
                                 context,
                                 MaterialPageRoute<void>(
-                                  builder: (_) =>
-                                      const ProductInsightsScreen(),
+                                  builder: (_) => const ProductInsightsScreen(),
                                 ),
                               );
                             },
@@ -676,23 +567,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                       ),
                       const SizedBox(height: 10),
 
-                      // 2. Product Management
-                      _buildOverviewTile(
-                        iconAsset: 'assets/cardsicon/product.png',
-                        title: 'Product Management',
-                        subtitle: 'View top performing products',
-                        onTap: () {
-                          Navigator.push<void>(
-                            context,
-                            MaterialPageRoute<void>(
-                              builder: (_) => const ProductInsightsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 10),
-
-                      // 3. Revenue Analytics
+                      // 2. Revenue Analytics
                       _buildOverviewTile(
                         iconAsset: 'assets/cardsicon/revenue.png',
                         title: 'Revenue Analytics',
@@ -708,7 +583,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                       ),
                       const SizedBox(height: 10),
 
-                      // 4. Promotions
+                      // 3. Promotions
                       _buildOverviewTile(
                         iconAsset: 'assets/cardsicon/discount.png',
                         title: 'Promotions',
@@ -732,8 +607,9 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
           // Floating Action Button (+ in black squircle with lime +)
           Positioned(
             right: 16,
-            bottom: 96 + MediaQuery.paddingOf(context).bottom,
+            bottom: 16 + MediaQuery.paddingOf(context).bottom,
             child: InkWell(
+              key: const Key('dashboard_add_product_fab'),
               onTap: () {
                 Navigator.push<void>(
                   context,
@@ -747,7 +623,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                 width: 54,
                 height: 54,
                 decoration: BoxDecoration(
-                  color: darkBg,
+                  color: brandLime,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: const [
                     BoxShadow(
@@ -757,14 +633,64 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                     ),
                   ],
                 ),
-                child: const Icon(
-                  Icons.add,
-                  color: brandLime,
-                  size: 28,
-                ),
+                child: const Icon(Icons.add, color: darkBg, size: 28),
               ),
             ),
           ),
+
+          // 3. New Order Arrival POPUP Overlay
+          if (_showNewOrderPopup)
+            Positioned.fill(
+              child: GestureDetector(
+                key: const Key('new_order_popup_barrier'),
+                onTap: () {
+                  setState(() {
+                    _showNewOrderPopup = false;
+                  });
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: GestureDetector(
+                    onTap:
+                        () {}, // Prevent tap from dismissing when tapping popup card
+                    child: NewOrderWaitingPopup(
+                      onClose: () {
+                        setState(() {
+                          _showNewOrderPopup = false;
+                        });
+                      },
+                      onViewAll: () {
+                        setState(() {
+                          _showNewOrderPopup = false;
+                        });
+                        Navigator.push<void>(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => const VendorOrdersScreen(
+                              initialTab: VendorOrderTab.newOrders,
+                            ),
+                          ),
+                        );
+                      },
+                      onTapOrder: (orderId) {
+                        setState(() {
+                          _showNewOrderPopup = false;
+                        });
+                        Navigator.push<void>(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => const OrderDetailsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -774,86 +700,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
   // HELPER WIDGETS
   // -------------------------------------------------------------
 
-  Widget _buildNewOrderCard({
-    required String orderTitle,
-    required String subtitle,
-    required String timeLeft,
-    required Color timeLeftColor,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    orderTitle,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF111827),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF6B7280),
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    timeLeft,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w700,
-                      color: timeLeftColor,
-                      height: 1.15,
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                  const SizedBox(height: 2),
-                  const Text(
-                    'left',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF6B7280),
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDarkMetricBox({
-    required String value,
-    required String label,
-  }) {
+  Widget _buildDarkMetricBox({required String value, required String label}) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
