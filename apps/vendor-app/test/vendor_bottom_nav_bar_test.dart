@@ -113,12 +113,16 @@ void main() {
       // Starts on Home tab
       expect(find.byType(VendorDashboardScreen), findsOneWidget);
 
-      // Switch to Earnings tab (index 1)
+      // Switch to Earnings tab (index 1) and test back arrow returns to Home
       await tester.tap(find.text('Earnings'));
       await tester.pumpAndSettle();
       expect(find.byType(VendorEarningsScreen), findsOneWidget);
 
-      // Switch to Orders tab (index 2)
+      await tester.tap(find.byKey(const Key('earnings_back_button')));
+      await tester.pumpAndSettle();
+      expect(find.byType(VendorDashboardScreen), findsOneWidget);
+
+      // Switch to Orders tab (index 2) and test back arrow returns to Home
       await tester.tap(
         find.descendant(
           of: find.byType(VendorBottomNavBar),
@@ -128,21 +132,34 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(VendorOrdersScreen), findsOneWidget);
 
-      // Switch to Inventory tab (index 3)
+      await tester.tap(find.byKey(const Key('orders_back_button')));
+      await tester.pumpAndSettle();
+      expect(find.byType(VendorDashboardScreen), findsOneWidget);
+
+      // Switch to Inventory tab (index 3) and test back arrow returns to Home
       await tester.tap(find.text('Inventory'));
       await tester.pumpAndSettle();
       expect(find.byType(VendorInventoryScreen), findsOneWidget);
 
-      // Tap top-left back arrow in Products & Inventory screen -> should return to Home
-      // Tap top-left back arrow in Products & Inventory screen -> should return to Home
-      await tester.tap(find.byKey(const Key('inventory_back_button')), warnIfMissed: false);
+      await tester.tap(find.byKey(const Key('inventory_back_button')));
       await tester.pumpAndSettle();
       expect(find.byType(VendorDashboardScreen), findsOneWidget);
 
-      // Switch to Profile tab (index 4)
+      // Switch to Profile tab (index 4) and test header & back arrow returns to Home
       await tester.tap(find.text('Profile'));
       await tester.pumpAndSettle();
       expect(find.byType(VendorProfileScreen), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(VendorProfileScreen),
+          matching: find.text('Profile'),
+        ),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(const Key('profile_back_button')));
+      await tester.pumpAndSettle();
+      expect(find.byType(VendorDashboardScreen), findsOneWidget);
 
       bloc.close();
     });

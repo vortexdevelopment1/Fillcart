@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 
@@ -7,7 +7,7 @@ import 'package:fillcart_vendor/core/constants/app_assets.dart';
 class EarningDetailsScreen extends StatelessWidget {
   const EarningDetailsScreen({super.key});
 
-  static const Color brandLime = Color(0xFFD4FA62);
+  static const Color brandLime = Color(0xFFC8F169);
   static const Color darkHeroBg = Color(0xFF0F172A);
   static const Color textBlack = Color(0xFF111827);
   static const Color textMuted = Color(0xFF6B7280);
@@ -31,7 +31,7 @@ class EarningDetailsScreen extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -102,31 +102,44 @@ class EarningDetailsScreen extends StatelessWidget {
 
               // 5. 3 Summary Cards
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: _buildSummaryCard(
-                      iconAsset: AppAssets.svgEarningOrder,
-                      fallbackIcon: Icons.inbox_outlined,
-                      value: '42',
-                      label: 'Orders',
+                  Flexible(
+                    child: SizedBox(
+                      width: 100,
+                      height: 111,
+                      child: _buildSummaryCard(
+                        iconAsset: AppAssets.svgEarningOrder,
+                        fallbackIcon: Icons.inbox_outlined,
+                        value: '42',
+                        label: 'Orders',
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildSummaryCard(
-                      iconAsset: AppAssets.svgAvgOrder,
-                      fallbackIcon: Icons.trending_up,
-                      value: '₹585',
-                      label: 'Avg. order\nvalue',
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: SizedBox(
+                      width: 100,
+                      height: 111,
+                      child: _buildSummaryCard(
+                        iconAsset: AppAssets.svgAvgOrder,
+                        fallbackIcon: Icons.trending_up,
+                        value: '₹585',
+                        label: 'Avg. order\nvalue',
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildSummaryCard(
-                      iconAsset: AppAssets.svgWallet,
-                      fallbackIcon: Icons.credit_card,
-                      value: '₹24,560',
-                      label: 'You will\nreceive',
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: SizedBox(
+                      width: 100,
+                      height: 111,
+                      child: _buildSummaryCard(
+                        iconAsset: AppAssets.svgWallet,
+                        fallbackIcon: Icons.credit_card,
+                        value: '₹24,560',
+                        label: 'You will\nreceive',
+                      ),
                     ),
                   ),
                 ],
@@ -199,7 +212,11 @@ class EarningDetailsScreen extends StatelessWidget {
   Widget _buildTotalEarningsHeroCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      constraints: const BoxConstraints(minHeight: 67),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 18,
+        vertical: 14,
+      ),
       decoration: BoxDecoration(
         color: darkHeroBg,
         borderRadius: BorderRadius.circular(20),
@@ -212,6 +229,7 @@ class EarningDetailsScreen extends StatelessWidget {
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -326,7 +344,7 @@ class EarningDetailsScreen extends StatelessWidget {
                       'Total earnings',
                       style: TextStyle(
                         fontFamily: 'Inter',
-                        fontSize: 16,
+                        fontSize: 15.5,
                         fontWeight: FontWeight.w700,
                         color: textBlack,
                       ),
@@ -336,9 +354,9 @@ class EarningDetailsScreen extends StatelessWidget {
                       '(settlement amount)',
                       style: TextStyle(
                         fontFamily: 'Inter',
-                        fontSize: 13,
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF374151),
+                        color: Color(0xFF4B5563),
                       ),
                     ),
                   ],
@@ -412,7 +430,7 @@ class EarningDetailsScreen extends StatelessWidget {
     required String label,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -439,25 +457,31 @@ class EarningDetailsScreen extends StatelessWidget {
               color: textBlack,
             ),
           ),
-          const SizedBox(height: 14),
-          Text(
-            value,
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              color: textBlack,
+          const SizedBox(height: 6),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: textBlack,
+              ),
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 11.5,
-              fontWeight: FontWeight.w400,
-              color: textMuted,
-              height: 1.2,
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: textMuted,
+                height: 1.2,
+              ),
             ),
           ),
         ],

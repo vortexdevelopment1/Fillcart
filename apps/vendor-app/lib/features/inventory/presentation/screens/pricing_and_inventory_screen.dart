@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
+import 'package:fillcart_vendor/core/widgets/vendor_toggle_switch.dart';
 import 'preview_and_publish_screen.dart';
 
 /// Screen 3 in Add Product Flow: Pricing & Inventory (matching Figma Image 3)
@@ -212,7 +213,7 @@ class _PricingAndInventoryScreenState extends State<PricingAndInventoryScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -465,12 +466,8 @@ class _PricingAndInventoryScreenState extends State<PricingAndInventoryScreen> {
                             ],
                           ),
                           const Spacer(),
-                          Switch(
+                          VendorToggleSwitch(
                             value: _isAvailable,
-                            activeThumbColor: Colors.white,
-                            activeTrackColor: const Color(0xFF84CC16),
-                            inactiveThumbColor: Colors.white,
-                            inactiveTrackColor: const Color(0xFFD1D5DB),
                             onChanged: (val) {
                               setState(() {
                                 _isAvailable = val;
@@ -590,7 +587,8 @@ class _PricingAndInventoryScreenState extends State<PricingAndInventoryScreen> {
                 child: ElevatedButton(
                   onPressed: _onNext,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC8F169),
+                    backgroundColor: const Color(0xFF000000),
+                    foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -602,7 +600,7 @@ class _PricingAndInventoryScreenState extends State<PricingAndInventoryScreen> {
                       fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF111827),
+                      color: Colors.white,
                     ),
                   ),
                 ),

@@ -32,19 +32,33 @@ class VendorApp extends StatelessWidget {
           scaffoldBackgroundColor: const Color(0xFFF0F0F0),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFC8F169),
-              foregroundColor: const Color(0xFF111827),
+              backgroundColor: const Color(0xFF000000),
+              foregroundColor: Colors.white,
             ),
           ),
           filledButtonTheme: FilledButtonThemeData(
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFC8F169),
-              foregroundColor: const Color(0xFF111827),
+              backgroundColor: const Color(0xFF000000),
+              foregroundColor: Colors.white,
             ),
           ),
           floatingActionButtonTheme: const FloatingActionButtonThemeData(
-            backgroundColor: Color(0xFFC8F169),
-            foregroundColor: Color(0xFF111827),
+            backgroundColor: Color(0xFF000000),
+            foregroundColor: Colors.white,
+          ),
+          switchTheme: SwitchThemeData(
+            thumbColor: WidgetStateProperty.resolveWith(
+              (states) => states.contains(WidgetState.selected)
+                  ? const Color(0xFFA2D331)
+                  : const Color(0xFFFFFFFF),
+            ),
+            trackColor: WidgetStateProperty.resolveWith(
+              (states) => states.contains(WidgetState.selected)
+                  ? const Color(0xFF000000)
+                  : const Color(0xFF9A9A9A),
+            ),
+            trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
+            trackOutlineWidth: const WidgetStatePropertyAll(0),
           ),
           textTheme: FCTheme.lightTheme.textTheme.apply(
             fontFamily: 'Inter',

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import 'package:fillcart_vendor/features/order_flow/models/order_flow_model.dart';
@@ -14,10 +14,7 @@ import 'package:fillcart_vendor/features/order_management/presentation/screens/v
 /// - "Bill and payout" card with customer paid, commission, and "You earned" lime box
 /// - "Contact Support" footer
 class VendorCompletedOrderDetailsScreen extends StatelessWidget {
-  const VendorCompletedOrderDetailsScreen({
-    super.key,
-    required this.order,
-  });
+  const VendorCompletedOrderDetailsScreen({super.key, required this.order});
 
   final VendorOrder order;
 
@@ -25,18 +22,53 @@ class VendorCompletedOrderDetailsScreen extends StatelessWidget {
   static const Color darkCharcoal = Color(0xFF000000);
 
   static const List<OrderItem> _defaultItems = [
-    OrderItem(name: 'Tomato (kg)', quantity: 2, unitPrice: 40, unit: 'kg', isPacked: true),
-    OrderItem(name: 'Onion (kg)', quantity: 3, unitPrice: 32, unit: 'kg', isPacked: true),
-    OrderItem(name: 'Coriander bunch', quantity: 1, unitPrice: 20, unit: 'bunch', isPacked: true),
-    OrderItem(name: 'Green chili 250 g', quantity: 1, unitPrice: 30, unit: '250 g', isPacked: true),
-    OrderItem(name: 'Potato (kg)', quantity: 2, unitPrice: 35, unit: 'kg', isPacked: true),
-    OrderItem(name: 'Ginger 100 g', quantity: 1, unitPrice: 30, unit: '100 g', isPacked: true),
+    OrderItem(
+      name: 'Tomato (kg)',
+      quantity: 2,
+      unitPrice: 40,
+      unit: 'kg',
+      isPacked: true,
+    ),
+    OrderItem(
+      name: 'Onion (kg)',
+      quantity: 3,
+      unitPrice: 32,
+      unit: 'kg',
+      isPacked: true,
+    ),
+    OrderItem(
+      name: 'Coriander bunch',
+      quantity: 1,
+      unitPrice: 20,
+      unit: 'bunch',
+      isPacked: true,
+    ),
+    OrderItem(
+      name: 'Green chili 250 g',
+      quantity: 1,
+      unitPrice: 30,
+      unit: '250 g',
+      isPacked: true,
+    ),
+    OrderItem(
+      name: 'Potato (kg)',
+      quantity: 2,
+      unitPrice: 35,
+      unit: 'kg',
+      isPacked: true,
+    ),
+    OrderItem(
+      name: 'Ginger 100 g',
+      quantity: 1,
+      unitPrice: 30,
+      unit: '100 g',
+      isPacked: true,
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final displayItems =
-        order.items.isNotEmpty ? order.items : _defaultItems;
+    final displayItems = order.items.isNotEmpty ? order.items : _defaultItems;
     final itemTotal = displayItems.fold<double>(
       0.0,
       (sum, item) => sum + item.totalPrice,
@@ -63,7 +95,7 @@ class VendorCompletedOrderDetailsScreen extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -111,12 +143,17 @@ class VendorCompletedOrderDetailsScreen extends StatelessWidget {
               // 1. TOP DARK STATUS BANNER
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(18),
+                constraints: const BoxConstraints(minHeight: 67),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: darkCharcoal,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -181,10 +218,7 @@ class VendorCompletedOrderDetailsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: const Color(0xFFE5E7EB),
-                    width: 1,
-                  ),
+                  border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.02),
@@ -220,32 +254,34 @@ class VendorCompletedOrderDetailsScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 14),
-                    ...displayItems.map((item) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${item.quantity} × ${item.name}',
-                                style: const TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 14.5,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF111827),
-                                ),
+                    ...displayItems.map(
+                      (item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${item.quantity} × ${item.name}',
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF111827),
                               ),
-                              Text(
-                                '₹${item.totalPrice.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 14.5,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF111827),
-                                ),
+                            ),
+                            Text(
+                              '₹${item.totalPrice.toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF111827),
                               ),
-                            ],
-                          ),
-                        )),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -257,10 +293,7 @@ class VendorCompletedOrderDetailsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: const Color(0xFFE5E7EB),
-                    width: 1,
-                  ),
+                  border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.02),
@@ -389,10 +422,7 @@ class VendorCompletedOrderDetailsScreen extends StatelessWidget {
                   },
                   borderRadius: BorderRadius.circular(12),
                   child: const Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Column(
                       children: [
                         Row(

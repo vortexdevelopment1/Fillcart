@@ -1,4 +1,4 @@
-﻿import 'package:fillcart_vendor/core/constants/app_assets.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import 'package:fillcart_vendor/features/analytics/revenue_analytics/presentation/screens/revenue_analytics_screen.dart';
 import 'package:fillcart_vendor/features/product_insights/presentation/screens/product_insights_screen.dart';
 import 'package:flutter/material.dart';

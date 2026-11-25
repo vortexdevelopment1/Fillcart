@@ -68,7 +68,7 @@ class CustomerCancellationBottomSheet extends StatelessWidget {
 
             // Modal Header Title & Subtitle
             const Text(
-              'Order cancel by customer',
+              'Order cancelled by customer',
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 18,
@@ -79,7 +79,7 @@ class CustomerCancellationBottomSheet extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              '$orderId order cancel on $cancelTime',
+              '$orderId order cancelled on $cancelTime',
               style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
@@ -132,8 +132,8 @@ class CustomerCancellationBottomSheet extends StatelessWidget {
               height: 52,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFC8F169),
-                  foregroundColor: const Color(0xFF111827),
+                  backgroundColor: const Color(0xFF000000),
+                  foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),

@@ -164,10 +164,10 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
   }
 
   void _handleBack() {
-    if (widget.onBackToHome != null) {
-      widget.onBackToHome!();
-    } else if (Navigator.of(context).canPop()) {
+    if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
+    } else if (widget.onBackToHome != null) {
+      widget.onBackToHome!();
     } else {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute<void>(
@@ -197,7 +197,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -299,13 +299,13 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
               padding: const EdgeInsets.only(bottom: 76),
               child: FloatingActionButton.extended(
                 onPressed: () => AddProductBottomSheet.show(context),
-                backgroundColor: const Color(0xFFC8F169),
-                foregroundColor: const Color(0xFF111827),
+                backgroundColor: const Color(0xFF000000),
+                foregroundColor: Colors.white,
                 elevation: 3,
                 icon: const Icon(
                   Icons.add_circle_outline_rounded,
                   size: 21,
-                  color: Color(0xFF111827),
+                  color: Colors.white,
                 ),
                 label: const Text(
                   'Add Product',
@@ -313,7 +313,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
                     fontFamily: 'Inter',
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF111827),
+                    color: Colors.white,
                   ),
                 ),
                 shape: const StadiumBorder(),
@@ -321,7 +321,7 @@ class _VendorInventoryScreenState extends State<VendorInventoryScreen> {
             )
           : null,
       body: PopScope(
-        canPop: false,
+        canPop: widget.onBackToHome != null,
         onPopInvokedWithResult: (didPop, result) {
           if (didPop) return;
           _handleBack();

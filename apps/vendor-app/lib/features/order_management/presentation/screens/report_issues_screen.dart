@@ -78,7 +78,7 @@ class _ReportIssuesScreenState extends State<ReportIssuesScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -298,8 +298,8 @@ class _ReportIssuesScreenState extends State<ReportIssuesScreen> {
                 child: ElevatedButton(
                   onPressed: _submitReport,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC8F169),
-                    foregroundColor: const Color(0xFF111827),
+                    backgroundColor: const Color(0xFF000000),
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),
                     ),

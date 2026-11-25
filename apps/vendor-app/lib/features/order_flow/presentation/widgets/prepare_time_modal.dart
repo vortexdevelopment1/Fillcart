@@ -318,8 +318,8 @@ class _PrepareTimeModalState extends State<PrepareTimeModal> {
               height: 52,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFC8F169),
-                  foregroundColor: const Color(0xFF111827),
+                  backgroundColor: const Color(0xFF000000),
+                  foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),

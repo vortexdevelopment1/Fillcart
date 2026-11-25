@@ -39,7 +39,7 @@ void main() {
     expect(find.text('New'), findsOneWidget);
     expect(find.text('Preparing'), findsOneWidget);
     expect(find.text('Completed'), findsOneWidget);
-    expect(find.text('Cancel'), findsOneWidget);
+    expect(find.text('Cancelled'), findsOneWidget);
 
     // 3. Tab 'All' shows sections
     expect(find.text('New Orders'), findsOneWidget);
@@ -138,12 +138,12 @@ void main() {
     await tester.pumpWidget(createTestWidget());
     await tester.pumpAndSettle();
 
-    // Switch to 'Cancel'
-    await tester.ensureVisible(find.text('Cancel'));
-    await tester.tap(find.text('Cancel'));
+    // Switch to 'Cancelled'
+    await tester.ensureVisible(find.text('Cancelled'));
+    await tester.tap(find.text('Cancelled'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Cancel'), findsWidgets);
+    expect(find.text('Cancelled'), findsWidgets);
     expect(
       find.text(
         'Tap a cancelled order to see when it was cancelled, what was already packed and what to do next.',

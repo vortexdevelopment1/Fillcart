@@ -128,7 +128,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         ),
                         child: Text(
-                          'skip',
+                          'Skip',
                           style: GoogleFonts.inter(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w400,
@@ -239,13 +239,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 24.0),
               child: SizedBox(
-                width: double.infinity,
-                height: 56.0,
+                width: 328,
+                height: 48,
                 child: ElevatedButton(
                   onPressed: isLastPage ? _completeOnboarding : _nextPage,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC8F169),
-                    foregroundColor: const Color(0xFF111827),
+                    backgroundColor: const Color(0xFF000000),
+                    foregroundColor: Colors.white,
                     elevation: 0,
                     shape: const StadiumBorder(),
                   ),
@@ -255,7 +255,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 17.0,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF111827),
+                            color: Colors.white,
                           ),
                         )
                       : Row(
@@ -267,7 +267,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               style: GoogleFonts.inter(
                                 fontSize: 17.0,
                                 fontWeight: FontWeight.w600,
-                                color: const Color(0xFF111827),
+                                color: Colors.white,
                               ),
                             ),
                             const SizedBox(width: 8.0),
@@ -277,7 +277,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               child: Icon(
                                 Icons.arrow_forward_rounded,
                                 size: 20.0,
-                                color: Color(0xFF111827),
+                                color: Colors.white,
                               ),
                             ),
                           ],

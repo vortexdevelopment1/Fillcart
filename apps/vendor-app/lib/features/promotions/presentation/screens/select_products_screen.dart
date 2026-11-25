@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/category_checklist_tile.dart';
@@ -342,8 +342,8 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC8F169),
-                    foregroundColor: const Color(0xFF111827),
+                    backgroundColor: const Color(0xFF000000),
+                    foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
