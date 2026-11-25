@@ -17,6 +17,7 @@ export const inviteStaffSchema = z.object({
   fullName: z.string().min(1, "Full name is required").max(100),
   roleId: z.string().min(1, "Role ID is required"),
   profileId: z.string().optional(),
+  password: z.string().min(6, "Password must be at least 6 characters").optional(),
 });
 
 export const updateStaffStatusSchema = z.object({

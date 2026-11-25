@@ -95,6 +95,7 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
         email: trimmedEmail,
         roleId: targetRoleId,
         profileId: targetProfileId,
+        password: password.trim() || undefined,
       });
 
       onSuccess({

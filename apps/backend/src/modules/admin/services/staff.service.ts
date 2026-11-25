@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import type { PrismaClient } from "../../../database/generated/client/client.js";
 import type { CryptoService } from "../../auth/services/crypto.service.js";
+import { PasswordService } from "../../auth/services/password.service.js";
 import {
   BadRequestError,
   NotFoundError,
@@ -235,6 +236,18 @@ export class StaffService {
           profileId: data.profileId,
           assignedBy: currentAdminId,
           assignedAt: new Date(),
+        },
+      });
+    }
+
+    if (data.password) {
+      const hashedPassword = await PasswordService.hashPassword(data.password);
+      await this.prisma.credential.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: newUserId,
+          type: "PASSWORD",
+          secretHash: hashedPassword,
         },
       });
     }

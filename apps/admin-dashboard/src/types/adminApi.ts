@@ -58,6 +58,7 @@ export interface InviteStaffPayload {
   fullName: string;
   roleId: string;
   profileId?: string | null;
+  password?: string;
 }
 
 export interface InviteStaffResponse {
