@@ -18,11 +18,15 @@ import { adminApi } from '../../services/adminApi';
 export interface AdminProfileContentProps {
   onClose: () => void;
   activeTriggerRef?: React.RefObject<HTMLButtonElement | null>;
+  onOpenNotifications?: () => void;
+  onOpenSupport?: () => void;
 }
 
 export const AdminProfileContent: React.FC<AdminProfileContentProps> = ({
   onClose,
   activeTriggerRef,
+  onOpenNotifications,
+  onOpenSupport,
 }) => {
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -189,7 +193,11 @@ export const AdminProfileContent: React.FC<AdminProfileContentProps> = ({
               role="menuitem"
               onClick={() => {
                 onClose();
-                navigate('/settings?tab=notifications');
+                if (onOpenNotifications) {
+                  onOpenNotifications();
+                } else {
+                  navigate('/settings?tab=notifications');
+                }
               }}
               className="w-full min-h-[44px] px-3 py-2 rounded-xl flex items-center justify-between text-left text-ink hover:bg-neutral transition-colors group focus:outline-none focus:ring-2 focus:ring-secondary cursor-pointer"
             >
@@ -202,7 +210,7 @@ export const AdminProfileContent: React.FC<AdminProfileContentProps> = ({
                     Notifications
                   </span>
                   <span className="text-[10px] text-ink/50 block truncate">
-                    Alert triggers & dispatch preferences
+                    Operational alerts & pending actions
                   </span>
                 </div>
               </div>
@@ -213,12 +221,16 @@ export const AdminProfileContent: React.FC<AdminProfileContentProps> = ({
               type="button"
               role="menuitem"
               onClick={() => {
-                addToast(
-                  'info',
-                  'Help & Support',
-                  'Central Operations Desk: ops-support@fillkart.in · Ext: 4022'
-                );
                 onClose();
+                if (onOpenSupport) {
+                  onOpenSupport();
+                } else {
+                  addToast(
+                    'info',
+                    'Help & Support',
+                    'Central Operations Desk: ops-support@fillkart.in · Ext: 4022'
+                  );
+                }
               }}
               className="w-full min-h-[44px] px-3 py-2 rounded-xl flex items-center justify-between text-left text-ink hover:bg-neutral transition-colors group focus:outline-none focus:ring-2 focus:ring-secondary cursor-pointer"
             >
@@ -231,7 +243,7 @@ export const AdminProfileContent: React.FC<AdminProfileContentProps> = ({
                     Help & Support
                   </span>
                   <span className="text-[10px] text-ink/50 block truncate">
-                    Platform documentation & ops desk
+                    Ops runbooks & technical escalation desk
                   </span>
                 </div>
               </div>

@@ -8,9 +8,13 @@ import type { ProductsController } from "../catalogue/controllers/products.contr
 import type { InventoryController } from "../catalogue/controllers/inventory.controller.js";
 import type { SettingsController } from "../settings/controllers/settings.controller.js";
 import type { AuditLogsController } from "../audit-logs/controllers/audit-logs.controller.js";
+import type { NotificationsController } from "../notifications/controllers/notifications.controller.js";
+import type { SupportController } from "../support/controllers/support.controller.js";
 import { createCatalogueRouter } from "../catalogue/routes/catalogue.routes.js";
 import { createSettingsRouter } from "../settings/routes/settings.routes.js";
 import { createAuditLogsRouter } from "../audit-logs/routes/audit-logs.routes.js";
+import { createNotificationsRouter } from "../notifications/routes/notifications.routes.js";
+import { createSupportRouter } from "../support/routes/support.routes.js";
 import { validateRequest } from "../../../middleware/validate-request.js";
 import { requirePermission } from "../middleware/admin-auth.middleware.js";
 import {
@@ -30,6 +34,8 @@ export interface AdminRouterDependencies {
   inventoryController: InventoryController;
   settingsController: SettingsController;
   auditLogsController: AuditLogsController;
+  notificationsController: NotificationsController;
+  supportController: SupportController;
   requireSettingsAccessMiddleware: RequestHandler;
 }
 
@@ -105,6 +111,20 @@ export function createAdminRouter(deps: AdminRouterDependencies): Router {
     auditLogsController: deps.auditLogsController,
   });
   router.use(auditLogsRouter);
+
+  // 10. Mount Notifications Sub-Module
+  // /api/v1/admin/notifications
+  const notificationsRouter = createNotificationsRouter({
+    notificationsController: deps.notificationsController,
+  });
+  router.use("/notifications", notificationsRouter);
+
+  // 11. Mount Support Ops Desk Sub-Module
+  // /api/v1/admin/support
+  const supportRouter = createSupportRouter({
+    supportController: deps.supportController,
+  });
+  router.use("/support", supportRouter);
 
   return router;
 }

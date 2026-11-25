@@ -331,3 +331,70 @@ export interface GetAuditLogsResponse {
     totalPages: number;
   };
 }
+
+export interface AdminNotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  category: 'KYC' | 'ORDERS' | 'INVENTORY' | 'FINANCE' | 'SECURITY' | 'SYSTEM';
+  severity: 'INFO' | 'WARNING' | 'CRITICAL' | 'SUCCESS';
+  isRead: boolean;
+  createdAt: string;
+  actionUrl?: string;
+  actionLabel?: string;
+}
+
+export interface GetNotificationsResponse {
+  notifications: AdminNotificationItem[];
+  unreadCount: number;
+}
+
+export interface SupportContact {
+  id: string;
+  role: string;
+  name: string;
+  email: string;
+  phone: string;
+  availability: string;
+  category: 'ENGINEERING' | 'DATABASE' | 'PAYMENT_GATEWAY' | 'LOGISTICS';
+}
+
+export interface SupportRunbook {
+  id: string;
+  title: string;
+  category: string;
+  summary: string;
+  steps: string[];
+}
+
+export interface SupportTicketItem {
+  id: string;
+  ticketNumber: string;
+  subject: string;
+  category: string;
+  priority: string;
+  description: string;
+  status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
+  createdByName: string;
+  createdAt: string;
+}
+
+export interface GetSupportInfoResponse {
+  contacts: SupportContact[];
+  runbooks: SupportRunbook[];
+  recentTickets: SupportTicketItem[];
+}
+
+export interface CreateSupportTicketPayload {
+  subject: string;
+  category:
+    | 'BUG_REPORT'
+    | 'PAYMENT_GATEWAY'
+    | 'DISPATCH_SYSTEM'
+    | 'DATABASE_SYNC'
+    | 'ACCESS_PERMISSION'
+    | 'FEATURE_REQUEST'
+    | 'OTHER';
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  description: string;
+}

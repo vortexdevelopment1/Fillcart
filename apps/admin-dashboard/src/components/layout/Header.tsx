@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
-import { RotateCw, Menu, X } from 'lucide-react';
+import { RotateCw, Menu, X, Bell } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { useSidebar } from '../../context/SidebarContext';
 import { GlobalSearch } from './GlobalSearch';
 import { AdminProfileContent } from './AdminProfileMenu';
+import { AdminNotificationsModal } from '../notifications/AdminNotificationsModal';
+import { AdminSupportModal } from '../support/AdminSupportModal';
+import { adminApi } from '../../services/adminApi';
 
 // Route-specific titles and subtitles for all dashboard pages
 const ROUTE_CONFIG: Record<string, { title: string; subtitle: string }> = {
@@ -111,6 +114,15 @@ export const Header: React.FC = () => {
 
   // Profile Menu State & Refs
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+
+  useEffect(() => {
+    adminApi.getNotifications().then((res) => {
+      setUnreadNotificationsCount(res.unreadCount);
+    }).catch(() => {});
+  }, []);
   const mobileAvatarButtonRef = useRef<HTMLButtonElement>(null);
   const desktopAvatarButtonRef = useRef<HTMLButtonElement>(null);
   const desktopContainerRef = useRef<HTMLDivElement>(null);
@@ -271,6 +283,20 @@ export const Header: React.FC = () => {
         {/* Global Search Bar / Button */}
         <GlobalSearch />
 
+        {/* Notifications Bell */}
+        <button
+          type="button"
+          onClick={() => setIsNotificationsOpen(true)}
+          className="relative h-10 w-10 rounded-full bg-white border border-primary/10 flex items-center justify-center shadow-sm hover:bg-neutral transition-all text-ink/70 hover:text-ink focus:outline-none focus:ring-2 focus:ring-secondary flex-shrink-0 cursor-pointer"
+          title="Admin Operational Notifications"
+          aria-label="Open notifications"
+        >
+          <Bell className="w-4 h-4" />
+          {unreadNotificationsCount > 0 && (
+            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+          )}
+        </button>
+
         {/* Sync Pill: "Last sync / Just now" */}
         <button
           onClick={handleManualSync}
@@ -307,6 +333,8 @@ export const Header: React.FC = () => {
               <AdminProfileContent
                 onClose={closeProfile}
                 activeTriggerRef={desktopAvatarButtonRef}
+                onOpenNotifications={() => setIsNotificationsOpen(true)}
+                onOpenSupport={() => setIsSupportOpen(true)}
               />
             </div>
           )}
@@ -349,11 +377,26 @@ export const Header: React.FC = () => {
               <AdminProfileContent
                 onClose={closeProfile}
                 activeTriggerRef={mobileAvatarButtonRef}
+                onOpenNotifications={() => setIsNotificationsOpen(true)}
+                onOpenSupport={() => setIsSupportOpen(true)}
               />
             </div>
           </div>,
           document.body
         )}
+
+      {/* Admin Operational Notifications Modal */}
+      <AdminNotificationsModal
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+        onCountChange={setUnreadNotificationsCount}
+      />
+
+      {/* Admin Operations Desk & Tech Support Modal */}
+      <AdminSupportModal
+        isOpen={isSupportOpen}
+        onClose={() => setIsSupportOpen(false)}
+      />
     </header>
   );
 };

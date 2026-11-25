@@ -32,6 +32,10 @@ import type {
   BackendAuditLogItem,
   GetAuditLogsParams,
   GetAuditLogsResponse,
+  GetNotificationsResponse,
+  GetSupportInfoResponse,
+  CreateSupportTicketPayload,
+  SupportTicketItem,
 } from '../types/adminApi';
 import { initialStaff, initialRolePermissions } from '../data/staffData';
 import { initialCategories, initialProducts } from '../data/products';
@@ -1067,6 +1071,200 @@ export const adminApi = {
 
     try {
       const res = await adminClient.get<GetAuditLogsResponse>('/audit-logs', { params });
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * ==========================================
+   * B.13 ADMIN NOTIFICATIONS & ALERTS
+   * ==========================================
+   */
+  getNotifications: async (): Promise<GetNotificationsResponse> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      return {
+        notifications: [
+          {
+            id: 'mock-notif-1',
+            title: 'KYC Verification Required',
+            message: '3 vendor verification documents are awaiting review.',
+            category: 'KYC',
+            severity: 'WARNING',
+            isRead: false,
+            actionUrl: '/document-verification',
+            actionLabel: 'Review Documents',
+            createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+          },
+          {
+            id: 'mock-notif-2',
+            title: 'Catalog Moderation Pending',
+            message: '2 new merchant products are pending admin approval.',
+            category: 'SYSTEM',
+            severity: 'INFO',
+            isRead: false,
+            actionUrl: '/products',
+            actionLabel: 'Review Products',
+            createdAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+          },
+          {
+            id: 'mock-notif-3',
+            title: 'Fleet Operations Status',
+            message: 'All delivery partner fleets are operating normally.',
+            category: 'ORDERS',
+            severity: 'SUCCESS',
+            isRead: true,
+            actionUrl: '/riders',
+            actionLabel: 'View Riders',
+            createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          },
+        ],
+        unreadCount: 2,
+      };
+    }
+
+    try {
+      const res = await adminClient.get<GetNotificationsResponse>('/notifications');
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  markNotificationRead: async (id: string): Promise<{ success: boolean }> => {
+    if (isMockMode()) {
+      return { success: true };
+    }
+
+    try {
+      const res = await adminClient.patch<{ success: boolean }>(`/notifications/${id}/read`);
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  markAllNotificationsRead: async (): Promise<{ success: boolean }> => {
+    if (isMockMode()) {
+      return { success: true };
+    }
+
+    try {
+      const res = await adminClient.post<{ success: boolean }>('/notifications/mark-all-read');
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  /**
+   * ==========================================
+   * B.14 ADMIN OPS DESK & HELP RUNBOOKS
+   * ==========================================
+   */
+  getSupportInfo: async (): Promise<GetSupportInfoResponse> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 200));
+      return {
+        contacts: [
+          {
+            id: 'c-1',
+            role: 'DevOps & Infrastructure On-Call',
+            name: 'Vikram Seth',
+            email: 'devops-lead@fillkart.in',
+            phone: '+91 98765 43210',
+            availability: '24x7 Emergency Escalation',
+            category: 'ENGINEERING',
+          },
+          {
+            id: 'c-2',
+            role: 'Database & DB Administrator (DBA)',
+            name: 'Pooja Nair',
+            email: 'dba-team@fillkart.in',
+            phone: '+91 98765 43211',
+            availability: '08:00 - 22:00 IST',
+            category: 'DATABASE',
+          },
+          {
+            id: 'c-3',
+            role: 'Payment Gateway Nodal Desk',
+            name: 'Razorpay / Cashfree Desk',
+            email: 'nodal-support@fillkart.in',
+            phone: '+91 98765 43212',
+            availability: '24x7 Banking Gateway Operations',
+            category: 'PAYMENT_GATEWAY',
+          },
+        ],
+        runbooks: [
+          {
+            id: 'sop-kyc-reject',
+            category: 'KYC',
+            title: 'SOP: High-Risk Vendor Document Rejection',
+            summary: 'Steps to take when a document appears forged or mismatched.',
+            steps: [
+              'Navigate to Document Verification (/document-verification).',
+              'Examine the GSTIN / PAN using the verify button.',
+              'If forged, select Reject and enter a clear audit note reason.',
+              'Submit a high-priority incident ticket if fraud is suspected.',
+            ],
+          },
+          {
+            id: 'sop-refund-dispute',
+            category: 'FINANCE',
+            title: 'SOP: Gateway Double-Debit & Auto-Refund Resolution',
+            summary: 'Handling customer claims for disputed or stuck transactions.',
+            steps: [
+              'Cross-check payment ID in Payments (/payments).',
+              'Check gateway webhook logs in Audit Logs.',
+              'If gateway captured but order failed, initiate refund from Finance portal.',
+            ],
+          },
+        ],
+        recentTickets: [
+          {
+            id: 't-1',
+            ticketNumber: 'TKT-100234',
+            subject: 'Gateway Webhook Latency Check',
+            category: 'PAYMENT_GATEWAY',
+            priority: 'MEDIUM',
+            description: 'Webhook latency elevated on HDFC netbanking callbacks.',
+            status: 'RESOLVED',
+            createdByName: 'Sarah Mitchell',
+            createdAt: new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString(),
+          },
+        ],
+      };
+    }
+
+    try {
+      const res = await adminClient.get<GetSupportInfoResponse>('/support/info');
+      return res.data;
+    } catch (err) {
+      throw parseApiError(err);
+    }
+  },
+
+  createSupportTicket: async (payload: CreateSupportTicketPayload): Promise<SupportTicketItem> => {
+    if (isMockMode()) {
+      await new Promise((r) => setTimeout(r, 300));
+      const rand = Math.floor(100000 + Math.random() * 900000);
+      return {
+        id: `t-${rand}`,
+        ticketNumber: `TKT-${rand}`,
+        subject: payload.subject,
+        category: payload.category,
+        priority: payload.priority || 'MEDIUM',
+        description: payload.description,
+        status: 'OPEN',
+        createdByName: 'Sarah Mitchell',
+        createdAt: new Date().toISOString(),
+      };
+    }
+
+    try {
+      const res = await adminClient.post<SupportTicketItem>('/support/tickets', payload);
       return res.data;
     } catch (err) {
       throw parseApiError(err);

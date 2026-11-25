@@ -49,6 +49,10 @@ import { SettingsService } from "./modules/admin/settings/services/settings.serv
 import { SettingsController } from "./modules/admin/settings/controllers/settings.controller.js";
 import { AuditLogsService } from "./modules/admin/audit-logs/services/audit-logs.service.js";
 import { AuditLogsController } from "./modules/admin/audit-logs/controllers/audit-logs.controller.js";
+import { NotificationsService } from "./modules/admin/notifications/services/notifications.service.js";
+import { NotificationsController } from "./modules/admin/notifications/controllers/notifications.controller.js";
+import { SupportService } from "./modules/admin/support/services/support.service.js";
+import { SupportController } from "./modules/admin/support/controllers/support.controller.js";
 
 /**
  * Express application factory.
@@ -125,6 +129,12 @@ export function createApp(config: AppConfig): Express {
   const auditLogsService = new AuditLogsService(prisma);
   const auditLogsController = new AuditLogsController(auditLogsService);
 
+  const notificationsService = new NotificationsService(prisma);
+  const notificationsController = new NotificationsController(notificationsService);
+
+  const supportService = new SupportService(prisma);
+  const supportController = new SupportController(supportService);
+
   const adminRouter = createAdminRouter({
     adminAuthMiddleware,
     adminAuthController,
@@ -135,6 +145,8 @@ export function createApp(config: AppConfig): Express {
     inventoryController,
     settingsController,
     auditLogsController,
+    notificationsController,
+    supportController,
     requireSettingsAccessMiddleware,
   });
 
