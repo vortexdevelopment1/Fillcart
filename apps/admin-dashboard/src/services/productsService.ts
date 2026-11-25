@@ -23,20 +23,58 @@ export function saveLocalProducts(products: Product[]): void {
   } catch {}
 }
 
+export const normalizeCategoryName = (name: string): string => {
+  const trimmed = name.trim();
+  if (/^grocer(y|ies)\s*&\s*staples$/i.test(trimmed)) {
+    return 'Grocery & Staples';
+  }
+  return trimmed;
+};
+
+export const isJunkCategory = (name: string): boolean => {
+  return /\d{6,}/.test(name);
+};
+
+export function sanitizeCategories(categories: Category[]): Category[] {
+  const seen = new Set<string>();
+  const sanitized: Category[] = [];
+
+  for (const cat of categories) {
+    if (!cat.name || isJunkCategory(cat.name)) continue;
+    const normalized = normalizeCategoryName(cat.name);
+    const key = normalized.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      sanitized.push({
+        ...cat,
+        name: normalized,
+      });
+    }
+  }
+  return sanitized;
+}
+
 export function getLocalCategories(): Category[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const cleaned = sanitizeCategories(parsed);
+        if (cleaned.length !== parsed.length) {
+          saveLocalCategories(cleaned);
+        }
+        return cleaned;
+      }
     }
   } catch {}
-  return initialCategories;
+  return sanitizeCategories(initialCategories);
 }
 
 export function saveLocalCategories(categories: Category[]): void {
   try {
-    localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
+    const cleaned = sanitizeCategories(categories);
+    localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(cleaned));
   } catch {}
 }
 
@@ -315,13 +353,15 @@ export const categoriesService = {
         }
         // Merge with local categories
         const local = getLocalCategories();
+        const merged = [...flatList];
         for (const lc of local) {
-          if (!flatList.some((fc) => fc.id === lc.id || fc.name.toLowerCase() === lc.name.toLowerCase())) {
-            flatList.push(lc);
+          if (!merged.some((mc) => mc.id === lc.id || mc.name.toLowerCase() === lc.name.toLowerCase())) {
+            merged.push(lc);
           }
         }
-        saveLocalCategories(flatList);
-        return { success: true, data: flatList };
+        const cleaned = sanitizeCategories(merged);
+        saveLocalCategories(cleaned);
+        return { success: true, data: cleaned };
       }
     } catch (err: any) {
       console.warn('Backend categories fetch failed, using local storage cache:', err?.message || err);

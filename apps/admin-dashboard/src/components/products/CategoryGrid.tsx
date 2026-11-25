@@ -58,7 +58,14 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
   };
 
   const filteredCategories = useMemo(() => {
-    return categories.filter((c) => {
+    const cleanList = Array.from(
+      new Map(
+        categories
+          .filter((c) => !/\d{6,}/.test(c.name))
+          .map((c) => [c.name.trim().toLowerCase(), c])
+      ).values()
+    );
+    return cleanList.filter((c) => {
       if (statusFilter === 'Active' && !c.isActive) return false;
       if (statusFilter === 'Inactive' && c.isActive) return false;
       if (search.trim()) {

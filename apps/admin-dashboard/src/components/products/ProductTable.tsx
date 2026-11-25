@@ -80,7 +80,13 @@ export const ProductTable: React.FC<ProductTableProps> = ({
       if (selectedTab === 'Inactive' && prod.status !== 'Inactive') return false;
 
       // 2. Category filter
-      if (selectedCategory !== 'All' && prod.category !== selectedCategory) return false;
+      if (selectedCategory !== 'All') {
+        const normSelected = selectedCategory.trim().toLowerCase();
+        const normProdCat = prod.category?.trim().toLowerCase() || '';
+        const isGroceryMatch =
+          normSelected.includes('grocer') && normProdCat.includes('grocer');
+        if (normSelected !== normProdCat && !isGroceryMatch) return false;
+      }
 
       // 3. Brand filter
       if (selectedBrand !== 'All Brands' && prod.brand !== selectedBrand) return false;
@@ -266,7 +272,13 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             className="h-[30px] px-2.5 text-[11px] font-sans bg-white border border-primary/10 rounded-full text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"
           >
             <option value="All">All Categories</option>
-            {categories.map((c) => (
+            {Array.from(
+              new Map(
+                categories
+                  .filter((c) => !/\d{6,}/.test(c.name))
+                  .map((c) => [c.name.trim().toLowerCase(), c])
+              ).values()
+            ).map((c) => (
               <option key={c.id} value={c.name}>
                 {c.name}
               </option>

@@ -262,7 +262,13 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full h-[38px] px-3 rounded-lg border border-black/[0.12] bg-white focus:outline-none focus:ring-2 focus:ring-secondary"
               >
-                {categories.map((c) => (
+                {Array.from(
+                  new Map(
+                    categories
+                      .filter((c) => !/\d{6,}/.test(c.name))
+                      .map((c) => [c.name.trim().toLowerCase(), c])
+                  ).values()
+                ).map((c) => (
                   <option key={c.id} value={c.name}>
                     {c.name}
                   </option>
