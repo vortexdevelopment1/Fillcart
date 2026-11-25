@@ -152,7 +152,7 @@ export const AdminNotificationsModal: React.FC<AdminNotificationsModalProps> = (
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-ink/50 backdrop-blur-sm animate-fade-in font-sans">
       <div
-        className="w-full max-w-2xl bg-white rounded-[24px] border border-primary/10 shadow-floating overflow-hidden flex flex-col max-h-[88vh] animate-scale-up"
+        className="w-full max-w-2xl bg-white rounded-[24px] border border-primary/10 shadow-floating overflow-hidden flex flex-col h-[580px] max-h-[90vh] animate-scale-up"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ──────── Modal Header ──────── */}
@@ -248,12 +248,12 @@ export const AdminNotificationsModal: React.FC<AdminNotificationsModalProps> = (
         {/* ──────── Notification Items List ──────── */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-2.5">
           {loading && items.length === 0 ? (
-            <div className="py-14 text-center text-ink/50 text-xs flex flex-col items-center gap-2">
+            <div className="h-full flex flex-col items-center justify-center text-center text-ink/50 text-xs gap-2 py-10">
               <RefreshCw className="w-5 h-5 animate-spin text-primary" />
               <span>Fetching live alerts...</span>
             </div>
           ) : filteredItems.length === 0 ? (
-            <div className="py-16 text-center text-ink/50 text-xs flex flex-col items-center justify-center">
+            <div className="h-full flex flex-col items-center justify-center text-center text-ink/50 text-xs py-10">
               <div className="w-12 h-12 rounded-2xl bg-neutral flex items-center justify-center text-ink/30 mb-3">
                 <Bell className="w-6 h-6" />
               </div>

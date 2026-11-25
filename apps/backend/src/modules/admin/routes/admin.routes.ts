@@ -10,11 +10,25 @@ import type { SettingsController } from "../settings/controllers/settings.contro
 import type { AuditLogsController } from "../audit-logs/controllers/audit-logs.controller.js";
 import type { NotificationsController } from "../notifications/controllers/notifications.controller.js";
 import type { SupportController } from "../support/controllers/support.controller.js";
+import type { DashboardController } from "../dashboard/controllers/dashboard.controller.js";
+import type { VerificationController } from "../verification/controllers/verification.controller.js";
+import type { VendorsController } from "../vendors/controllers/vendors.controller.js";
+import type { RidersController } from "../riders/controllers/riders.controller.js";
+import type { OrdersController } from "../orders/controllers/orders.controller.js";
+import type { FinanceController } from "../finance/controllers/finance.controller.js";
+import type { ReportsController } from "../reports/controllers/reports.controller.js";
 import { createCatalogueRouter } from "../catalogue/routes/catalogue.routes.js";
 import { createSettingsRouter } from "../settings/routes/settings.routes.js";
 import { createAuditLogsRouter } from "../audit-logs/routes/audit-logs.routes.js";
 import { createNotificationsRouter } from "../notifications/routes/notifications.routes.js";
 import { createSupportRouter } from "../support/routes/support.routes.js";
+import { createDashboardRouter } from "../dashboard/routes/dashboard.routes.js";
+import { createVerificationRouter } from "../verification/routes/verification.routes.js";
+import { createVendorsRouter } from "../vendors/routes/vendors.routes.js";
+import { createRidersRouter } from "../riders/routes/riders.routes.js";
+import { createOrdersRouter } from "../orders/routes/orders.routes.js";
+import { createFinanceRouter } from "../finance/routes/finance.routes.js";
+import { createReportsRouter } from "../reports/routes/reports.routes.js";
 import { validateRequest } from "../../../middleware/validate-request.js";
 import { requirePermission } from "../middleware/admin-auth.middleware.js";
 import {
@@ -36,6 +50,13 @@ export interface AdminRouterDependencies {
   auditLogsController: AuditLogsController;
   notificationsController: NotificationsController;
   supportController: SupportController;
+  dashboardController: DashboardController;
+  verificationController: VerificationController;
+  vendorsController: VendorsController;
+  ridersController: RidersController;
+  ordersController: OrdersController;
+  financeController: FinanceController;
+  reportsController: ReportsController;
   requireSettingsAccessMiddleware: RequestHandler;
 }
 
@@ -125,6 +146,55 @@ export function createAdminRouter(deps: AdminRouterDependencies): Router {
     supportController: deps.supportController,
   });
   router.use("/support", supportRouter);
+
+  // 12. Mount Dashboard Sub-Module
+  // /api/v1/admin/dashboard
+  const dashboardRouter = createDashboardRouter({
+    dashboardController: deps.dashboardController,
+  });
+  router.use("/dashboard", dashboardRouter);
+
+  // 13. Mount Verification (KYC) Sub-Module
+  // /api/v1/admin/verification
+  const verificationRouter = createVerificationRouter({
+    verificationController: deps.verificationController,
+  });
+  router.use("/verification", verificationRouter);
+
+  // 14. Mount Vendors Sub-Module
+  // /api/v1/admin/vendors
+  const vendorsRouter = createVendorsRouter({
+    vendorsController: deps.vendorsController,
+  });
+  router.use("/vendors", vendorsRouter);
+
+  // 15. Mount Riders Sub-Module
+  // /api/v1/admin/riders
+  const ridersRouter = createRidersRouter({
+    ridersController: deps.ridersController,
+  });
+  router.use("/riders", ridersRouter);
+
+  // 16. Mount Orders Sub-Module
+  // /api/v1/admin/orders
+  const ordersRouter = createOrdersRouter({
+    ordersController: deps.ordersController,
+  });
+  router.use("/orders", ordersRouter);
+
+  // 17. Mount Finance Sub-Module
+  // /api/v1/admin/finance
+  const financeRouter = createFinanceRouter({
+    financeController: deps.financeController,
+  });
+  router.use("/finance", financeRouter);
+
+  // 18. Mount Reports Sub-Module
+  // /api/v1/admin/reports
+  const reportsRouter = createReportsRouter({
+    reportsController: deps.reportsController,
+  });
+  router.use("/reports", reportsRouter);
 
   return router;
 }

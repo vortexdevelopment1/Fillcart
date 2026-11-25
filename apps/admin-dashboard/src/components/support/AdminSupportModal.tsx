@@ -110,7 +110,7 @@ export const AdminSupportModal: React.FC<AdminSupportModalProps> = ({ isOpen, on
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-ink/50 backdrop-blur-sm animate-fade-in font-sans">
       <div
-        className="w-full max-w-3xl bg-white rounded-[24px] border border-primary/10 shadow-floating overflow-hidden flex flex-col max-h-[90vh] animate-scale-up"
+        className="w-full max-w-3xl bg-white rounded-[24px] border border-primary/10 shadow-floating overflow-hidden flex flex-col h-[620px] max-h-[90vh] animate-scale-up"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

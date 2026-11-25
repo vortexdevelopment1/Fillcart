@@ -53,6 +53,20 @@ import { NotificationsService } from "./modules/admin/notifications/services/not
 import { NotificationsController } from "./modules/admin/notifications/controllers/notifications.controller.js";
 import { SupportService } from "./modules/admin/support/services/support.service.js";
 import { SupportController } from "./modules/admin/support/controllers/support.controller.js";
+import { DashboardService } from "./modules/admin/dashboard/services/dashboard.service.js";
+import { DashboardController } from "./modules/admin/dashboard/controllers/dashboard.controller.js";
+import { VerificationService } from "./modules/admin/verification/services/verification.service.js";
+import { VerificationController } from "./modules/admin/verification/controllers/verification.controller.js";
+import { VendorsService } from "./modules/admin/vendors/services/vendors.service.js";
+import { VendorsController } from "./modules/admin/vendors/controllers/vendors.controller.js";
+import { RidersService } from "./modules/admin/riders/services/riders.service.js";
+import { RidersController } from "./modules/admin/riders/controllers/riders.controller.js";
+import { OrdersService } from "./modules/admin/orders/services/orders.service.js";
+import { OrdersController } from "./modules/admin/orders/controllers/orders.controller.js";
+import { FinanceService } from "./modules/admin/finance/services/finance.service.js";
+import { FinanceController } from "./modules/admin/finance/controllers/finance.controller.js";
+import { ReportsService } from "./modules/admin/reports/services/reports.service.js";
+import { ReportsController } from "./modules/admin/reports/controllers/reports.controller.js";
 
 /**
  * Express application factory.
@@ -135,6 +149,27 @@ export function createApp(config: AppConfig): Express {
   const supportService = new SupportService(prisma);
   const supportController = new SupportController(supportService);
 
+  const dashboardService = new DashboardService(prisma);
+  const dashboardController = new DashboardController(dashboardService);
+
+  const verificationService = new VerificationService(prisma);
+  const verificationController = new VerificationController(verificationService);
+
+  const vendorsService = new VendorsService(prisma);
+  const vendorsController = new VendorsController(vendorsService);
+
+  const ridersService = new RidersService(prisma);
+  const ridersController = new RidersController(ridersService);
+
+  const ordersService = new OrdersService(prisma);
+  const ordersController = new OrdersController(ordersService);
+
+  const financeService = new FinanceService(prisma);
+  const financeController = new FinanceController(financeService);
+
+  const reportsService = new ReportsService(prisma);
+  const reportsController = new ReportsController(reportsService);
+
   const adminRouter = createAdminRouter({
     adminAuthMiddleware,
     adminAuthController,
@@ -147,6 +182,13 @@ export function createApp(config: AppConfig): Express {
     auditLogsController,
     notificationsController,
     supportController,
+    dashboardController,
+    verificationController,
+    vendorsController,
+    ridersController,
+    ordersController,
+    financeController,
+    reportsController,
     requireSettingsAccessMiddleware,
   });
 
