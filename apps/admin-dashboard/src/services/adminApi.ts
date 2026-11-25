@@ -125,6 +125,12 @@ adminClient.interceptors.response.use(
   (res) => res,
   async (error) => {
     const originalRequest = error.config;
+
+    // Do NOT redirect to login if 401 is from password verification in settings
+    if (originalRequest?.url?.includes('/auth/verify-settings-access')) {
+      return Promise.reject(parseApiError(error));
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
