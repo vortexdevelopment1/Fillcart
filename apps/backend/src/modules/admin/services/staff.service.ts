@@ -201,6 +201,32 @@ export class StaffService {
       },
     });
 
+    // 5. Create or ensure User record exists so invited staff member is immediately active and visible in staff directory
+    const newUserId = crypto.randomUUID();
+    await this.prisma.user.create({
+      data: {
+        id: newUserId,
+        fullName: data.fullName,
+        emailNormalized,
+        displayEmail: emailNormalized,
+        accountType: "ADMIN",
+        status: "ACTIVE",
+        roleId: data.roleId,
+      },
+    });
+
+    if (data.profileId) {
+      await this.prisma.adminProfileAssignment.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: newUserId,
+          profileId: data.profileId,
+          assignedBy: currentAdminId,
+          assignedAt: new Date(),
+        },
+      });
+    }
+
     // TODO [notifications]: send staff invitation email with invite token (${rawToken}) via notifications module
 
     return {

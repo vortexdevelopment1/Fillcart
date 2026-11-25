@@ -17,6 +17,8 @@ export const BACKEND_TO_FRONTEND_ROLES: Record<string, string> = {
   Support_Tier_1: 'Support Admin',
   Security_Auditor: 'Security Auditor',
   Finance_Manager: 'Finance Admin',
+  Marketing_Admin: 'Marketing Admin',
+  Marketing_Lead: 'Marketing Admin',
 };
 
 export const FRONTEND_TO_BACKEND_ROLES: Record<string, string> = {
@@ -25,6 +27,7 @@ export const FRONTEND_TO_BACKEND_ROLES: Record<string, string> = {
   'Support Admin': 'Support_Tier_1',
   'Finance Admin': 'Finance_Manager',
   'Security Auditor': 'Security_Auditor',
+  'Marketing Admin': 'Marketing_Admin',
 };
 
 /**

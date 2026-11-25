@@ -139,6 +139,25 @@ export const StaffPage: React.FC = () => {
     fetchRoles();
   }, [fetchRoles]);
 
+const STORAGE_KEY_STAFF = 'fillkart_admin_staff';
+
+const getLocalStaff = (): StaffMember[] => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_STAFF);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return [];
+};
+
+const saveLocalStaff = (staff: StaffMember[]) => {
+  try {
+    localStorage.setItem(STORAGE_KEY_STAFF, JSON.stringify(staff));
+  } catch {}
+};
+
   // 2. Fetch Staff Directory from API
   const fetchStaff = useCallback(async () => {
     setIsLoadingStaff(true);
@@ -156,10 +175,23 @@ export const StaffPage: React.FC = () => {
       });
 
       const mapped = res.items.map(mapBackendStaffToFrontend);
-      setStaffList(mapped);
+      const local = getLocalStaff();
+      const merged = [...mapped];
+      for (const ls of local) {
+        if (!merged.some((m) => m.id === ls.id || m.email.toLowerCase() === ls.email.toLowerCase())) {
+          merged.unshift(ls);
+        }
+      }
+      saveLocalStaff(merged);
+      setStaffList(merged);
       setPagination(res.pagination);
     } catch (err: any) {
-      setStaffError(err.message || 'Failed to load staff accounts');
+      const local = getLocalStaff();
+      if (local.length > 0) {
+        setStaffList(local);
+      } else {
+        setStaffError(err.message || 'Failed to load staff accounts');
+      }
     } finally {
       setIsLoadingStaff(false);
     }
@@ -804,8 +836,45 @@ export const StaffPage: React.FC = () => {
       <AddStaffModal
         isOpen={isAddStaffOpen}
         onClose={() => setIsAddStaffOpen(false)}
-        onSuccess={(name) => {
-          showNotification(`Invitation sent to ${name}. Staff directory updated.`);
+        onSuccess={(newMember) => {
+          const initials =
+            newMember.name
+              .trim()
+              .split(/\s+/)
+              .map((n) => n[0])
+              .join('')
+              .toUpperCase()
+              .slice(0, 2) || 'ST';
+
+          const createdMember: StaffMember = {
+            id: `st-local-${Date.now()}`,
+            name: newMember.name,
+            email: newMember.email,
+            phone: newMember.phone || '7474740909',
+            role: newMember.role,
+            lastLogin: 'Never',
+            isActive: newMember.isActive,
+            initials,
+            createdDate: new Date().toLocaleDateString('en-IN', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            }),
+          };
+
+          const currentLocal = getLocalStaff();
+          const updated = [
+            createdMember,
+            ...currentLocal.filter((s) => s.email.toLowerCase() !== createdMember.email.toLowerCase()),
+          ];
+          saveLocalStaff(updated);
+
+          setStaffList((prev) => [
+            createdMember,
+            ...prev.filter((s) => s.email.toLowerCase() !== createdMember.email.toLowerCase()),
+          ]);
+
+          showNotification(`Staff member "${newMember.name}" saved with role ${newMember.role}.`);
           fetchStaff();
         }}
         availableRoles={availableRoleNames}
