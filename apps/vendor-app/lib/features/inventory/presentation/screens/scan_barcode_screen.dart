@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import 'product_details_screen.dart';
 import 'upload_photos_screen.dart';
 
@@ -64,14 +64,15 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen>
     // Feedback SnackBar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
+        content: const Row(
           children: [
-            const Icon(Icons.check_circle, color: Color(0xFF22C55E), size: 20),
-            const SizedBox(width: 10),
+            Icon(Icons.check_circle, color: Color(0xFF22C55E), size: 20),
+            SizedBox(width: 10),
             Expanded(
               child: Text(
                 'Scanned: 8901263021234 (Amul Taaza Milk 1 L)',
-                style: GoogleFonts.inter(
+                style: TextStyle(
+                  fontFamily: 'Inter',
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
                   fontSize: 13,
@@ -80,7 +81,7 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen>
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: const Color(0xFF111827),
         duration: const Duration(milliseconds: 1400),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -142,7 +143,61 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen>
     const double reticleSize = 270.0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A), // Dark camera background
+      backgroundColor: const Color(0xFF111827), // Dark camera background
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 52,
+        leadingWidth: 52,
+        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Center(
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(255, 255, 255, 0.20),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 2,
+                    spreadRadius: 0,
+                    color: Color(0x1A000000),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ),
+        ),
+        title: const Text(
+          'Scan Barcode',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+            height: 28 / 20,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -168,46 +223,6 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen>
           SafeArea(
             child: Column(
               children: [
-                // Top Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        'Scan Barcode',
-                        style: GoogleFonts.inter(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
                 const Spacer(),
 
                 // Central Scanner Viewfinder Area
@@ -312,7 +327,8 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen>
                   ),
                   child: Text(
                     'Align barcode within frame to scan',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
+                      fontFamily: 'Inter',
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
                       color: Colors.white.withValues(alpha: 0.9),
@@ -340,7 +356,7 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen>
                           width: 52,
                           height: 52,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E293B).withValues(alpha: 0.85),
+                            color: const Color(0xFF1F2937).withValues(alpha: 0.85),
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: Colors.white.withValues(alpha: 0.15),
@@ -411,7 +427,7 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen>
                           decoration: BoxDecoration(
                             color: _isTorchOn
                                 ? const Color(0xFFFACC15).withValues(alpha: 0.9)
-                                : const Color(0xFF1E293B).withValues(alpha: 0.85),
+                                : const Color(0xFF1F2937).withValues(alpha: 0.85),
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: _isTorchOn
@@ -426,7 +442,7 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen>
                               height: 22,
                               colorFilter: ColorFilter.mode(
                                 _isTorchOn
-                                    ? const Color(0xFF0F172A)
+                                    ? const Color(0xFF111827)
                                     : Colors.white,
                                 BlendMode.srcIn,
                               ),
@@ -436,14 +452,14 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen>
                                 height: 22,
                                 colorFilter: ColorFilter.mode(
                                   _isTorchOn
-                                      ? const Color(0xFF0F172A)
+                                      ? const Color(0xFF111827)
                                       : Colors.white,
                                   BlendMode.srcIn,
                                 ),
                                 placeholderBuilder: (_) => Icon(
                                   Icons.flashlight_on_outlined,
                                   color: _isTorchOn
-                                      ? const Color(0xFF0F172A)
+                                      ? const Color(0xFF111827)
                                       : Colors.white,
                                   size: 22,
                                 ),

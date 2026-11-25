@@ -165,5 +165,49 @@ void main() {
       expect(find.text('Expiry Alert'), findsOneWidget);
       expect(find.text('Save Settings'), findsOneWidget);
     });
+
+    testWidgets('tapping top header 3-dots button opens header options menu', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(buildTestableWidget(const VendorInventoryScreen()));
+      await tester.pumpAndSettle();
+
+      // Find AppBar 3-dots popup menu button
+      final headerMenuButton = find.byType(InventoryHeaderOptionsMenuButton);
+      expect(headerMenuButton, findsOneWidget);
+
+      await tester.tap(headerMenuButton);
+      await tester.pumpAndSettle();
+
+      // Verify all 4 options are rendered
+      expect(find.text('Manage Categories'), findsOneWidget);
+      expect(find.text('Bulk Upload Products'), findsOneWidget);
+      expect(find.text('Export Product List'), findsOneWidget);
+      expect(find.text('Inventory Settings'), findsOneWidget);
+    });
+
+    testWidgets('tapping product card 3-dots button opens product card options menu', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(buildTestableWidget(const VendorInventoryScreen()));
+      await tester.pumpAndSettle();
+
+      // Find product card 3-dots button
+      final cardMenuButtons = find.byType(ProductCardOptionsMenuButton);
+      expect(cardMenuButtons, findsWidgets);
+
+      final firstCardMenu = cardMenuButtons.first;
+      await tester.ensureVisible(firstCardMenu);
+      await tester.pumpAndSettle();
+
+      await tester.tap(firstCardMenu);
+      await tester.pumpAndSettle();
+
+      // Verify all 4 product card options are rendered
+      expect(find.text('Edit Product'), findsOneWidget);
+      expect(find.text('Update Stock'), findsOneWidget);
+      expect(find.text('Deactivate Product'), findsOneWidget);
+      expect(find.text('Delete Product'), findsOneWidget);
+    });
   });
 }

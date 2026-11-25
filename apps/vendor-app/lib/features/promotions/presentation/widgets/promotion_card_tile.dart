@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
+import 'promotion_options_menu.dart';
 
 enum PromotionStatus {
   active,
@@ -16,6 +19,9 @@ class PromotionCardTile extends StatelessWidget {
     required this.iconAsset,
     this.iconBgColor,
     this.onTap,
+    this.onEdit,
+    this.onDeactivate,
+    this.onDelete,
   });
 
   final String title;
@@ -25,6 +31,9 @@ class PromotionCardTile extends StatelessWidget {
   final String iconAsset;
   final Color? iconBgColor;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDeactivate;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -134,38 +143,13 @@ class PromotionCardTile extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: PopupMenuButton<String>(
-                              padding: EdgeInsets.zero,
-                              iconSize: 18,
-                              constraints: const BoxConstraints(),
-                              icon: const Icon(
-                                Icons.more_vert,
-                                color: Color(0xFF9CA3AF),
-                                size: 18,
-                              ),
-                              onSelected: (value) {
-                                if (value == 'view' && onTap != null) {
-                                  onTap!();
-                                }
-                              },
-                              itemBuilder: (context) => [
-                                const PopupMenuItem(
-                                  value: 'view',
-                                  child: Text('View Performance'),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'edit',
-                                  child: Text('Edit Offer'),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'deactivate',
-                                  child: Text('End Offer'),
-                                ),
-                              ],
-                            ),
+                          PromotionOptionsMenuButton(
+                            promotionTitle: title,
+                            iconSize: 18,
+                            iconColor: const Color(0xFF9CA3AF),
+                            onEdit: onEdit,
+                            onDeactivate: onDeactivate,
+                            onDelete: onDelete,
                           ),
                         ],
                       ),
@@ -184,10 +168,14 @@ class PromotionCardTile extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(
-                            Icons.calendar_today_outlined,
-                            size: 11,
-                            color: Color(0xFF9CA3AF),
+                          SvgPicture.asset(
+                            AppAssets.svgCalendar,
+                            width: 11,
+                            height: 11,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF9CA3AF),
+                              BlendMode.srcIn,
+                            ),
                           ),
                           const SizedBox(width: 4),
                           Text(

@@ -1,5 +1,7 @@
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import 'package:fillcart_vendor/features/authentication/authentication.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/onboarding_item.dart';
 import '../widgets/onboarding_dot_indicator.dart';
@@ -104,10 +106,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     if (!isFirstPage)
                       IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: Color(0xFF1E293B),
-                          size: 24.0,
+                        icon: SvgPicture.asset(
+                          AppAssets.svgBackArrow,
+                          width: 24,
+                          height: 24,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF1E293B),
+                            BlendMode.srcIn,
+                          ),
                         ),
                         onPressed: _previousPage,
                         tooltip: 'Back',
@@ -238,8 +244,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: ElevatedButton(
                   onPressed: isLastPage ? _completeOnboarding : _nextPage,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF000000),
-                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFFC8F169),
+                    foregroundColor: const Color(0xFF111827),
                     elevation: 0,
                     shape: const StadiumBorder(),
                   ),
@@ -249,7 +255,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 17.0,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: const Color(0xFF111827),
                           ),
                         )
                       : Row(
@@ -261,17 +267,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               style: GoogleFonts.inter(
                                 fontSize: 17.0,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: const Color(0xFF111827),
                               ),
                             ),
-                            SizedBox(width: 8.0),
-                            SizedBox(
+                            const SizedBox(width: 8.0),
+                            const SizedBox(
                               width: 20.0,
                               height: 20.0,
                               child: Icon(
                                 Icons.arrow_forward_rounded,
                                 size: 20.0,
-                                color: Colors.white,
+                                color: Color(0xFF111827),
                               ),
                             ),
                           ],

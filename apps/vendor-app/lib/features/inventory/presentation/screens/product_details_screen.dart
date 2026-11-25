@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
+import 'pricing_and_inventory_screen.dart';
 
 /// Screen 3: Product Details (matching Image 3)
 class ProductDetailsScreen extends StatefulWidget {
@@ -8,6 +9,9 @@ class ProductDetailsScreen extends StatefulWidget {
   final String? initialSubcategory;
   final String? initialBrand;
   final String? initialProductName;
+  final String? initialUnitPackSize;
+  final String buttonText;
+  final bool showPreviewCard;
 
   const ProductDetailsScreen({
     super.key,
@@ -15,6 +19,9 @@ class ProductDetailsScreen extends StatefulWidget {
     this.initialSubcategory,
     this.initialBrand,
     this.initialProductName,
+    this.initialUnitPackSize,
+    this.buttonText = 'Next',
+    this.showPreviewCard = true,
   });
 
   @override
@@ -26,6 +33,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late final TextEditingController _subcategoryController;
   late final TextEditingController _brandController;
   late final TextEditingController _productNameController;
+  late final TextEditingController _unitPackSizeController;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -44,6 +52,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     _productNameController = TextEditingController(
       text: widget.initialProductName ?? 'Amul Taaza Milk (1 L)',
     );
+    _unitPackSizeController = TextEditingController(
+      text: widget.initialUnitPackSize ?? '1 L',
+    );
   }
 
   @override
@@ -52,22 +63,33 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     _subcategoryController.dispose();
     _brandController.dispose();
     _productNameController.dispose();
+    _unitPackSizeController.dispose();
     super.dispose();
   }
 
   void _onNext() {
     if (_formKey.currentState?.validate() ?? false) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Product details saved for ${_productNameController.text}!',
-            style: GoogleFonts.inter(color: Colors.white),
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => PricingAndInventoryScreen(
+            productName: _productNameController.text.trim().isNotEmpty
+                ? _productNameController.text.trim()
+                : 'Amul Taaza Milk (1 L)',
+            brand: _brandController.text.trim().isNotEmpty
+                ? _brandController.text.trim()
+                : 'Amul',
+            category: _categoryController.text.trim().isNotEmpty
+                ? _categoryController.text.trim()
+                : 'Grocery',
+            subCategory: _subcategoryController.text.trim().isNotEmpty
+                ? _subcategoryController.text.trim()
+                : 'Dairy',
+            unitPackSize: _unitPackSizeController.text.trim().isNotEmpty
+                ? _unitPackSizeController.text.trim()
+                : '1 L',
           ),
-          backgroundColor: const Color(0xFF0F172A),
-          duration: const Duration(seconds: 2),
         ),
       );
-      Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
@@ -96,7 +118,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         placeholderBuilder: (_) => Icon(
           fallbackIcon,
           size: width,
-          color: color ?? const Color(0xFF0F172A),
+          color: color ?? const Color(0xFF111827),
         ),
       ),
     );
@@ -113,16 +135,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         RichText(
           text: TextSpan(
             text: label,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF0F172A),
+              color: Color(0xFF111827),
             ),
             children: [
               if (isRequired)
                 const TextSpan(
                   text: ' *',
                   style: TextStyle(
+                    fontFamily: 'Inter',
                     color: Color(0xFFEF4444),
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -139,16 +163,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: const Color(0xFFE2E8F0),
+              color: const Color(0xFFE5E7EB),
             ),
           ),
           alignment: Alignment.centerLeft,
           child: TextFormField(
             controller: controller,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 15,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF0F172A),
+              color: Color(0xFF111827),
             ),
             decoration: const InputDecoration(
               isDense: true,
@@ -176,41 +201,59 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
+        toolbarHeight: 52,
+        leadingWidth: 52,
         centerTitle: false,
-        leadingWidth: 64,
+        titleSpacing: 12,
         leading: Padding(
-          padding: const EdgeInsets.only(left: 16, top: 6, bottom: 6),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: const Color(0xFFE2E8F0),
+          padding: const EdgeInsets.only(left: 16),
+          child: Center(
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 2,
+                    spreadRadius: 0,
+                    color: Color(0x1A000000),
+                  ),
+                ],
               ),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Color(0xFF0F172A),
-                size: 20,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF111827),
+                    BlendMode.srcIn,
+                  ),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
               ),
-              onPressed: () => Navigator.of(context).pop(),
             ),
           ),
         ),
-        title: Text(
+        title: const Text(
           'Product Details',
-          style: GoogleFonts.inter(
+          style: TextStyle(
+            fontFamily: 'Inter',
             fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF0F172A),
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF111827),
+            height: 28 / 20,
+            letterSpacing: -0.2,
           ),
         ),
       ),
@@ -230,17 +273,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           RichText(
-                            text: TextSpan(
+                            text: const TextSpan(
                               text: 'Product Images',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
+                                fontFamily: 'Inter',
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: const Color(0xFF0F172A),
+                                color: Color(0xFF111827),
                               ),
-                              children: const [
+                              children: [
                                 TextSpan(
                                   text: ' *',
                                   style: TextStyle(
+                                    fontFamily: 'Inter',
                                     color: Color(0xFFEF4444),
                                     fontWeight: FontWeight.w600,
                                     fontSize: 15,
@@ -249,12 +294,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ],
                             ),
                           ),
-                          Text(
+                          const Text(
                             '1 of 4 uploaded',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 13,
                               fontWeight: FontWeight.w400,
-                              color: const Color(0xFF64748B),
+                              color: Color(0xFF6B7280),
                             ),
                           ),
                         ],
@@ -268,13 +314,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           GestureDetector(
                             onTap: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Text(
                                     'Add photo clicked',
-                                    style: GoogleFonts.inter(color: Colors.white),
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                  backgroundColor: const Color(0xFF0F172A),
-                                  duration: const Duration(seconds: 1),
+                                  backgroundColor: Color(0xFF111827),
+                                  duration: Duration(seconds: 1),
                                 ),
                               );
                             },
@@ -285,7 +334,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: const Color(0xFFE2E8F0),
+                                  color: const Color(0xFFE5E7EB),
                                 ),
                               ),
                               child: Column(
@@ -304,18 +353,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         fallbackPath: 'assets/svg/add photos.svg',
                                         width: 22,
                                         height: 22,
-                                        color: const Color(0xFF00450D),
+                                        color: const Color(0xFF047857),
                                         fallbackIcon: Icons.camera_alt_outlined,
                                       ),
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Text(
+                                  const Text(
                                     'Add Photo',
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF00450D),
+                                      color: Color(0xFF047857),
                                     ),
                                   ),
                                 ],
@@ -328,13 +378,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           GestureDetector(
                             onTap: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Text(
                                     'Back view clicked',
-                                    style: GoogleFonts.inter(color: Colors.white),
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                  backgroundColor: const Color(0xFF0F172A),
-                                  duration: const Duration(seconds: 1),
+                                  backgroundColor: Color(0xFF111827),
+                                  duration: Duration(seconds: 1),
                                 ),
                               );
                             },
@@ -345,7 +398,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: const Color(0xFFE2E8F0),
+                                  color: const Color(0xFFE5E7EB),
                                 ),
                               ),
                               child: Column(
@@ -364,18 +417,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         fallbackPath: 'assets/svg/back view.svg',
                                         width: 22,
                                         height: 22,
-                                        color: const Color(0xFF94A3B8),
+                                        color: const Color(0xFF9CA3AF),
                                         fallbackIcon: Icons.image_outlined,
                                       ),
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Text(
+                                  const Text(
                                     'Back View',
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
-                                      color: const Color(0xFF94A3B8),
+                                      color: Color(0xFF9CA3AF),
                                     ),
                                   ),
                                 ],
@@ -387,22 +441,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       const SizedBox(height: 14),
 
                       // Conversion Tip Banner
-                      Row(
+                      const Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
-                            Icons.check_circle_outline,
+                          Icon(
+                            Icons.verified_outlined,
                             size: 16,
-                            color: Color(0xFF16A34A),
+                            color: Color(0xFF047857),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               'High-resolution photos with clear product labels convert 35% faster.',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
+                                fontFamily: 'Inter',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w400,
-                                color: const Color(0xFF0F172A),
+                                color: Color(0xFF111827),
                                 height: 1.3,
                               ),
                             ),
@@ -412,80 +467,84 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       const SizedBox(height: 16),
 
                       // Scanned / Preview Product Card
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: const Color(0xFFE2E8F0),
+                      if (widget.showPreviewCard) ...[
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: const Color(0xFFE5E7EB),
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8FAFC),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Image.asset(
-                                'assets/cardsicon/amul_milk.png',
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Center(
-                                  child: Icon(
-                                    Icons.local_drink_outlined,
-                                    color: Color(0xFF0F172A),
-                                    size: 24,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8FAFC),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: Image.asset(
+                                  'assets/cardsicon/amul_milk.png',
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Center(
+                                    child: Icon(
+                                      Icons.local_drink_outlined,
+                                      color: Color(0xFF111827),
+                                      size: 24,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Amul Taaza Milk (1 L)',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF0F172A),
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Amul Taaza Milk (1 L)',
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF111827),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Amul',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w400,
-                                      color: const Color(0xFF64748B),
+                                    SizedBox(height: 2),
+                                    Text(
+                                      'Amul',
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF6B7280),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: _buildSvg(
-                                primaryPath:
-                                    'assets/svg/edit title and brand.svg',
-                                fallbackPath:
-                                    'assets/svg/edit_title_and_brand.svg',
-                                width: 18,
-                                height: 18,
-                                color: const Color(0xFF64748B),
-                                fallbackIcon: Icons.edit_outlined,
+                              Padding(
+                                padding: const EdgeInsets.only(right: 4),
+                                child: _buildSvg(
+                                  primaryPath:
+                                      'assets/svg/edit title and brand.svg',
+                                  fallbackPath:
+                                      'assets/svg/edit_title_and_brand.svg',
+                                  width: 18,
+                                  height: 18,
+                                  color: const Color(0xFF6B7280),
+                                  fallbackIcon: Icons.edit_outlined,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 18),
+                        const SizedBox(height: 18),
+                      ],
 
                       // Form Fields
                       _buildField(
@@ -514,6 +573,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         controller: _productNameController,
                         isRequired: true,
                       ),
+                      const SizedBox(height: 14),
+
+                      _buildField(
+                        label: 'Unit / Pack Size',
+                        controller: _unitPackSizeController,
+                        isRequired: false,
+                      ),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -521,7 +587,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
             ),
 
-            // Bottom Next Button
+            // Bottom Next / Continue Button
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
               child: SizedBox(
@@ -530,18 +596,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 child: ElevatedButton(
                   onPressed: _onNext,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4F932),
+                    backgroundColor: const Color(0xFFC8F169),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: Text(
-                    'Next',
-                    style: GoogleFonts.inter(
+                    widget.buttonText,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF0F172A),
+                      color: Color(0xFF111827),
                     ),
                   ),
                 ),

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/inventory_product.dart';
 
 /// Model representing a product update item in the review screen
@@ -128,7 +128,7 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
       SnackBar(
         content: Text(
           'Stock updated successfully for ${_items.length} products.',
-          style: GoogleFonts.inter(),
+          style: const TextStyle(fontFamily: 'Inter'),
         ),
         backgroundColor: const Color(0xFF15803D),
       ),
@@ -144,38 +144,59 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
     final count = _items.length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
+        toolbarHeight: 52,
+        leadingWidth: 52,
+        centerTitle: false,
+        titleSpacing: 12,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Center(
             child: Container(
-              width: 44,
-              height: 44,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color.fromRGBO(255, 255, 255, 0.36),
                 borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 2,
+                    spreadRadius: 0,
+                    color: Color(0x1A000000),
+                  ),
+                ],
               ),
               child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFF0F172A),
-                  size: 20,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF111827),
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
           ),
         ),
-        title: Text(
+        title: const Text(
           'Review & Update',
-          style: GoogleFonts.inter(
+          style: TextStyle(
+            fontFamily: 'Inter',
             fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF0F172A),
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF111827),
+            height: 28 / 20,
+            letterSpacing: -0.2,
           ),
         ),
       ),
@@ -188,24 +209,29 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Summary Banner (Image 2)
+                    // Summary Banner (Image 1)
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFECFDF3),
+                        color: const Color(0xFFF0FDF4),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFD1FADF)),
+                        border: Border.all(color: const Color(0xFFDCFCE7)),
                       ),
                       child: Row(
                         children: [
-                          SizedBox(
+                          Container(
                             width: 32,
                             height: 32,
-                            child: SvgPicture.asset(
-                              'assets/svg/selected_product.svg',
-                              width: 32,
-                              height: 32,
-                              fit: BoxFit.contain,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF22C55E),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -215,19 +241,21 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                               children: [
                                 Text(
                                   '$count Products Selected',
-                                  style: GoogleFonts.inter(
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color(0xFF0F172A),
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF111827),
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   'You\'re about to update stock for $count products',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w400,
-                                    color: const Color(0xFF475467),
+                                    color: Color(0xFF4B5563),
                                   ),
                                 ),
                               ],
@@ -247,10 +275,14 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFE5E7EB),
+                            width: 1,
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.03),
-                              blurRadius: 8,
+                              blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
                           ],
@@ -268,7 +300,7 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                                   color: const Color(0xFFF8FAFC),
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: const Color(0xFFE2E8F0),
+                                    color: const Color(0xFFE5E7EB),
                                   ),
                                 ),
                                 child: Center(
@@ -284,19 +316,21 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                                   children: [
                                     Text(
                                       product.name,
-                                      style: GoogleFonts.inter(
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF0F172A),
+                                        color: Color(0xFF111827),
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       'Current Stock: ${product.currentStock} units',
-                                      style: GoogleFonts.inter(
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,
-                                        color: const Color(0xFF64748B),
+                                        color: Color(0xFF6B7280),
                                       ),
                                     ),
                                   ],
@@ -313,7 +347,7 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: const Color(0xFFE2E8F0),
+                                    color: const Color(0xFFE5E7EB),
                                   ),
                                 ),
                                 child: Column(
@@ -321,18 +355,20 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                                   children: [
                                     Text(
                                       '${item.newQuantity}',
-                                      style: GoogleFonts.inter(
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF0F172A),
+                                        color: Color(0xFF111827),
                                       ),
                                     ),
-                                    Text(
+                                    const Text(
                                       'units',
-                                      style: GoogleFonts.inter(
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
                                         fontSize: 11,
                                         fontWeight: FontWeight.w400,
-                                        color: const Color(0xFF64748B),
+                                        color: Color(0xFF6B7280),
                                       ),
                                     ),
                                   ],
@@ -347,22 +383,24 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
 
                     // Additional Note (Optional)
                     RichText(
-                      text: TextSpan(
+                      text: const TextSpan(
                         children: [
                           TextSpan(
                             text: 'Additional Note ',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF0F172A),
+                              color: Color(0xFF111827),
                             ),
                           ),
                           TextSpan(
                             text: '(Optional)',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 13,
                               fontWeight: FontWeight.w400,
-                              color: const Color(0xFF64748B),
+                              color: Color(0xFF6B7280),
                             ),
                           ),
                         ],
@@ -379,7 +417,7 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        border: Border.all(color: const Color(0xFFE5E7EB)),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.02),
@@ -391,19 +429,12 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: SvgPicture.asset(
-                              'assets/svg/Pencil Icon.svg',
-                              width: 20,
-                              height: 20,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
-                                'assets/svg/pencil_icon.svg',
-                                width: 20,
-                                height: 20,
-                                fit: BoxFit.contain,
-                              ),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 2),
+                            child: Icon(
+                              Icons.description_outlined,
+                              size: 20,
+                              color: Color(0xFF9CA3AF),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -434,18 +465,20 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                                 }) =>
                                     null, // We build our own clean counter below
                                 onChanged: (val) => setState(() {}),
-                                style: GoogleFonts.inter(
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
                                   fontSize: 13,
-                                  color: const Color(0xFF0F172A),
+                                  color: Color(0xFF111827),
                                 ),
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   isDense: true,
                                   contentPadding: EdgeInsets.zero,
                                   hintText:
                                       'Add note (e.g. new batch, supplier...)',
-                                  hintStyle: GoogleFonts.inter(
+                                  hintStyle: TextStyle(
+                                    fontFamily: 'Inter',
                                     fontSize: 13,
-                                    color: const Color(0xFF94A3B8),
+                                    color: Color(0xFF9CA3AF),
                                   ),
                                   filled: false,
                                   fillColor: Colors.transparent,
@@ -466,9 +499,10 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                       alignment: Alignment.centerRight,
                       child: Text(
                         '${_noteController.text.length}/100',
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 11,
-                          color: const Color(0xFF94A3B8),
+                          color: Color(0xFF9CA3AF),
                         ),
                       ),
                     ),
@@ -478,37 +512,27 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFFBEB),
+                        color: const Color(0xFFFEFCE8),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFFDE68A)),
+                        border: Border.all(color: const Color(0xFFFEF08A)),
                       ),
-                      child: Row(
+                      child: const Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: SvgPicture.asset(
-                              'assets/svg/Info Circular Icon.svg',
-                              width: 20,
-                              height: 20,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
-                                'assets/svg/info_circular_icon.svg',
-                                width: 20,
-                                height: 20,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
+                          Icon(
+                            Icons.info_outline,
+                            size: 20,
+                            color: Color(0xFFD97706),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               'Stock will be updated immediately in your inventory.',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
+                                fontFamily: 'Inter',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w400,
-                                color: const Color(0xFF0F172A),
+                                color: Color(0xFF111827),
                                 height: 1.4,
                               ),
                             ),
@@ -531,19 +555,20 @@ class _ReviewAndUpdateScreenState extends State<ReviewAndUpdateScreen> {
                 child: ElevatedButton(
                   onPressed: _onConfirmUpdate,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4F932),
-                    foregroundColor: const Color(0xFF0F172A),
+                    backgroundColor: const Color(0xFFC8F169),
+                    foregroundColor: const Color(0xFF111827),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Confirm Update',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
+                      fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF0F172A),
+                      color: Color(0xFF111827),
                     ),
                   ),
                 ),

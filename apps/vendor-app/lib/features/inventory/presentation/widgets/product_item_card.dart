@@ -1,18 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../models/inventory_product.dart';
+import 'inventory_options_menu.dart';
 
-/// Card widget rendering an individual inventory product item matching Image 1.
+/// Card widget rendering an individual inventory product item matching Figma Image 5.
+///
+/// Figma Specifications (Image 5):
+/// - Flow: Horizontal
+/// - Width: Fixed (328px) / Fill
+/// - Height: Hug (84px)
+/// - Radius: 16px
+/// - Padding: 12px
+/// - Card Background: Pure White (#FFFFFF)
+/// - Thumbnail: 48x48 rounded rectangle (radius: 12px) with product image
+/// - Title & Category: Left column with high-contrast Inter typography
+/// - Top-Right: Qty badge & 3-dots icon aligned horizontally side-by-side
+/// - Bottom Row: Price, MRP strikethrough, and discount badge
 class ProductItemCard extends StatelessWidget {
   final InventoryProduct product;
   final VoidCallback onTap;
   final VoidCallback? onMoreOptionsTap;
+  final VoidCallback? onEditProduct;
+  final VoidCallback? onUpdateStock;
+  final VoidCallback? onDeactivateProduct;
+  final VoidCallback? onDeleteProduct;
 
   const ProductItemCard({
     super.key,
     required this.product,
     required this.onTap,
     this.onMoreOptionsTap,
+    this.onEditProduct,
+    this.onUpdateStock,
+    this.onDeactivateProduct,
+    this.onDeleteProduct,
   });
 
   @override
@@ -24,9 +44,9 @@ class ProductItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
@@ -39,103 +59,101 @@ class ProductItemCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Product Thumbnail / Icon
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: Center(
-                    child: _buildProductIcon(product),
-                  ),
-                ),
+                // Clean Single Thumbnail (No double-box, no clipping)
+                _buildProductThumbnail(product),
                 const SizedBox(width: 12),
 
-                // Main Details Column
+                // Details Column
                 Expanded(
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Top Row: Product Title & Category on left, Stock Badge & 3-dots on right
+                      // Top Row: Title on left, [Qty badge + 3-dots icon] on right
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // Title & Category
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product.name,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color(0xFF0F172A),
-                                    height: 1.25,
-                                  ),
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  '${product.category}  ›  ${product.subCategory}',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
-                                    color: const Color(0xFF64748B),
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              product.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF111827),
+                                height: 1.2,
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 8),
-
-                          // Right Column: Stock Badge & 3-dots Menu
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                          const SizedBox(width: 6),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               _buildStockBadge(product),
-                              const SizedBox(height: 8),
-                              GestureDetector(
-                                onTap: onMoreOptionsTap,
-                                child: const Icon(
-                                  Icons.more_vert,
-                                  size: 20,
-                                  color: Color(0xFF94A3B8),
+                              const SizedBox(width: 2),
+                              SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: ProductCardOptionsMenuButton(
+                                  product: product,
+                                  iconSize: 18,
+                                  iconColor: const Color(0xFF9CA3AF),
+                                  onEditProduct: onEditProduct,
+                                  onUpdateStock: onUpdateStock ?? onTap,
+                                  onDeactivateProduct: onDeactivateProduct,
+                                  onDeleteProduct: onDeleteProduct,
                                 ),
                               ),
                             ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 2),
 
-                      // Price and Discount Row: Spans full remaining width with auto-wrap
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 6,
-                        runSpacing: 4,
+                      // Category Subtitle
+                      Text(
+                        '${product.category}  ›  ${product.subCategory}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+
+                      // Price and Discount Row
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
                             '₹${product.price.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF0F172A),
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF111827),
                             ),
                           ),
+                          const SizedBox(width: 6),
                           Text(
                             'MRP ₹${product.mrp.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
-                              color: const Color(0xFF94A3B8),
+                              color: Color(0xFF9CA3AF),
                               decoration: TextDecoration.lineThrough,
                             ),
                           ),
+                          const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
@@ -147,10 +165,11 @@ class ProductItemCard extends StatelessWidget {
                             ),
                             child: Text(
                               '${product.discountPercent.toStringAsFixed(product.discountPercent.truncateToDouble() == product.discountPercent ? 0 : 1)}% off',
-                              style: GoogleFonts.inter(
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: const Color(0xFF059669),
+                                color: Color(0xFF059669),
                               ),
                             ),
                           ),
@@ -167,20 +186,41 @@ class ProductItemCard extends StatelessWidget {
     );
   }
 
+  Widget _buildProductThumbnail(InventoryProduct product) {
+    if (product.imageUrl != null && product.imageUrl!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: Image.asset(
+            product.imageUrl!,
+            width: 48,
+            height: 48,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => _buildFallbackIcon(product),
+          ),
+        ),
+      );
+    }
+    return _buildFallbackIcon(product);
+  }
+
   Widget _buildStockBadge(InventoryProduct product) {
     if (product.isOutOfStock) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
           color: const Color(0xFFFEF2F2),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9999),
         ),
-        child: Text(
+        child: const Text(
           'Out of Stock',
-          style: GoogleFonts.inter(
-            fontSize: 12,
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 11.5,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFFDC2626),
+            color: Color(0xFFDC2626),
           ),
         ),
       );
@@ -188,40 +228,42 @@ class ProductItemCard extends StatelessWidget {
 
     if (product.isLowStock) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFFBEB),
-          borderRadius: BorderRadius.circular(12),
+          color: const Color(0xFFFEF3C7),
+          borderRadius: BorderRadius.circular(9999),
         ),
         child: Text(
           'Low Stock: ${product.currentStock}',
-          style: GoogleFonts.inter(
-            fontSize: 12,
+          style: const TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 11.5,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFFD97706),
+            color: Color(0xFFD97706),
           ),
         ),
       );
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFFF3F4F6),
+        borderRadius: BorderRadius.circular(9999),
       ),
       child: Text(
         'Qty: ${product.currentStock}',
-        style: GoogleFonts.inter(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: const Color(0xFF334155),
+        style: const TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 11.5,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF4B5563),
         ),
       ),
     );
   }
 
-  Widget _buildProductIcon(InventoryProduct product) {
+  Widget _buildFallbackIcon(InventoryProduct product) {
     IconData icon;
     Color iconColor;
 
@@ -239,6 +281,16 @@ class ProductItemCard extends StatelessWidget {
       iconColor = const Color(0xFF10B981);
     }
 
-    return Icon(icon, color: iconColor, size: 26);
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(
+        child: Icon(icon, color: iconColor, size: 24),
+      ),
+    );
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_assets.dart';
 import '../../models/inventory_metrics.dart';
 
 /// Card showing the Stock Availability breakdown progress bar and legend (Image 2).
@@ -19,10 +21,14 @@ class StockAvailabilityCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -35,47 +41,46 @@ class StockAvailabilityCard extends StatelessWidget {
             onTap: onTap,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text(
+              children: [
+                const Text(
                   'Stock Availability',
                   style: TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F172A),
+                    color: Color(0xFF111827),
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right,
-                  size: 20,
-                  color: Color(0xFF64748B),
+                SvgPicture.asset(
+                  AppAssets.svgNextArrow,
+                  width: 18,
+                  height: 18,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF6B7280),
+                    BlendMode.srcIn,
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 14),
 
-          // Multi-segment continuous progress bar
+          // Continuous gradient progress bar matching Image 4
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: SizedBox(
+            child: Container(
               height: 8,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: metrics.inStockCount,
-                    child: Container(color: const Color(0xFF10B981)),
-                  ),
-                  const SizedBox(width: 2),
-                  Expanded(
-                    flex: metrics.lowStockCount,
-                    child: Container(color: const Color(0xFFF59E0B)),
-                  ),
-                  const SizedBox(width: 2),
-                  Expanded(
-                    flex: metrics.outOfStockCount,
-                    child: Container(color: const Color(0xFFEF4444)),
-                  ),
-                ],
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF10B981),
+                    Color(0xFF22C55E),
+                    Color(0xFFF59E0B),
+                    Color(0xFFEF4444),
+                  ],
+                  stops: [0.0, 0.75, 0.90, 1.0],
+                ),
               ),
             ),
           ),
@@ -131,16 +136,18 @@ class StockAvailabilityCard extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 12,
-                color: Color(0xFF64748B),
+                color: Color(0xFF6B7280),
               ),
             ),
             Text(
               stat,
               style: const TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF0F172A),
+                color: Color(0xFF111827),
               ),
             ),
           ],

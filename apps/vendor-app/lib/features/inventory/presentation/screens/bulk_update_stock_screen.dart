@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/inventory_product.dart';
 import 'review_and_update_screen.dart';
 
@@ -138,7 +138,11 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
         errorBuilder: (context, error, stackTrace) => const Icon(Icons.egg_outlined, color: Color(0xFF059669), size: 24),
       );
     } else {
-      return const Icon(Icons.cleaning_services_outlined, color: Color(0xFF7C3AED), size: 24);
+      return Image.asset(
+        'assets/cardsicon/Household.png',
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) => const Icon(Icons.local_laundry_service_outlined, color: Color(0xFF7C3AED), size: 24),
+      );
     }
   }
 
@@ -147,15 +151,16 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: const Color(0xFFFEE2E2),
+          color: const Color(0xFFFEF2F2),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Text(
+        child: const Text(
           'Out of Stock',
-          style: GoogleFonts.inter(
+          style: TextStyle(
+            fontFamily: 'Inter',
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFFDC2626),
+            color: Color(0xFFDC2626),
           ),
         ),
       );
@@ -168,12 +173,13 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
           color: const Color(0xFFFEF3C7),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Text(
+        child: const Text(
           'Low Stock',
-          style: GoogleFonts.inter(
+          style: TextStyle(
+            fontFamily: 'Inter',
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFFB45309),
+            color: Color(0xFFB45309),
           ),
         ),
       );
@@ -185,12 +191,13 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
         color: const Color(0xFFEAF8ED),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
+      child: const Text(
         'In Stock',
-        style: GoogleFonts.inter(
+        style: TextStyle(
+          fontFamily: 'Inter',
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF15803D),
+          color: Color(0xFF15803D),
         ),
       ),
     );
@@ -199,38 +206,59 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
+        toolbarHeight: 52,
+        leadingWidth: 52,
+        centerTitle: false,
+        titleSpacing: 12,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Center(
             child: Container(
-              width: 44,
-              height: 44,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color.fromRGBO(255, 255, 255, 0.36),
                 borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 2,
+                    spreadRadius: 0,
+                    color: Color(0x1A000000),
+                  ),
+                ],
               ),
               child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFF0F172A),
-                  size: 20,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF111827),
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
           ),
         ),
-        title: Text(
+        title: const Text(
           'Bulk Update Stock',
-          style: GoogleFonts.inter(
+          style: TextStyle(
+            fontFamily: 'Inter',
             fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF0F172A),
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF111827),
+            height: 28 / 20,
+            letterSpacing: -0.2,
           ),
         ),
         actions: [
@@ -238,17 +266,27 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
             padding: const EdgeInsets.only(right: 16),
             child: Center(
               child: Container(
-                width: 44,
-                height: 44,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color.fromRGBO(255, 255, 255, 0.36),
                   borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      offset: Offset(0, 1),
+                      blurRadius: 2,
+                      spreadRadius: 0,
+                      color: Color(0x1A000000),
+                    ),
+                  ],
                 ),
                 child: IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   icon: SvgPicture.asset(
                     'assets/svg/info_button.svg',
-                    width: 22,
-                    height: 22,
+                    width: 20,
+                    height: 20,
                     fit: BoxFit.contain,
                   ),
                   onPressed: () {},
@@ -283,27 +321,29 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                     const SizedBox(height: 16),
 
                     // Hero Headline & Subtitle
-                    Center(
+                    const Center(
                       child: Text(
                         'Update stock for multiple\nproducts in just a few steps',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF0F172A),
+                          color: Color(0xFF111827),
                           height: 1.3,
                         ),
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Center(
+                    const Center(
                       child: Text(
                         'Choose products, set quantity and update\nstock in bulk.',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
-                          color: const Color(0xFF64748B),
+                          color: Color(0xFF6B7280),
                           height: 1.4,
                         ),
                       ),
@@ -320,7 +360,7 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Scan barcode initiated.'),
-                                  backgroundColor: Color(0xFF0F172A),
+                                  backgroundColor: Color(0xFF111827),
                                 ),
                               );
                             },
@@ -331,6 +371,9 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: const Color(0xFFE5E7EB),
+                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.03),
@@ -352,13 +395,14 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 10),
-                                  Expanded(
+                                  const Expanded(
                                     child: Text(
                                       'Scan\nBarcode',
-                                      style: GoogleFonts.inter(
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF0F172A),
+                                        color: Color(0xFF111827),
                                         height: 1.2,
                                       ),
                                     ),
@@ -377,7 +421,7 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Upload file initiated.'),
-                                  backgroundColor: Color(0xFF0F172A),
+                                  backgroundColor: Color(0xFF111827),
                                 ),
                               );
                             },
@@ -388,6 +432,9 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: const Color(0xFFE5E7EB),
+                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.03),
@@ -415,13 +462,14 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 10),
-                                  Expanded(
+                                  const Expanded(
                                     child: Text(
                                       'Upload\nFile',
-                                      style: GoogleFonts.inter(
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF0F172A),
+                                        color: Color(0xFF111827),
                                         height: 1.2,
                                       ),
                                     ),
@@ -436,28 +484,29 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                     const SizedBox(height: 20),
 
                     // Divider with "or"
-                    Row(
+                    const Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Divider(
-                            color: Color(0xFFCBD5E1),
+                            color: Color(0xFFE5E7EB),
                             thickness: 1,
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          padding: EdgeInsets.symmetric(horizontal: 14),
                           child: Text(
                             'or',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 13,
                               fontWeight: FontWeight.w400,
-                              color: const Color(0xFF94A3B8),
+                              color: Color(0xFF9CA3AF),
                             ),
                           ),
                         ),
-                        const Expanded(
+                        Expanded(
                           child: Divider(
-                            color: Color(0xFFCBD5E1),
+                            color: Color(0xFFE5E7EB),
                             thickness: 1,
                           ),
                         ),
@@ -466,12 +515,13 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                     const SizedBox(height: 20),
 
                     // Section Heading: Select Products
-                    Text(
+                    const Text(
                       'Select Products',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF0F172A),
+                        color: Color(0xFF111827),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -486,10 +536,14 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFE5E7EB),
+                            width: 1,
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.03),
-                              blurRadius: 8,
+                              blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
                           ],
@@ -513,7 +567,7 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                                       color: const Color(0xFFF8FAFC),
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
-                                        color: const Color(0xFFE2E8F0),
+                                        color: const Color(0xFFE5E7EB),
                                       ),
                                     ),
                                     child: Center(
@@ -529,19 +583,21 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                                       children: [
                                         Text(
                                           product.name,
-                                          style: GoogleFonts.inter(
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
-                                            color: const Color(0xFF0F172A),
+                                            color: Color(0xFF111827),
                                           ),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           'SKU: ${product.sku}',
-                                          style: GoogleFonts.inter(
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
                                             fontSize: 11,
                                             fontWeight: FontWeight.w400,
-                                            color: const Color(0xFF94A3B8),
+                                            color: Color(0xFF9CA3AF),
                                           ),
                                         ),
                                         const SizedBox(height: 6),
@@ -561,8 +617,8 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
                                         color: isLimeBorder
-                                            ? const Color(0xFFD4F932)
-                                            : const Color(0xFFE2E8F0),
+                                            ? const Color(0xFFC8F169)
+                                            : const Color(0xFFE5E7EB),
                                         width: isLimeBorder ? 1.5 : 1,
                                       ),
                                     ),
@@ -571,26 +627,29 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                                       children: [
                                         Text(
                                           '${item.quantity}',
-                                          style: GoogleFonts.inter(
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
                                             fontSize: 13,
                                             fontWeight: FontWeight.w600,
-                                            color: const Color(0xFF0F172A),
+                                            color: Color(0xFF111827),
                                           ),
                                         ),
                                         const SizedBox(width: 4),
-                                        Text(
+                                        const Text(
                                           '|',
-                                          style: GoogleFonts.inter(
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
                                             fontSize: 13,
-                                            color: const Color(0xFFCBD5E1),
+                                            color: Color(0xFFE5E7EB),
                                           ),
                                         ),
                                         const SizedBox(width: 4),
-                                        Text(
+                                        const Text(
                                           'units',
-                                          style: GoogleFonts.inter(
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
                                             fontSize: 11,
-                                            color: const Color(0xFF64748B),
+                                            color: Color(0xFF6B7280),
                                           ),
                                         ),
                                       ],
@@ -618,19 +677,20 @@ class _BulkUpdateStockScreenState extends State<BulkUpdateStockScreen> {
                 child: ElevatedButton(
                   onPressed: () => _navigateToReview(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4F932),
-                    foregroundColor: const Color(0xFF0F172A),
+                    backgroundColor: const Color(0xFFC8F169),
+                    foregroundColor: const Color(0xFF111827),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Next',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
+                      fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF0F172A),
+                      color: Color(0xFF111827),
                     ),
                   ),
                 ),

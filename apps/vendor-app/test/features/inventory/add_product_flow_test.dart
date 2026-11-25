@@ -142,5 +142,51 @@ void main() {
       // Next button
       expect(find.text('Next'), findsOneWidget);
     });
+
+    testWidgets('Add Product Full Flow: Product Details -> Pricing & Inventory -> Preview & Publish', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        buildTestableWidget(const ProductDetailsScreen()),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap Next to navigate to Pricing & Inventory
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+
+      // Verify Pricing & Inventory Screen
+      expect(find.byType(PricingAndInventoryScreen), findsOneWidget);
+      expect(find.text('Pricing & Inventory'), findsOneWidget);
+      expect(find.text('72'), findsOneWidget);
+      expect(find.text('68'), findsOneWidget);
+      expect(find.text('Discount'), findsOneWidget);
+      expect(find.text('5.5% off'), findsOneWidget);
+      expect(find.text('5%'), findsOneWidget);
+      expect(find.text('120'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+      expect(find.text('Availability'), findsOneWidget);
+      expect(find.text('Show this product in your store'), findsOneWidget);
+      expect(find.text('Add size, pack, etc.'), findsOneWidget);
+
+      // Tap Next to navigate to Preview & Publish
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+
+      // Verify Preview & Publish Screen
+      expect(find.byType(PreviewAndPublishScreen), findsOneWidget);
+      expect(find.text('Preview & Publish'), findsOneWidget);
+      expect(find.text('Amul Taaza Milk (1 L)'), findsOneWidget);
+      expect(find.text('Amul • Dairy'), findsOneWidget);
+      expect(find.text('₹68'), findsOneWidget);
+      expect(find.text('₹72'), findsOneWidget);
+      expect(find.text('In Stock (120)'), findsOneWidget);
+      expect(find.text('Category'), findsOneWidget);
+      expect(find.text('Grocery › Dairy'), findsOneWidget);
+      expect(find.text('GST'), findsOneWidget);
+      expect(find.text('Unit'), findsOneWidget);
+      expect(find.text('1 L'), findsOneWidget);
+      expect(find.text('Available'), findsOneWidget);
+    });
   });
 }

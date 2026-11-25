@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../../models/inventory_product.dart';
 import '../widgets/product_item_card.dart';
 
@@ -56,26 +58,44 @@ class _InventoryProductSelectionScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F6F0),
+      backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
+        toolbarHeight: 52,
+        leadingWidth: 52,
+        centerTitle: false,
+        titleSpacing: 12,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Center(
             child: Container(
-              width: 44,
-              height: 44,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color.fromRGBO(255, 255, 255, 0.36),
                 borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 2,
+                    spreadRadius: 0,
+                    color: Color(0x1A000000),
+                  ),
+                ],
               ),
               child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFF0F172A),
-                  size: 20,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF111827),
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
               ),
@@ -85,9 +105,12 @@ class _InventoryProductSelectionScreenState
         title: Text(
           widget.title,
           style: const TextStyle(
+            fontFamily: 'Inter',
             fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF0F172A),
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF111827),
+            height: 28 / 20,
+            letterSpacing: -0.2,
           ),
         ),
       ),
@@ -102,10 +125,14 @@ class _InventoryProductSelectionScreenState
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: const Color(0xFFE5E7EB),
+                    width: 1,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.03),
-                      blurRadius: 10,
+                      blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
                   ],
@@ -113,8 +140,16 @@ class _InventoryProductSelectionScreenState
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    const Icon(Icons.search, color: Color(0xFF94A3B8), size: 22),
-                    const SizedBox(width: 10),
+                    SvgPicture.asset(
+                      AppAssets.svgSearch,
+                      width: 20,
+                      height: 20,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF6B7280),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Theme(
                         data: Theme.of(context).copyWith(
@@ -133,16 +168,18 @@ class _InventoryProductSelectionScreenState
                           controller: _searchController,
                           textAlignVertical: TextAlignVertical.center,
                           style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF0F172A),
-                            fontWeight: FontWeight.w500,
+                            fontFamily: 'Inter',
+                            fontSize: 14.5,
+                            color: Color(0xFF111827),
+                            fontWeight: FontWeight.w400,
                           ),
                           onChanged: (val) => setState(() {}),
                           decoration: const InputDecoration(
                             hintText: 'Search products by name or SKU...',
                             hintStyle: TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontSize: 14,
+                              fontFamily: 'Inter',
+                              color: Color(0xFF9CA3AF),
+                              fontSize: 14.5,
                               fontWeight: FontWeight.w400,
                             ),
                             border: InputBorder.none,
@@ -166,7 +203,7 @@ class _InventoryProductSelectionScreenState
                         },
                         child: const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Icon(Icons.close, color: Color(0xFF94A3B8), size: 18),
+                          child: Icon(Icons.close, color: Color(0xFF9CA3AF), size: 18),
                         ),
                       ),
                   ],
@@ -181,7 +218,8 @@ class _InventoryProductSelectionScreenState
                       child: Text(
                         'No products match your search.',
                         style: TextStyle(
-                          color: Color(0xFF64748B),
+                          fontFamily: 'Inter',
+                          color: Color(0xFF6B7280),
                           fontSize: 15,
                         ),
                       ),

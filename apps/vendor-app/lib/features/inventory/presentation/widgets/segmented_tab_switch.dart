@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 
-/// Top pill-shaped segmented switcher matching the "Products (324) | Inventory" design.
+/// Top pill-shaped segmented switcher matching the "Products (324) | Inventory" Figma design.
+///
+/// Figma Specifications (Image 4):
+/// - Flow: Horizontal
+/// - Width: Fill (328px)
+/// - Height: Hug (48px)
+/// - Radius: 9999px (stadium border)
+/// - Padding: 4px
+/// - Active Pill: #C8F169 with dark text #111827 (fontFamily: Inter, fontSize: 14.5, w700)
+/// - Inactive Pill: transparent with cool grey text #6B7280 (fontFamily: Inter, fontSize: 14.5, w500)
 class SegmentedTabSwitch extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTabChanged;
@@ -18,15 +27,15 @@ class SegmentedTabSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 52,
+      height: 48,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(9999),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
@@ -68,19 +77,21 @@ class _TabButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFD4F932) : Colors.transparent,
-          borderRadius: BorderRadius.circular(22),
+          color: isSelected ? const Color(0xFFC8F169) : Colors.transparent,
+          borderRadius: BorderRadius.circular(9999),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 15,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+            fontFamily: 'Inter',
+            fontSize: 14.5,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected ? const Color(0xFF111827) : const Color(0xFF6B7280),
           ),
         ),
       ),

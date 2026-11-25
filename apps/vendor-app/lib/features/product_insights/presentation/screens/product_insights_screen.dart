@@ -1,4 +1,9 @@
+import 'package:fillcart_vendor/features/sales&analystics/presentation/screens/customer_demand_screen.dart';
+import 'package:fillcart_vendor/features/sales&analystics/presentation/screens/order_distribution_screen.dart';
+import 'package:fillcart_vendor/features/sales&analystics/presentation/screens/stock_movement_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/product_insight_tile.dart';
 import '../widgets/product_metric_card.dart';
 import '../widgets/product_sales_trend_chart.dart';
@@ -20,7 +25,7 @@ class ProductInsightsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFFF1EEE6);
+    const bgColor = Color(0xFFF0F0F0);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -44,10 +49,16 @@ class ProductInsightsScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: const Color(0xFFE5E7EB)),
                       ),
-                      child: const Icon(
-                        Icons.arrow_back_rounded,
-                        color: Color(0xFF111827),
-                        size: 20,
+                      child: Center(
+                        child: SvgPicture.asset(
+                          AppAssets.svgBackArrow,
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF111827),
+                            BlendMode.srcIn,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -205,24 +216,60 @@ class ProductInsightsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              const ProductInsightTile(
+              ProductInsightTile(
                 title: 'Stock Movement',
                 subtitle: '126 sold · 40 in stock',
                 iconPath: 'assets/cardsicon/stock_momentum.png',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => StockMovementScreen(
+                        productName: productName,
+                        sku: sku,
+                        price: price,
+                        imagePath: imagePath,
+                      ),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 8),
 
-              const ProductInsightTile(
+              ProductInsightTile(
                 title: 'Order Distribution',
                 subtitle: 'Added in 48 orders',
                 iconPath: 'assets/cardsicon/order_distribution.png',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => OrderDistributionScreen(
+                        productName: productName,
+                        sku: sku,
+                        price: price,
+                        imagePath: imagePath,
+                      ),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 8),
 
-              const ProductInsightTile(
+              ProductInsightTile(
                 title: 'Customer Demand',
                 subtitle: '+18% higher than previous 7 days',
                 iconPath: 'assets/cardsicon/custom_demand.png',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => CustomerDemandScreen(
+                        productName: productName,
+                        sku: sku,
+                        price: price,
+                        imagePath: imagePath,
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

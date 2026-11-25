@@ -119,7 +119,12 @@ void main() {
       expect(find.byType(VendorEarningsScreen), findsOneWidget);
 
       // Switch to Orders tab (index 2)
-      await tester.tap(find.text('Orders'));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(VendorBottomNavBar),
+          matching: find.text('Orders'),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(VendorOrdersScreen), findsOneWidget);
 
@@ -129,7 +134,8 @@ void main() {
       expect(find.byType(VendorInventoryScreen), findsOneWidget);
 
       // Tap top-left back arrow in Products & Inventory screen -> should return to Home
-      await tester.tap(find.byIcon(Icons.arrow_back));
+      // Tap top-left back arrow in Products & Inventory screen -> should return to Home
+      await tester.tap(find.byKey(const Key('inventory_back_button')), warnIfMissed: false);
       await tester.pumpAndSettle();
       expect(find.byType(VendorDashboardScreen), findsOneWidget);
 

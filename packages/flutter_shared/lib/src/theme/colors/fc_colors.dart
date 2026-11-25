@@ -10,8 +10,8 @@ abstract final class FCColors {
   static const Color seedColor = Color(0xFF455A64); // Blue Grey neutral seed
 
   // Light Theme Semantic Palette
-  static const Color lightPrimary = Color(0xFF263238);
-  static const Color lightOnPrimary = Color(0xFFFFFFFF);
+  static const Color lightPrimary = Color(0xFFC8F169);
+  static const Color lightOnPrimary = Color(0xFF111827);
   static const Color lightPrimaryContainer = Color(0xFFECEFF1);
   static const Color lightOnPrimaryContainer = Color(0xFF102027);
 

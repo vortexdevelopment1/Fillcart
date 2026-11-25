@@ -28,7 +28,28 @@ class VendorApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Fillcart Vendor',
         debugShowCheckedModeBanner: false,
-        theme: FCTheme.lightTheme,
+        theme: FCTheme.lightTheme.copyWith(
+          scaffoldBackgroundColor: const Color(0xFFF0F0F0),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFC8F169),
+              foregroundColor: const Color(0xFF111827),
+            ),
+          ),
+          filledButtonTheme: FilledButtonThemeData(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFC8F169),
+              foregroundColor: const Color(0xFF111827),
+            ),
+          ),
+          floatingActionButtonTheme: const FloatingActionButtonThemeData(
+            backgroundColor: Color(0xFFC8F169),
+            foregroundColor: Color(0xFF111827),
+          ),
+          textTheme: FCTheme.lightTheme.textTheme.apply(
+            fontFamily: 'Inter',
+          ),
+        ),
         darkTheme: FCTheme.darkTheme,
         themeMode: ThemeMode.light,
         home: home ??

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/promotion_card_tile.dart';
 import '../widgets/promotion_stat_card.dart';
 import 'choose_promotion_type_screen.dart';
@@ -23,7 +25,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFFF1EEE6);
+    const bgColor = Color(0xFFF0F0F0);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -50,10 +52,16 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: const Color(0xFFE5E7EB)),
                             ),
-                            child: const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Color(0xFF111827),
-                              size: 20,
+                            child: Center(
+                              child: SvgPicture.asset(
+                                AppAssets.svgBackArrow,
+                                width: 20,
+                                height: 20,
+                                colorFilter: const ColorFilter.mode(
+                                  Color(0xFF111827),
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -116,7 +124,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                               top: 0,
                               bottom: 0,
                               child: Image.asset(
-                                'assets/cardsicon/promo_banner_art.png',
+                                'assets/illustrations/promotion_banner.png',
                                 width: 145,
                                 fit: BoxFit.contain,
                               ),
@@ -152,8 +160,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                                     const SizedBox(height: 12),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFF133E2B),
-                                        foregroundColor: Colors.white,
+                                        backgroundColor: const Color(0xFFC8F169),
+                                        foregroundColor: const Color(0xFF111827),
                                         elevation: 0,
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 14,
@@ -178,6 +186,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                                           fontFamily: 'Inter',
                                           fontSize: 12.5,
                                           fontWeight: FontWeight.w700,
+                                          color: Color(0xFF111827),
                                         ),
                                       ),
                                     ),
@@ -220,7 +229,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
 
                     // Section Heading: Your Promotions
                     const Text(
-                      'Your Promotions (4)',
+                      'Your Promotions',
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 15,

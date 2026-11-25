@@ -1,4 +1,6 @@
+import 'package:fillcart_vendor/features/analytics/revenue_analytics/presentation/screens/revenue_analytics_screen.dart';
 import 'package:fillcart_vendor/features/dashboard/presentation/screens/vendor_dashboard_screen.dart';
+import 'package:fillcart_vendor/features/product_insights/presentation/screens/product_insights_screen.dart';
 import 'package:fillcart_vendor/features/sales&analystics/presentation/screens/sales_analytics_screen.dart';
 import 'package:fillcart_vendor/features/sales&analystics/presentation/widgets/category_donut_chart.dart';
 import 'package:fillcart_vendor/features/sales&analystics/presentation/widgets/recent_order_tile.dart';
@@ -105,7 +107,7 @@ void main() {
       expect(find.byType(RecentOrderTile), findsNWidgets(4));
     });
 
-    testWidgets('tapping Open Sales Analytics on Dashboard navigates to SalesAnalyticsScreen', (
+    testWidgets('tapping Sales Analytics on Dashboard navigates to SalesAnalyticsScreen', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -115,15 +117,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Open Sales Analytics'), findsOneWidget);
-
-      await tester.tap(find.text('Open Sales Analytics'));
+      await tester.ensureVisible(find.text('Sales Analytics'));
+      await tester.tap(find.text('Sales Analytics'));
       await tester.pumpAndSettle();
 
       expect(find.byType(SalesAnalyticsScreen), findsOneWidget);
     });
 
-    testWidgets('tapping Open Product Insights on Dashboard navigates to ProductInsightsScreen', (
+    testWidgets('verify Product Management is removed from Dashboard and FAB navigates to ProductInsightsScreen', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -133,15 +134,15 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Open Product Insights'), findsOneWidget);
+      expect(find.text('Product Management'), findsNothing);
 
-      await tester.tap(find.text('Open Product Insights'));
+      await tester.tap(find.byKey(const Key('dashboard_add_product_fab')));
       await tester.pumpAndSettle();
 
-      expect(find.text('Product Insights'), findsOneWidget);
+      expect(find.byType(ProductInsightsScreen), findsOneWidget);
     });
 
-    testWidgets('tapping Open Revenue Analytics on Dashboard navigates to RevenueAnalyticsScreen', (
+    testWidgets('tapping Revenue Analytics on Dashboard navigates to RevenueAnalyticsScreen', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -151,12 +152,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Open Revenue Analytics'), findsOneWidget);
-
-      await tester.tap(find.text('Open Revenue Analytics'));
+      await tester.ensureVisible(find.text('Revenue Analytics'));
+      await tester.tap(find.text('Revenue Analytics'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Revenue Analytics'), findsOneWidget);
+      expect(find.byType(RevenueAnalyticsScreen), findsOneWidget);
     });
   });
 }

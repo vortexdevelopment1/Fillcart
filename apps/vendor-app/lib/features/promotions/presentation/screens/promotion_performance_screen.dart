@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import '../widgets/promotion_daily_chart.dart';
+import '../widgets/promotion_options_menu.dart';
 
 /// Screen 6: Promotion Performance Analytics Screen - Matching Figma Image 4 exactly.
 class PromotionPerformanceScreen extends StatelessWidget {
@@ -9,16 +12,22 @@ class PromotionPerformanceScreen extends StatelessWidget {
     this.subtitle = 'On Dairy & Snacks',
     this.dateRange = '10 Nov – 20 Nov',
     this.iconAsset = 'assets/cardsicon/promo_percent.png',
+    this.onEdit,
+    this.onDeactivate,
+    this.onDelete,
   });
 
   final String title;
   final String subtitle;
   final String dateRange;
   final String iconAsset;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDeactivate;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFFF1EEE6);
+    const bgColor = Color(0xFFF0F0F0);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -45,10 +54,16 @@ class PromotionPerformanceScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: const Color(0xFFE5E7EB)),
                             ),
-                            child: const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Color(0xFF111827),
-                              size: 20,
+                            child: Center(
+                              child: SvgPicture.asset(
+                                AppAssets.svgBackArrow,
+                                width: 20,
+                                height: 20,
+                                colorFilter: const ColorFilter.mode(
+                                  Color(0xFF111827),
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -65,23 +80,16 @@ class PromotionPerformanceScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        PopupMenuButton<String>(
-                          borderRadius: BorderRadius.circular(12),
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'edit',
-                              child: Text('Edit Promotion'),
-                            ),
-                            const PopupMenuItem(
-                              value: 'pause',
-                              child: Text('Pause Promotion'),
-                            ),
-                            const PopupMenuItem(
-                              value: 'end',
-                              child: Text('End Promotion'),
-                            ),
-                          ],
-                          child: Container(
+                        PromotionOptionsMenuButton(
+                          promotionTitle: title,
+                          offset: const Offset(0, 48),
+                          onEdit: onEdit,
+                          onDeactivate: onDeactivate,
+                          onDelete: onDelete ??
+                              () {
+                                Navigator.maybePop(context);
+                              },
+                          customTrigger: Container(
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
@@ -173,10 +181,14 @@ class PromotionPerformanceScreen extends StatelessWidget {
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    const Icon(
-                                      Icons.calendar_today_outlined,
-                                      size: 11,
-                                      color: Color(0xFF4B5563),
+                                    SvgPicture.asset(
+                                      AppAssets.svgCalendar,
+                                      width: 11,
+                                      height: 11,
+                                      colorFilter: const ColorFilter.mode(
+                                        Color(0xFF4B5563),
+                                        BlendMode.srcIn,
+                                      ),
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
