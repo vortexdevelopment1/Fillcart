@@ -20,9 +20,9 @@ import { ProductReportModal } from '../components/products/ProductReportModal';
 import { useApp } from '../context/AppContext';
 
 export const ProductsPage: React.FC = () => {
-  // State for products and categories
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  // State for products and categories initialized from persistent storage
+  const [products, setProducts] = useState<Product[]>(() => productsService.getLocalProducts());
+  const [categories, setCategories] = useState<Category[]>(() => categoriesService.getLocalCategories());
 
   // Active top tab: 'Products' | 'Categories'
   const [activeTab, setActiveTab] = useState<'Products' | 'Categories'>('Products');
