@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
@@ -141,12 +141,18 @@ export const StaffPage: React.FC = () => {
 
 const STORAGE_KEY_STAFF = 'fillkart_admin_staff';
 
+const isProbeAccount = (email: string) => {
+  return /admin_probe_\d+|superadmin_\d+|staff_\d+|admin_\d+@fillcart\.internal/i.test(email);
+};
+
 const getLocalStaff = (): StaffMember[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_STAFF);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.filter((s) => !isProbeAccount(s.email));
+      }
     }
   } catch {}
   return [];
@@ -154,7 +160,8 @@ const getLocalStaff = (): StaffMember[] => {
 
 const saveLocalStaff = (staff: StaffMember[]) => {
   try {
-    localStorage.setItem(STORAGE_KEY_STAFF, JSON.stringify(staff));
+    const cleaned = staff.filter((s) => !isProbeAccount(s.email));
+    localStorage.setItem(STORAGE_KEY_STAFF, JSON.stringify(cleaned));
   } catch {}
 };
 
@@ -174,12 +181,15 @@ const saveLocalStaff = (staff: StaffMember[]) => {
         profile: backendProfile,
       });
 
-      const mapped = res.items.map(mapBackendStaffToFrontend);
+      const mapped = res.items
+        .map(mapBackendStaffToFrontend)
+        .filter((s) => !isProbeAccount(s.email));
+
       const local = getLocalStaff();
       const merged = [...mapped];
       for (const ls of local) {
         if (!merged.some((m) => m.id === ls.id || m.email.toLowerCase() === ls.email.toLowerCase())) {
-          merged.unshift(ls);
+          merged.push(ls);
         }
       }
       saveLocalStaff(merged);
@@ -200,6 +210,47 @@ const saveLocalStaff = (staff: StaffMember[]) => {
   useEffect(() => {
     fetchStaff();
   }, [fetchStaff]);
+
+  // Client-side real-time filter & relevance sorting
+  const displayedStaffList: StaffMember[] = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return staffList
+      .filter((member) => !isProbeAccount(member.email))
+      .filter((member) => {
+        if (q) {
+          const nameMatch = member.name.toLowerCase().includes(q);
+          const emailMatch = member.email.toLowerCase().includes(q);
+          const phoneMatch = member.phone ? member.phone.includes(q) : false;
+          const roleMatch = member.role.toLowerCase().includes(q);
+          if (!nameMatch && !emailMatch && !phoneMatch && !roleMatch) return false;
+        }
+
+        if (statusParam === 'ACTIVE' && !member.isActive) return false;
+        if (statusParam === 'DEACTIVATED' && member.isActive) return false;
+
+        if (profileParam !== 'ALL') {
+          const p = profileParam.toLowerCase();
+          const r = member.role.toLowerCase();
+          if (!r.includes(p) && !p.includes(r)) return false;
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        if (!q) return 0;
+        const aNameStarts = a.name.toLowerCase().startsWith(q);
+        const bNameStarts = b.name.toLowerCase().startsWith(q);
+        if (aNameStarts && !bNameStarts) return -1;
+        if (!aNameStarts && bNameStarts) return 1;
+
+        const aEmailStarts = a.email.toLowerCase().startsWith(q);
+        const bEmailStarts = b.email.toLowerCase().startsWith(q);
+        if (aEmailStarts && !bEmailStarts) return -1;
+        if (!aEmailStarts && bEmailStarts) return 1;
+
+        return 0;
+      });
+  }, [staffList, searchQuery, statusParam, profileParam]);
 
   // Sync local matrix permissions when tab switches or dictionary updates
   useEffect(() => {
@@ -355,7 +406,7 @@ const saveLocalStaff = (staff: StaffMember[]) => {
           <div className="p-4 rounded-[24px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.02)] flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
             <div>
               <h2 className="font-heading text-lg font-normal text-ink">
-                Ops Team Staff ({pagination.total})
+                Ops Team Staff ({displayedStaffList.length})
               </h2>
               <p className="font-sans text-xs text-ink/60">
                 Authorized internal administrators & operators
@@ -444,7 +495,7 @@ const saveLocalStaff = (staff: StaffMember[]) => {
                 Retry
               </button>
             </div>
-          ) : staffList.length === 0 ? (
+          ) : displayedStaffList.length === 0 ? (
             <div className="p-12 text-center rounded-[20px] bg-white border border-primary/10 flex flex-col items-center justify-center">
               <Users className="w-10 h-10 text-primary/30 mx-auto mb-2" />
               <h4 className="font-heading text-base font-normal text-ink">No staff members found</h4>
@@ -462,7 +513,7 @@ const saveLocalStaff = (staff: StaffMember[]) => {
             </div>
           ) : (
             <div className="space-y-2.5">
-              {staffList.map((member) => (
+              {displayedStaffList.map((member: StaffMember) => (
                 <div
                   key={member.id}
                   className="w-full rounded-[20px] bg-white border border-primary/10 shadow-[0_2px_8px_rgba(18,55,71,0.03)] hover:border-secondary hover:bg-neutral/20 transition-all p-[12px_18px] relative select-none"
