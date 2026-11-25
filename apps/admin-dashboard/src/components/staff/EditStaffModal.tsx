@@ -12,6 +12,9 @@ interface EditStaffModalProps {
 }
 
 const EXCLUDED_STAFF_ROLES = new Set([
+  'Super Admin',
+  'ADMIN',
+  'System_Admin',
   'CUSTOMER',
   'VENDOR',
   'RIDER',
@@ -23,7 +26,6 @@ const EXCLUDED_STAFF_ROLES = new Set([
 
 const DEFAULT_STAFF_ROLES = [
   'Operations Admin',
-  'Super Admin',
   'Finance Admin',
   'Support Admin',
   'Marketing Admin',
