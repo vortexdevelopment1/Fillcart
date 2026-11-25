@@ -145,6 +145,16 @@ export function mapBackendPermissionsToMatrix(
   return matrix as RolePermissions;
 }
 
+const EXCLUDED_STAFF_ROLES = new Set([
+  'CUSTOMER',
+  'VENDOR',
+  'RIDER',
+  'Customer',
+  'Vendor',
+  'Rider',
+  'Vendor Staff',
+]);
+
 /**
  * Converts backend roles list to a dictionary of RolePermissions for all available role tabs.
  */
@@ -161,7 +171,14 @@ export function buildFrontendRolesDictionary(
   const roleToProfileIdMapping: Record<string, string> = {};
 
   for (const item of backendRoles) {
+    if (EXCLUDED_STAFF_ROLES.has(item.name) || /\d{6,}/.test(item.name)) {
+      continue;
+    }
     const frontendLabel = mapBackendRoleToFrontend(item.name);
+    if (EXCLUDED_STAFF_ROLES.has(frontendLabel)) {
+      continue;
+    }
+
     rolesDictionary[frontendLabel] = mapBackendPermissionsToMatrix(item.permissions, item.name);
 
     if (item.isSystem && item.name === 'ADMIN') {

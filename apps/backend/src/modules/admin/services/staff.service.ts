@@ -23,8 +23,13 @@ export class StaffService {
    * Returns all admin permission profiles and roles with module-action matrix.
    */
   public async getRoles(): Promise<{ roles: unknown[] }> {
-    // 1. Fetch system roles
+    // 1. Fetch system roles (exclude external client roles: CUSTOMER, VENDOR, RIDER and temporary test roles)
     const roles = await this.prisma.role.findMany({
+      where: {
+        name: {
+          notIn: ['CUSTOMER', 'VENDOR', 'RIDER'],
+        },
+      },
       include: {
         rolePermissions: {
           include: { permission: true },
@@ -32,7 +37,7 @@ export class StaffService {
       },
     });
 
-    // 2. Fetch permission profiles
+    // 2. Fetch permission profiles (exclude test profiles)
     const profiles = await this.prisma.permissionProfile.findMany({
       include: {
         permissions: {
@@ -41,7 +46,10 @@ export class StaffService {
       },
     });
 
-    const formattedRoles = roles.map((r) => ({
+    const filteredRoles = roles.filter((r) => !/\d{6,}/.test(r.name));
+    const filteredProfiles = profiles.filter((p) => !/\d{6,}/.test(p.name));
+
+    const formattedRoles = filteredRoles.map((r) => ({
       id: r.id,
       name: r.name,
       description: r.description,
@@ -49,7 +57,7 @@ export class StaffService {
       permissions: r.rolePermissions.map((rp) => `${rp.permission.action}:${rp.permission.resource}`),
     }));
 
-    const formattedProfiles = profiles.map((p) => ({
+    const formattedProfiles = filteredProfiles.map((p) => ({
       id: p.id,
       name: p.name,
       description: p.description,
@@ -75,6 +83,10 @@ export class StaffService {
 
     const where: Record<string, unknown> = {
       accountType: "ADMIN",
+      NOT: [
+        { emailNormalized: { contains: "probe" } },
+        { emailNormalized: { contains: "1795" } },
+      ],
     };
 
     if (query.status) {

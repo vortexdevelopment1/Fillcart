@@ -11,6 +11,25 @@ interface EditStaffModalProps {
   availableRoles: string[];
 }
 
+const EXCLUDED_STAFF_ROLES = new Set([
+  'CUSTOMER',
+  'VENDOR',
+  'RIDER',
+  'Customer',
+  'Vendor',
+  'Rider',
+  'Vendor Staff',
+]);
+
+const DEFAULT_STAFF_ROLES = [
+  'Operations Admin',
+  'Super Admin',
+  'Finance Admin',
+  'Support Admin',
+  'Marketing Admin',
+  'Security Auditor',
+];
+
 export const EditStaffModal: React.FC<EditStaffModalProps> = ({
   staffMember,
   isOpen,
@@ -18,6 +37,11 @@ export const EditStaffModal: React.FC<EditStaffModalProps> = ({
   onSave,
   availableRoles,
 }) => {
+  const sanitizedRoles = (availableRoles || []).filter(
+    (r) => !EXCLUDED_STAFF_ROLES.has(r) && !/\d{6,}/.test(r)
+  );
+  const selectableRoles = sanitizedRoles.length > 0 ? sanitizedRoles : DEFAULT_STAFF_ROLES;
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<StaffRole>('Support');
@@ -93,7 +117,7 @@ export const EditStaffModal: React.FC<EditStaffModalProps> = ({
               onChange={(e) => setRole(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary"
             >
-              {availableRoles.map((r) => (
+              {selectableRoles.map((r) => (
                 <option key={r} value={r}>
                   {r}
                 </option>

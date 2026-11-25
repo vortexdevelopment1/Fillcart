@@ -21,6 +21,25 @@ interface AddStaffModalProps {
   roleToProfileIdMapping?: Record<string, string>;
 }
 
+const EXCLUDED_STAFF_ROLES = new Set([
+  'CUSTOMER',
+  'VENDOR',
+  'RIDER',
+  'Customer',
+  'Vendor',
+  'Rider',
+  'Vendor Staff',
+]);
+
+const DEFAULT_STAFF_ROLES = [
+  'Operations Admin',
+  'Super Admin',
+  'Finance Admin',
+  'Support Admin',
+  'Marketing Admin',
+  'Security Auditor',
+];
+
 export const AddStaffModal: React.FC<AddStaffModalProps> = ({
   isOpen,
   onClose,
@@ -29,10 +48,15 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
   adminRoleId,
   roleToProfileIdMapping = {},
 }) => {
+  const sanitizedRoles = (availableRoles || []).filter(
+    (r) => !EXCLUDED_STAFF_ROLES.has(r) && !/\d{6,}/.test(r)
+  );
+  const selectableRoles = sanitizedRoles.length > 0 ? sanitizedRoles : DEFAULT_STAFF_ROLES;
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<StaffRole>(availableRoles[0] || 'Operations Admin');
+  const [role, setRole] = useState<StaffRole>(selectableRoles[0] || 'Operations Admin');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isActive, setIsActive] = useState(true);
@@ -192,7 +216,7 @@ export const AddStaffModal: React.FC<AddStaffModalProps> = ({
                 disabled={isSubmitting}
                 className="w-full px-3 py-2 rounded-xl border border-primary/20 bg-neutral/30 font-sans text-xs text-ink focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-60"
               >
-                {availableRoles.map((r) => (
+                {selectableRoles.map((r) => (
                   <option key={r} value={r}>
                     {r}
                   </option>

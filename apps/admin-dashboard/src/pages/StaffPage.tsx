@@ -181,6 +181,11 @@ const saveLocalStaff = (staff: StaffMember[]) => {
         profile: backendProfile,
       });
 
+      if (res.pagination && pageParam > res.pagination.totalPages && res.pagination.totalPages > 0) {
+        updateQueryParams({ page: 1 });
+        return;
+      }
+
       const mapped = res.items
         .map(mapBackendStaffToFrontend)
         .filter((s) => !isProbeAccount(s.email));
@@ -387,7 +392,9 @@ const saveLocalStaff = (staff: StaffMember[]) => {
     setActiveMenuId(null);
   };
 
-  const availableRoleNames = Object.keys(rolesDictionary);
+  const availableRoleNames = Object.keys(rolesDictionary).filter(
+    (r) => !['CUSTOMER', 'VENDOR', 'RIDER', 'Customer', 'Vendor', 'Rider', 'Vendor Staff'].includes(r) && !/\d{6,}/.test(r)
+  );
 
   return (
     <div className="space-y-5 pb-12 w-full max-w-full min-w-0">
@@ -627,8 +634,12 @@ const saveLocalStaff = (staff: StaffMember[]) => {
               <span className="font-sans text-xs text-ink/60">
                 Showing{' '}
                 <strong className="text-ink">
-                  {(pagination.page - 1) * pagination.limit + 1} -{' '}
-                  {Math.min(pagination.page * pagination.limit, pagination.total)}
+                  {displayedStaffList.length === 0
+                    ? 0
+                    : `${(pagination.page - 1) * pagination.limit + 1} - ${Math.min(
+                        (pagination.page - 1) * pagination.limit + displayedStaffList.length,
+                        pagination.total
+                      )}`}
                 </strong>{' '}
                 of <strong className="text-ink">{pagination.total}</strong> staff
               </span>
