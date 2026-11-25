@@ -157,6 +157,7 @@ class _PanDetailsScreenState extends State<PanDetailsScreen> {
                 alignment: Alignment.centerLeft,
                 child: TextField(
                   controller: _panController,
+                  cursorColor: const Color(0xFF71717A),
                   textCapitalization: TextCapitalization.characters,
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(10),

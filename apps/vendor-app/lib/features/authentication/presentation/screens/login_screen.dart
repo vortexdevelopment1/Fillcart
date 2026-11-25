@@ -14,6 +14,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
+  final FocusNode _phoneFocusNode = FocusNode();
   bool _agreedToTerms = true;
   String? _errorMessage;
 
@@ -32,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     _phoneController.dispose();
+    _phoneFocusNode.dispose();
     super.dispose();
   }
 
@@ -112,60 +114,67 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 10.0),
 
               // Input Container with border
-              Container(
-                height: 56.0,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(14.0),
-                  border: Border.all(
-                    color: _errorMessage != null
-                        ? const Color(0xFFEF4444)
-                        : const Color(0xFF71717A),
-                    width: 1.0,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  children: [
-                    Text(
-                      '+91',
-                      style: GoogleFonts.inter(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF0F172A),
-                      ),
+              GestureDetector(
+                key: const Key('phone_input_container'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _phoneFocusNode.requestFocus(),
+                child: Container(
+                  height: 56.0,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(14.0),
+                    border: Border.all(
+                      color: _errorMessage != null
+                          ? const Color(0xFFEF4444)
+                          : const Color(0xFF71717A),
+                      width: 1.0,
                     ),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: TextField(
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
-                        ],
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      Text(
+                        '+91',
                         style: GoogleFonts.inter(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF0F172A),
-                          letterSpacing: 0.5,
-                        ),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          focusedErrorBorder: InputBorder.none,
-                          filled: false,
-                          fillColor: Colors.transparent,
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8.0),
+                      Expanded(
+                        child: TextField(
+                          controller: _phoneController,
+                          focusNode: _phoneFocusNode,
+                          cursorColor: const Color(0xFF71717A),
+                          keyboardType: TextInputType.phone,
+                          textAlignVertical: TextAlignVertical.center,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                          style: GoogleFonts.inter(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF0F172A),
+                            letterSpacing: 0.5,
+                          ),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            focusedErrorBorder: InputBorder.none,
+                            filled: false,
+                            fillColor: Colors.transparent,
+                            contentPadding: EdgeInsets.symmetric(vertical: 14.0),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

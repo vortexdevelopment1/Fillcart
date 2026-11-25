@@ -272,6 +272,7 @@ class _AadhaarVerificationScreenState extends State<AadhaarVerificationScreen> {
         child: TextField(
           controller: controller,
           focusNode: focusNode,
+          cursorColor: const Color(0xFF0F172A),
           keyboardType: TextInputType.number,
           textAlign: TextAlign.center,
           inputFormatters: [

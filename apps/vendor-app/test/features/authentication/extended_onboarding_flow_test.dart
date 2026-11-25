@@ -1,4 +1,7 @@
 import 'package:fillcart_vendor/features/authentication/authentication.dart';
+import 'package:fillcart_vendor/features/dashboard/presentation/screens/vendor_dashboard_screen.dart';
+import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
+import 'package:fillcart_vendor/features/navigation/presentation/widgets/vendor_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -134,6 +137,33 @@ void main() {
       expect(find.text('Business Documents'), findsOneWidget);
       expect(find.text('4/5'), findsOneWidget);
 
+      // All 4 cards should be closed by default
+      expect(find.text('Upload File'), findsNothing);
+      expect(find.text('Shop Owner'), findsNothing);
+
+      // Tap Gumasta Certificate -> opens Upload File
+      await tester.tap(find.text('Gumasta Certificate'));
+      await tester.pumpAndSettle();
+      expect(find.text('Upload File'), findsOneWidget);
+
+      // Upload file in Gumasta
+      await tester.tap(find.text('Upload File'));
+      await tester.pumpAndSettle();
+      expect(find.text('File Uploaded ✓'), findsOneWidget);
+
+      // Tap FSSAI Certificate -> previous upload is cleared automatically
+      await tester.tap(find.text('FSSAI Certificate'));
+      await tester.pumpAndSettle();
+      expect(find.text('File Uploaded ✓'), findsNothing);
+      expect(find.text('Upload File'), findsOneWidget);
+
+      // Tap Electricity Bill -> shows Shop Owner / On Rent and Upload File
+      await tester.tap(find.text('Electricity Bill'));
+      await tester.pumpAndSettle();
+      expect(find.text('Shop Owner'), findsOneWidget);
+      expect(find.text('On Rent'), findsOneWidget);
+      expect(find.text('Upload File'), findsOneWidget);
+
       // Scroll and Tap Continue
       await tester.ensureVisible(find.text('Continue'));
       await tester.pumpAndSettle();
@@ -245,5 +275,28 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets(
+      'VerificationInProgressScreen redirects to MainVendorScreen after delay',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          buildTestableWidget(
+            const VerificationInProgressScreen(
+              redirectDelay: Duration(seconds: 2),
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(find.byType(VerificationInProgressScreen), findsOneWidget);
+
+        // Advance past redirectDelay -> should land on MainVendorScreen
+        await tester.pump(const Duration(seconds: 2));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(MainVendorScreen), findsOneWidget);
+        expect(find.byType(VendorBottomNavBar), findsOneWidget);
+        expect(find.byType(VendorDashboardScreen), findsOneWidget);
+      },
+    );
   });
 }

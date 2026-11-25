@@ -32,6 +32,15 @@ void main() {
       expect(find.text('Agree to our Terms & Conditions'), findsOneWidget);
       expect(find.text('Send OTP'), findsOneWidget);
 
+      // Tapping near top-left edge of input container focuses the TextField
+      final containerTopLeft = tester.getTopLeft(
+        find.byKey(const Key('phone_input_container')),
+      );
+      await tester.tapAt(containerTopLeft + const Offset(12, 8));
+      await tester.pumpAndSettle();
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.focusNode?.hasFocus, isTrue);
+
       // Tap Send OTP without input shows validation
       await tester.tap(find.text('Send OTP'));
       await tester.pumpAndSettle();

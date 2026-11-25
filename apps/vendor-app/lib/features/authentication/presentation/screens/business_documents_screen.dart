@@ -34,10 +34,23 @@ class BusinessDocumentsScreen extends StatefulWidget {
 }
 
 class _BusinessDocumentsScreenState extends State<BusinessDocumentsScreen> {
-  String _selectedDocType = 'gumasta';
+  String? _selectedDocType;
   bool _electricityIsOwner = true;
   bool _gumastaUploaded = false;
+  bool _fssaiUploaded = false;
+  bool _gstUploaded = false;
   bool _electricityUploaded = false;
+
+  void _selectDocType(String typeId) {
+    if (_selectedDocType == typeId) return;
+    setState(() {
+      _selectedDocType = typeId;
+      _gumastaUploaded = false;
+      _fssaiUploaded = false;
+      _gstUploaded = false;
+      _electricityUploaded = false;
+    });
+  }
 
   void _onContinue() {
     if (widget.isEditing) {
@@ -87,15 +100,17 @@ class _BusinessDocumentsScreenState extends State<BusinessDocumentsScreen> {
                     ),
                   ),
                   const SizedBox(width: 14.0),
-                  Text(
-                    'Business Documents',
-                    style: GoogleFonts.inter(
-                      fontSize: 22.0,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF0F172A),
+                  Expanded(
+                    child: Text(
+                      'Business Documents',
+                      style: GoogleFonts.inter(
+                        fontSize: 22.0,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF0F172A),
+                      ),
                     ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 8.0),
                   Text(
                     '4/5',
                     style: GoogleFonts.inter(
@@ -134,11 +149,13 @@ class _BusinessDocumentsScreenState extends State<BusinessDocumentsScreen> {
                 title: 'Gumasta Certificate',
                 subtitle: 'Shop & Establishment Certificate',
                 isSelected: _selectedDocType == 'gumasta',
-                child: _buildUploadButton(
-                  isUploaded: _gumastaUploaded,
-                  onTap: () =>
-                      setState(() => _gumastaUploaded = !_gumastaUploaded),
-                ),
+                child: _selectedDocType == 'gumasta'
+                    ? _buildUploadButton(
+                        isUploaded: _gumastaUploaded,
+                        onTap: () => setState(
+                            () => _gumastaUploaded = !_gumastaUploaded),
+                      )
+                    : null,
               ),
               const SizedBox(height: 14.0),
 
@@ -148,6 +165,13 @@ class _BusinessDocumentsScreenState extends State<BusinessDocumentsScreen> {
                 title: 'FSSAI Certificate',
                 subtitle: 'Food Safety License',
                 isSelected: _selectedDocType == 'fssai',
+                child: _selectedDocType == 'fssai'
+                    ? _buildUploadButton(
+                        isUploaded: _fssaiUploaded,
+                        onTap: () => setState(
+                            () => _fssaiUploaded = !_fssaiUploaded),
+                      )
+                    : null,
               ),
               const SizedBox(height: 14.0),
 
@@ -157,6 +181,13 @@ class _BusinessDocumentsScreenState extends State<BusinessDocumentsScreen> {
                 title: 'GST Certificate',
                 subtitle: 'Good and Services Tax Certificate',
                 isSelected: _selectedDocType == 'gst',
+                child: _selectedDocType == 'gst'
+                    ? _buildUploadButton(
+                        isUploaded: _gstUploaded,
+                        onTap: () =>
+                            setState(() => _gstUploaded = !_gstUploaded),
+                      )
+                    : null,
               ),
               const SizedBox(height: 14.0),
 
@@ -166,74 +197,76 @@ class _BusinessDocumentsScreenState extends State<BusinessDocumentsScreen> {
                 title: 'Electricity Bill',
                 subtitle: 'Choose one option',
                 isSelected: _selectedDocType == 'electricity',
-                child: Column(
-                  children: [
-                    // Segmented Selector: [Shop Owner] vs [On Rent]
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () =>
-                                setState(() => _electricityIsOwner = true),
-                            child: Container(
-                              height: 44.0,
-                              decoration: BoxDecoration(
-                                color: _electricityIsOwner
-                                    ? const Color(0xFF0F172A)
-                                    : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Shop Owner',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w600,
-                                  color: _electricityIsOwner
-                                      ? Colors.white
-                                      : const Color(0xFF0F172A),
+                child: _selectedDocType == 'electricity'
+                    ? Column(
+                        children: [
+                          // Segmented Selector: [Shop Owner] vs [On Rent]
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      setState(() => _electricityIsOwner = true),
+                                  child: Container(
+                                    height: 44.0,
+                                    decoration: BoxDecoration(
+                                      color: _electricityIsOwner
+                                          ? const Color(0xFF0F172A)
+                                          : const Color(0xFFF1F5F9),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Shop Owner',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w600,
+                                        color: _electricityIsOwner
+                                            ? Colors.white
+                                            : const Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10.0),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () =>
-                                setState(() => _electricityIsOwner = false),
-                            child: Container(
-                              height: 44.0,
-                              decoration: BoxDecoration(
-                                color: !_electricityIsOwner
-                                    ? const Color(0xFF0F172A)
-                                    : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'On Rent',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w600,
-                                  color: !_electricityIsOwner
-                                      ? Colors.white
-                                      : const Color(0xFF0F172A),
+                              const SizedBox(width: 10.0),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(
+                                      () => _electricityIsOwner = false),
+                                  child: Container(
+                                    height: 44.0,
+                                    decoration: BoxDecoration(
+                                      color: !_electricityIsOwner
+                                          ? const Color(0xFF0F172A)
+                                          : const Color(0xFFF1F5F9),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'On Rent',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w600,
+                                        color: !_electricityIsOwner
+                                            ? Colors.white
+                                            : const Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12.0),
-                    _buildUploadButton(
-                      isUploaded: _electricityUploaded,
-                      onTap: () => setState(
-                          () => _electricityUploaded = !_electricityUploaded),
-                    ),
-                  ],
-                ),
+                          const SizedBox(height: 12.0),
+                          _buildUploadButton(
+                            isUploaded: _electricityUploaded,
+                            onTap: () => setState(() =>
+                                _electricityUploaded = !_electricityUploaded),
+                          ),
+                        ],
+                      )
+                    : null,
               ),
               const SizedBox(height: 20.0),
 
@@ -295,7 +328,7 @@ class _BusinessDocumentsScreenState extends State<BusinessDocumentsScreen> {
     Widget? child,
   }) {
     return GestureDetector(
-      onTap: () => setState(() => _selectedDocType = typeId),
+      onTap: () => _selectDocType(typeId),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),

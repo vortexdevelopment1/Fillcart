@@ -401,6 +401,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
       alignment: Alignment.centerLeft,
       child: TextField(
         controller: controller,
+        cursorColor: const Color(0xFF71717A),
         style: GoogleFonts.inter(
           fontSize: 15.5,
           fontWeight: FontWeight.w400,

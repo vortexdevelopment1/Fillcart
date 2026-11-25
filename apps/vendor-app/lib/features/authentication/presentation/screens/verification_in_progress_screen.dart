@@ -1,10 +1,53 @@
+import 'dart:async';
+import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'verification_fixes_screen.dart';
 
 /// Screen: "Verification In Progress" (Image 9).
-class VerificationInProgressScreen extends StatelessWidget {
-  const VerificationInProgressScreen({super.key});
+/// Automatically redirects to [MainVendorScreen] after [redirectDelay].
+class VerificationInProgressScreen extends StatefulWidget {
+  final Duration redirectDelay;
+  final bool autoRedirect;
+
+  const VerificationInProgressScreen({
+    super.key,
+    this.redirectDelay = const Duration(seconds: 3),
+    this.autoRedirect = true,
+  });
+
+  @override
+  State<VerificationInProgressScreen> createState() =>
+      _VerificationInProgressScreenState();
+}
+
+class _VerificationInProgressScreenState
+    extends State<VerificationInProgressScreen> {
+  Timer? _redirectTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.autoRedirect) {
+      _redirectTimer = Timer(widget.redirectDelay, _redirectToHome);
+    }
+  }
+
+  void _redirectToHome() {
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute<void>(
+        builder: (_) => const MainVendorScreen(),
+      ),
+      (route) => false,
+    );
+  }
+
+  @override
+  void dispose() {
+    _redirectTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +67,7 @@ class VerificationInProgressScreen extends StatelessWidget {
               GestureDetector(
                 key: const Key('verification_illustration'),
                 onTap: () {
+                  _redirectTimer?.cancel();
                   // User can tap illustration to preview fix screen
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(

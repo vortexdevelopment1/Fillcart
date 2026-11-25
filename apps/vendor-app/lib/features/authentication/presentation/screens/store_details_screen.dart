@@ -535,6 +535,7 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
       alignment: Alignment.centerLeft,
       child: TextField(
         controller: controller,
+        cursorColor: const Color(0xFF71717A),
         keyboardType: keyboardType,
         style: GoogleFonts.inter(
           fontSize: 15.5,

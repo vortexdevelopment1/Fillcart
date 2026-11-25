@@ -160,6 +160,7 @@ class _AadhaarDetailsScreenState extends State<AadhaarDetailsScreen> {
                 alignment: Alignment.centerLeft,
                 child: TextField(
                   controller: _aadhaarController,
+                  cursorColor: const Color(0xFF71717A),
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,

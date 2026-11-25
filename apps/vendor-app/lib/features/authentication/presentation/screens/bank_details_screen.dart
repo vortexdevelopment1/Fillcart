@@ -311,6 +311,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
       alignment: Alignment.centerLeft,
       child: TextField(
         controller: controller,
+        cursorColor: const Color(0xFF71717A),
         keyboardType: keyboardType,
         textCapitalization: textCapitalization,
         style: GoogleFonts.inter(
