@@ -187,6 +187,9 @@ export const envSchema = z.object({
   MSG91_AUTH_KEY: z.string().optional(),
   MSG91_TEMPLATE_ID: z.string().optional(),
   MSG91_BASE_URL: z.string().url().default("https://control.msg91.com"),
+
+  // Dedicated Master Password for Admin System Settings Unlock
+  SETTINGS_MASTER_PASSWORD: z.string().optional(),
 });
 
 export type AppConfig = z.infer<typeof envSchema>;

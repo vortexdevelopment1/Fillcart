@@ -60,22 +60,29 @@ export class AdminAuthService {
       );
     }
 
-    // 2. Fetch admin user password credential
-    const credential = await this.prisma.credential.findFirst({
-      where: {
-        userId: params.userId,
-        type: "PASSWORD",
-      },
-    });
+    // 2. Verification logic:
+    // A) If dedicated master settings password is set in .env, check it
+    const masterSettingsPassword = process.env.SETTINGS_MASTER_PASSWORD;
+    let isPasswordValid = false;
 
-    if (!credential) {
-      throw new UnauthorizedError("No password credential found for this admin", ERROR_CODES.INVALID_CREDENTIALS);
+    if (masterSettingsPassword && params.password === masterSettingsPassword.trim()) {
+      isPasswordValid = true;
+    } else {
+      // B) Or verify against admin user's password credential with Argon2id
+      const credential = await this.prisma.credential.findFirst({
+        where: {
+          userId: params.userId,
+          type: "PASSWORD",
+        },
+      });
+
+      if (credential) {
+        const { valid } = await PasswordService.verifyPassword(params.password, credential.secretHash);
+        isPasswordValid = valid;
+      }
     }
 
-    // 3. Verify password with Argon2id
-    const { valid } = await PasswordService.verifyPassword(params.password, credential.secretHash);
-
-    if (!valid) {
+    if (!isPasswordValid) {
       // Record rate limit failure entry
       await this.prisma.rateLimitRecord.create({
         data: {
