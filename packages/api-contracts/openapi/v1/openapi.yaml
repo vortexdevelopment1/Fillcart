@@ -1047,6 +1047,589 @@ paths:
         "200":
           description: Paginated audit logs
 
+  # ---------------------------------------------------------------------------
+  # B.1 Dashboard Module
+  # ---------------------------------------------------------------------------
+  /api/v1/admin/dashboard/summary:
+    get:
+      summary: Dashboard KPI Summary
+      operationId: getDashboardSummary
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema: { type: string, enum: [today, 7d, 30d, all], default: 30d }
+      responses:
+        "200":
+          description: Aggregated operational dashboard KPIs
+        "503":
+          $ref: "#/components/responses/ErrorResponse"
+
+  # ---------------------------------------------------------------------------
+  # B.2 Verification / KYC Module
+  # ---------------------------------------------------------------------------
+  /api/v1/admin/verification/applicants:
+    get:
+      summary: List KYC Applicants
+      operationId: getApplicants
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: type
+          in: query
+          schema: { type: string, enum: [VENDOR, RIDER, ALL], default: ALL }
+        - name: status
+          in: query
+          schema: { type: string, enum: [PENDING, APPROVED, REJECTED, REUPLOAD_REQUESTED, ALL], default: ALL }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paginated applicant list
+        "503":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/verification/applicants/{id}:
+    get:
+      summary: Get Applicant Details & KYC Documents
+      operationId: getApplicantDetails
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Applicant KYC details with masked identifiers
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/verification/documents/{id}/review:
+    patch:
+      summary: Review KYC Document
+      operationId: reviewDocument
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewDocumentRequest"
+      responses:
+        "200":
+          description: Document review outcome recorded
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/verification/applicants/{id}/decision:
+    post:
+      summary: Make Final Applicant Onboarding Decision
+      operationId: applicantDecision
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicantDecisionRequest"
+      responses:
+        "200":
+          description: Onboarding decision recorded
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  # ---------------------------------------------------------------------------
+  # B.3 Vendors Module
+  # ---------------------------------------------------------------------------
+  /api/v1/admin/vendors:
+    get:
+      summary: List Vendors
+      operationId: getVendors
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: status
+          in: query
+          schema: { type: string, enum: [ACTIVE, SUSPENDED, INACTIVE, PENDING_ONBOARDING, ALL], default: ALL }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paginated vendor list
+
+  /api/v1/admin/vendors/{id}:
+    get:
+      summary: Get Vendor Details
+      operationId: getVendorDetails
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Vendor details with masked bank numbers
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/vendors/{id}/status:
+    patch:
+      summary: Update Vendor Status
+      operationId: updateVendorStatus
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateVendorStatusRequest"
+      responses:
+        "200":
+          description: Vendor status updated
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/vendors/{id}/commission:
+    patch:
+      summary: Update Vendor Commission Rule
+      operationId: updateVendorCommission
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateVendorCommissionRequest"
+      responses:
+        "200":
+          description: Commission rule updated in CommissionRule table
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  # ---------------------------------------------------------------------------
+  # B.4 Riders Module
+  # ---------------------------------------------------------------------------
+  /api/v1/admin/riders:
+    get:
+      summary: List Fleet Riders
+      operationId: getRiders
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: status
+          in: query
+          schema: { type: string, enum: [ACTIVE, SUSPENDED, INACTIVE, PENDING_ONBOARDING, ALL], default: ALL }
+        - name: availability
+          in: query
+          schema: { type: string, enum: [ONLINE, OFFLINE, ON_DELIVERY, ALL], default: ALL }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paginated rider fleet
+
+  /api/v1/admin/riders/{id}:
+    get:
+      summary: Get Rider Details
+      operationId: getRiderDetails
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Rider details with masked bank numbers
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/riders/{id}/status:
+    patch:
+      summary: Update Rider Status
+      operationId: updateRiderStatus
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRiderStatusRequest"
+      responses:
+        "200":
+          description: Rider status updated
+
+  /api/v1/admin/riders/{id}/availability:
+    patch:
+      summary: Update Rider Availability
+      operationId: updateRiderAvailability
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRiderAvailabilityRequest"
+      responses:
+        "200":
+          description: Availability updated
+
+  # ---------------------------------------------------------------------------
+  # B.5 Orders Module
+  # ---------------------------------------------------------------------------
+  /api/v1/admin/orders:
+    get:
+      summary: List Orders
+      operationId: getAdminOrders
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: status
+          in: query
+          schema: { type: string, enum: [PLACED, ACCEPTED, PREPARING, READY_FOR_PICKUP, OUT_FOR_DELIVERY, DELIVERED, CANCELLED, ALL] }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paginated orders
+
+  /api/v1/admin/orders/{id}:
+    get:
+      summary: Get Order Details
+      operationId: getAdminOrderDetails
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Order details
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/orders/{id}/cancel:
+    post:
+      summary: Cancel Order
+      operationId: cancelOrderAdmin
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelOrderRequest"
+      responses:
+        "200":
+          description: Order cancelled, audit log and refund record written
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+        "409":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/orders/{id}/assign-rider:
+    patch:
+      summary: Assign Delivery Rider
+      operationId: assignRiderAdmin
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignRiderRequest"
+      responses:
+        "200":
+          description: Rider assigned
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+        "409":
+          $ref: "#/components/responses/ErrorResponse"
+
+  # ---------------------------------------------------------------------------
+  # B.6 Finance Module
+  # ---------------------------------------------------------------------------
+  /api/v1/admin/finance/overview:
+    get:
+      summary: Finance Revenue & Settlement Overview
+      operationId: getFinanceOverview
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: Financial metrics overview
+
+  /api/v1/admin/finance/settlements:
+    get:
+      summary: List Settlement Batches
+      operationId: getSettlementBatches
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: Settlement batches list
+
+  /api/v1/admin/finance/settlements/{id}/process:
+    post:
+      summary: Process Settlement Batch
+      operationId: processSettlementBatch
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Batch transitioned to PROCESSING status
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+        "409":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/v1/admin/finance/commissions:
+    get:
+      summary: List Commission Rules
+      operationId: getCommissions
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: Commission rules
+    post:
+      summary: Create Commission Rule
+      operationId: createCommissionRule
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommissionRuleRequest"
+      responses:
+        "200":
+          description: Rule created
+
+  /api/v1/admin/finance/coupons:
+    get:
+      summary: List Coupons
+      operationId: getCoupons
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: Active coupons
+    post:
+      summary: Create Promotional Coupon
+      operationId: createCoupon
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCouponRequest"
+      responses:
+        "200":
+          description: Coupon created
+
+  /api/v1/admin/finance/taxes:
+    get:
+      summary: List Tax Slabs
+      operationId: getTaxes
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: Tax slabs
+
+  # ---------------------------------------------------------------------------
+  # B.7 Reports Module
+  # ---------------------------------------------------------------------------
+  /api/v1/admin/reports/sales:
+    get:
+      summary: Sales Analytics Report
+      operationId: getSalesReports
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: Aggregated sales data
+
+  /api/v1/admin/reports/vendors:
+    get:
+      summary: Vendor Performance Report
+      operationId: getVendorReports
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: Top vendor performance
+
+  /api/v1/admin/reports/riders:
+    get:
+      summary: Fleet Performance Report
+      operationId: getRiderReports
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: Fleet metrics
+
+  # ---------------------------------------------------------------------------
+  # B.8 Notifications Module
+  # ---------------------------------------------------------------------------
+  /api/v1/admin/notifications:
+    get:
+      summary: List Admin Notifications
+      operationId: getAdminNotifications
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: Operational notification list
+
+  /api/v1/admin/notifications/{id}/read:
+    patch:
+      summary: Mark Notification Read
+      operationId: markNotificationRead
+      security:
+        - AdminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Notification marked read
+
+  /api/v1/admin/notifications/mark-all-read:
+    post:
+      summary: Mark All Notifications Read
+      operationId: markAllNotificationsRead
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: All marked read
+
+  # ---------------------------------------------------------------------------
+  # B.9 Support Desk Module
+  # ---------------------------------------------------------------------------
+  /api/v1/admin/support/info:
+    get:
+      summary: Support Desk Information
+      operationId: getSupportInfo
+      security:
+        - AdminBearerAuth: []
+      responses:
+        "200":
+          description: Support desk contact and status
+
+  /api/v1/admin/support/tickets:
+    post:
+      summary: Create Support Ticket
+      operationId: createSupportTicket
+      security:
+        - AdminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupportTicketRequest"
+      responses:
+        "200":
+          description: Ticket logged
+
 components:
   securitySchemes:
     AdminBearerAuth:
@@ -1473,3 +2056,145 @@ components:
         settings:
           type: object
           description: Key-value settings matching the target SettingsTabId structure
+
+    # ---------------------------------------------------------------------------
+    # New Admin Modules Schemas
+    # ---------------------------------------------------------------------------
+    ReviewDocumentRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [APPROVED, REJECTED, REUPLOAD_REQUESTED]
+        reason:
+          type: string
+        remarks:
+          type: string
+
+    ApplicantDecisionRequest:
+      type: object
+      required: [decision]
+      properties:
+        decision:
+          type: string
+          enum: [APPROVED, REJECTED]
+        notes:
+          type: string
+
+    UpdateVendorStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ACTIVE, SUSPENDED, INACTIVE, PENDING_ONBOARDING]
+        reason:
+          type: string
+        remarks:
+          type: string
+
+    UpdateVendorCommissionRequest:
+      type: object
+      required: [commissionPct]
+      properties:
+        commissionPct:
+          type: number
+          minimum: 0
+          maximum: 100
+        reason:
+          type: string
+
+    UpdateRiderStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ACTIVE, SUSPENDED, INACTIVE, PENDING_ONBOARDING]
+        reason:
+          type: string
+        remarks:
+          type: string
+
+    UpdateRiderAvailabilityRequest:
+      type: object
+      required: [availability]
+      properties:
+        availability:
+          type: string
+          enum: [ONLINE, OFFLINE, ON_DELIVERY]
+        reason:
+          type: string
+
+    CancelOrderRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+        remarks:
+          type: string
+        triggerRefund:
+          type: boolean
+          default: true
+
+    AssignRiderRequest:
+      type: object
+      required: [riderId]
+      properties:
+        riderId:
+          type: string
+          format: uuid
+        notes:
+          type: string
+
+    CreateCommissionRuleRequest:
+      type: object
+      required: [category, percentage]
+      properties:
+        category:
+          type: string
+        percentage:
+          type: number
+          minimum: 0
+          maximum: 100
+        flatFee:
+          type: number
+          default: 0
+
+    CreateCouponRequest:
+      type: object
+      required: [code, discountType, discountValue]
+      properties:
+        code:
+          type: string
+        discountType:
+          type: string
+          enum: [PERCENTAGE, FLAT]
+        discountValue:
+          type: number
+        minOrderAmount:
+          type: number
+          default: 0
+        maxDiscount:
+          type: number
+        expiresAt:
+          type: string
+          format: date-time
+
+    CreateSupportTicketRequest:
+      type: object
+      required: [subject, category, description]
+      properties:
+        subject:
+          type: string
+        category:
+          type: string
+          enum: [BUG_REPORT, PAYMENT_GATEWAY, DISPATCH_SYSTEM, DATABASE_SYNC, ACCESS_PERMISSION, FEATURE_REQUEST, OTHER]
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+          default: MEDIUM
+        description:
+          type: string

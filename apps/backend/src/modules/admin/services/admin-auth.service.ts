@@ -60,26 +60,18 @@ export class AdminAuthService {
       );
     }
 
-    // 2. Verification logic:
-    // A) If dedicated master settings password is set in .env, check it
-    const masterSettingsPassword = process.env.SETTINGS_MASTER_PASSWORD;
+    // 2. Verification logic: strictly verify logged-in admin user's password credential with Argon2id
     let isPasswordValid = false;
+    const credential = await this.prisma.credential.findFirst({
+      where: {
+        userId: params.userId,
+        type: "PASSWORD",
+      },
+    });
 
-    if (masterSettingsPassword && params.password === masterSettingsPassword.trim()) {
-      isPasswordValid = true;
-    } else {
-      // B) Or verify against admin user's password credential with Argon2id
-      const credential = await this.prisma.credential.findFirst({
-        where: {
-          userId: params.userId,
-          type: "PASSWORD",
-        },
-      });
-
-      if (credential) {
-        const { valid } = await PasswordService.verifyPassword(params.password, credential.secretHash);
-        isPasswordValid = valid;
-      }
+    if (credential) {
+      const { valid } = await PasswordService.verifyPassword(params.password, credential.secretHash);
+      isPasswordValid = valid;
     }
 
     if (!isPasswordValid) {

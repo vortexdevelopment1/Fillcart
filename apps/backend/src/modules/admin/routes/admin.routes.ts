@@ -70,6 +70,7 @@ export function createAdminRouter(deps: AdminRouterDependencies): Router {
   // POST /api/v1/admin/auth/verify-settings-access
   router.post(
     "/auth/verify-settings-access",
+    requirePermission("settings", "access"),
     validateRequest({ body: verifySettingsAccessSchema }),
     deps.adminAuthController.verifySettingsAccess
   );

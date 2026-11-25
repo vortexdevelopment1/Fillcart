@@ -14,6 +14,7 @@ export interface AuthenticatedAdmin {
   sessionId: string;
   roleId: string | null;
   roleName?: string;
+  profileNames: string[];
   permissions: Set<string>;
 }
 
@@ -129,8 +130,12 @@ export function createAdminAuthMiddleware(prisma: PrismaClient, cryptoService: C
       }
 
       // Tier 2: Admin Profile Assignments
+      const profileNames: string[] = [];
       if (user.adminProfileAssignments) {
         for (const pa of user.adminProfileAssignments) {
+          if (pa.profile?.name) {
+            profileNames.push(pa.profile.name);
+          }
           for (const pp of pa.profile.permissions) {
             activePermissions.add(`${pp.permission.action}:${pp.permission.resource}`);
             activePermissions.add(`${pp.permission.resource}:${pp.permission.action}`);
@@ -163,6 +168,7 @@ export function createAdminAuthMiddleware(prisma: PrismaClient, cryptoService: C
         sessionId: session.id,
         roleId: user.roleId,
         roleName: user.role?.name,
+        profileNames,
         permissions: activePermissions,
       };
 
@@ -184,14 +190,18 @@ export function requirePermission(actionOrResource: string, resourceOrAction?: s
     requiredKey = actionOrResource;
   }
 
-  return (req: AdminAuthRequest, _res: Response, next: NextFunction): void => {
+  const middleware = (req: AdminAuthRequest, _res: Response, next: NextFunction): void => {
     try {
       if (!req.adminUser) {
         throw new UnauthorizedError("Unauthenticated admin request", ERROR_CODES.UNAUTHORIZED);
       }
 
-      // Super Admin bypass or wildcard
-      if (req.adminUser.roleName === "ADMIN" || req.adminUser.permissions.has("*:*")) {
+      // Super Admin bypass: ONLY real Super Admin profile or "*:*" permission. Never the role name.
+      const isSuperAdmin =
+        req.adminUser.permissions.has("*:*") ||
+        (Array.isArray(req.adminUser.profileNames) && req.adminUser.profileNames.includes("Super Admin"));
+
+      if (isSuperAdmin) {
         return next();
       }
 
@@ -213,6 +223,10 @@ export function requirePermission(actionOrResource: string, resourceOrAction?: s
       next(err);
     }
   };
+
+  (middleware as any).permissionKey = requiredKey;
+  (middleware as any).isPermissionMiddleware = true;
+  return middleware;
 }
 
 /**

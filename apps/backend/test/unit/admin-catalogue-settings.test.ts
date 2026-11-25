@@ -187,6 +187,38 @@ describe("Admin Catalogue, Settings & Audit Logs Unit Tests", () => {
       });
     });
 
+    it("performs soft delete (isActive: false) on DELETE /categories/:id and records audit log", async () => {
+      mockPrisma.category.findUnique.mockResolvedValue({
+        id: "cat-del-1",
+        name: "Snacks",
+        isActive: true,
+        isDeleted: false,
+      });
+      mockPrisma.category.update.mockResolvedValue({
+        id: "cat-del-1",
+        name: "Snacks",
+        isActive: false,
+      });
+
+      const res = await categoriesService.delete("cat-del-1", adminUserId);
+      expect(res.isActive).toBe(false);
+      expect(res.message).toBe("Category deactivated successfully");
+      expect(mockPrisma.category.update).toHaveBeenCalledWith({
+        where: { id: "cat-del-1" },
+        data: { isActive: false },
+      });
+      expect(mockPrisma.adminAuditLog.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          action: "UPDATE",
+          targetId: "cat-del-1",
+          changesSummary: expect.objectContaining({
+            action: "SOFT_DELETE",
+            after: { isActive: false },
+          }),
+        }),
+      });
+    });
+
     it("reorders categories in batch transaction", async () => {
       mockPrisma.category.update.mockImplementation(({ data }: any) => ({
         id: "cat-x",

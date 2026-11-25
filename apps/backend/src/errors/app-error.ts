@@ -79,3 +79,35 @@ export class InternalServerError extends AppError {
     super(message, 500, code, details);
   }
 }
+
+export class ConflictError extends AppError {
+  constructor(
+    message: string = "State transition conflict",
+    code: ErrorCode = ("STATE_CONFLICT" as any),
+    details?: FieldError[]
+  ) {
+    super(message, 409, code, details);
+  }
+}
+
+export class MigrationPendingError extends AppError {
+  constructor(
+    message: string = "Required database table does not exist. Migration is pending.",
+    code: ErrorCode = ("MIGRATION_PENDING" as any)
+  ) {
+    super(message, 503, code);
+  }
+}
+
+export function handlePrismaTableErrors(err: unknown): never {
+  const pErr = err as { code?: string; message?: string };
+  if (
+    pErr?.code === "P2021" ||
+    (typeof pErr?.message === "string" &&
+      (pErr.message.includes("does not exist in the current database") ||
+        pErr.message.includes("relation") && pErr.message.includes("does not exist")))
+  ) {
+    throw new MigrationPendingError();
+  }
+  throw err;
+}

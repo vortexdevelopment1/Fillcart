@@ -150,8 +150,9 @@ export class LiveVerificationService {
     const resolvedPermissionsList = Array.from(activePermissions);
 
     // 5. Evaluate Required Permission Authorization Decision
+    let isAuthorized = true;
     if (params.requiredPermission) {
-      const isAuthorized = activePermissions.has(params.requiredPermission);
+      isAuthorized = activePermissions.has(params.requiredPermission);
       if (!isAuthorized) {
         return {
           valid: true,

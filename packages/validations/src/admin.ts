@@ -53,19 +53,19 @@ export const dashboardSummaryQuerySchema = z.object({
 export const getApplicantsQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
-  type: z.enum(["Vendor", "Rider", "ALL"]).optional().default("ALL"),
-  status: z.enum(["Pending", "Approved", "Rejected", "ALL"]).optional().default("ALL"),
+  type: z.enum(["VENDOR", "RIDER", "ALL"]).optional().default("ALL"),
+  status: z.enum(["PENDING", "APPROVED", "REJECTED", "REUPLOAD_REQUESTED", "ALL"]).optional().default("ALL"),
   search: z.string().optional(),
 });
 
 export const reviewDocumentSchema = z.object({
-  status: z.enum(["Approved", "Rejected"]),
+  status: z.enum(["APPROVED", "REJECTED", "REUPLOAD_REQUESTED"]),
   reason: z.string().optional(),
   remarks: z.string().optional(),
 });
 
 export const applicantDecisionSchema = z.object({
-  decision: z.enum(["Approved", "Rejected"]),
+  decision: z.enum(["APPROVED", "REJECTED"]),
   notes: z.string().optional(),
 });
 
@@ -76,12 +76,12 @@ export const getVendorsQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
   search: z.string().optional(),
-  status: z.enum(["ACTIVE", "SUSPENDED", "INACTIVE", "ALL"]).optional().default("ALL"),
+  status: z.enum(["ACTIVE", "SUSPENDED", "INACTIVE", "PENDING_ONBOARDING", "ALL"]).optional().default("ALL"),
   category: z.string().optional(),
 });
 
 export const updateVendorStatusSchema = z.object({
-  status: z.enum(["ACTIVE", "SUSPENDED", "INACTIVE"]),
+  status: z.enum(["ACTIVE", "SUSPENDED", "INACTIVE", "PENDING_ONBOARDING"]),
   reason: z.string().max(255).optional(),
   remarks: z.string().max(500).optional(),
 });
@@ -98,18 +98,18 @@ export const getRidersQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
   search: z.string().optional(),
-  status: z.enum(["ACTIVE", "SUSPENDED", "INACTIVE", "ALL"]).optional().default("ALL"),
-  availability: z.enum(["ONLINE", "OFFLINE", "ALL"]).optional().default("ALL"),
+  status: z.enum(["ACTIVE", "SUSPENDED", "INACTIVE", "PENDING_ONBOARDING", "ALL"]).optional().default("ALL"),
+  availability: z.enum(["ONLINE", "OFFLINE", "ON_DELIVERY", "ALL"]).optional().default("ALL"),
 });
 
 export const updateRiderStatusSchema = z.object({
-  status: z.enum(["ACTIVE", "SUSPENDED", "INACTIVE"]),
+  status: z.enum(["ACTIVE", "SUSPENDED", "INACTIVE", "PENDING_ONBOARDING"]),
   reason: z.string().max(255).optional(),
   remarks: z.string().max(500).optional(),
 });
 
 export const updateRiderAvailabilitySchema = z.object({
-  availability: z.enum(["ONLINE", "OFFLINE"]),
+  availability: z.enum(["ONLINE", "OFFLINE", "ON_DELIVERY"]),
   reason: z.string().max(255).optional(),
 });
 
@@ -120,7 +120,7 @@ export const getOrdersQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
   search: z.string().optional(),
-  status: z.string().optional(),
+  status: z.enum(["PLACED", "ACCEPTED", "PREPARING", "READY_FOR_PICKUP", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED", "ALL"]).optional(),
   paymentMethod: z.string().optional(),
 });
 

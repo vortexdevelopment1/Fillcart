@@ -43,7 +43,8 @@ export class FinanceController {
   ): Promise<void> => {
     try {
       const id = req.params.id as string;
-      const result = await this.financeService.processSettlement(id);
+      const adminUserId = req.adminUser?.id || "system";
+      const result = await this.financeService.processSettlement(id, adminUserId);
       res.status(200).json(result);
     } catch (err) {
       next(err);

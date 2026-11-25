@@ -119,4 +119,26 @@ export class CategoriesController {
       next(err);
     }
   };
+
+  public delete = async (
+    req: AdminAuthRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      if (!req.adminUser) {
+        throw new UnauthorizedError("Admin authentication required", ERROR_CODES.UNAUTHORIZED);
+      }
+      const id = req.params.id as string;
+      const result = await this.categoriesService.delete(
+        id,
+        req.adminUser.id,
+        req.ip,
+        req.get("user-agent")
+      );
+      res.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
+  };
 }

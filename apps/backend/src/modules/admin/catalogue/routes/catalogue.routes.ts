@@ -73,6 +73,12 @@ export function createCatalogueRouter(deps: CatalogueRouterDependencies): Router
     deps.categoriesController.updateStatus
   );
 
+  router.delete(
+    "/categories/:id",
+    requirePermission("products", "manage"),
+    deps.categoriesController.delete
+  );
+
   // ---------------------------------------------------------------------------
   // Brands
   // ---------------------------------------------------------------------------

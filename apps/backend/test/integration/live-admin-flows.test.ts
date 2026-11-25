@@ -27,7 +27,8 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
 
     const config = validateConfig({
       DATABASE_URL:
-        "postgresql://fillcart_app_user:fillcart_app_pass@127.0.0.1:5432/fillcart?schema=public",
+        process.env.MIGRATION_DATABASE_URL ||
+        "postgresql://fillcart_user:fillcart_pass@127.0.0.1:5432/fillcart?schema=public",
       MIGRATION_DATABASE_URL:
         "postgresql://fillcart_user:fillcart_pass@127.0.0.1:5432/fillcart?schema=public",
       JWT_ISSUER_URL: "https://auth.fillcart.internal",
@@ -63,7 +64,7 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
       },
     });
 
-    // 2. Create test admin user
+    // 2. Create test admin user with authoritative Super Admin profile
     adminUserId = crypto.randomUUID();
     const adminEmail = `admin_probe_${Date.now()}@fillcart.internal`;
     await prisma.user.create({
@@ -75,6 +76,24 @@ describe("Live Admin Flows Integration (Real PostgreSQL DB)", () => {
         accountType: "ADMIN",
         status: "ACTIVE",
         roleId: adminRole.id,
+      },
+    });
+
+    const superAdminProfile = await prisma.permissionProfile.upsert({
+      where: { name: "Super Admin" },
+      update: {},
+      create: {
+        name: "Super Admin",
+        description: "Super Admin Profile with full platform authority",
+        isSystem: true,
+      },
+    });
+
+    await prisma.adminProfileAssignment.create({
+      data: {
+        userId: adminUserId,
+        profileId: superAdminProfile.id,
+        assignedBy: adminUserId,
       },
     });
 

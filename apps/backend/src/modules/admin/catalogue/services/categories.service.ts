@@ -284,4 +284,48 @@ export class CategoriesService {
       return { reordered: results };
     });
   }
+
+  public async delete(
+    id: string,
+    adminUserId: string,
+    ipAddress?: string,
+    userAgent?: string
+  ) {
+    const existing = await this.prisma.category.findUnique({
+      where: { id },
+    });
+    if (!existing || existing.isDeleted) {
+      throw new NotFoundError(`Category with ID '${id}' not found`);
+    }
+
+    return await this.prisma.$transaction(async (tx) => {
+      // Soft status change: deactivate category (isActive: false)
+      const updated = await tx.category.update({
+        where: { id },
+        data: { isActive: false },
+      });
+
+      await recordAdminAudit(tx, {
+        adminUserId,
+        action: "UPDATE",
+        targetType: "CATALOG",
+        targetId: id,
+        changesSummary: {
+          updatedEntity: "Category",
+          action: "SOFT_DELETE",
+          before: { isActive: existing.isActive },
+          after: { isActive: false },
+        },
+        ipAddress,
+        userAgent,
+      });
+
+      return {
+        id: updated.id,
+        name: updated.name,
+        isActive: updated.isActive,
+        message: "Category deactivated successfully",
+      };
+    });
+  }
 }

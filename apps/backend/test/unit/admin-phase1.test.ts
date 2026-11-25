@@ -40,9 +40,11 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
         findMany: vi.fn(),
         count: vi.fn(),
         update: vi.fn(),
+        create: vi.fn().mockResolvedValue({ id: "user-created-1" }),
       },
       credential: {
         findFirst: vi.fn(),
+        create: vi.fn().mockResolvedValue({ id: "cred-created-1" }),
       },
       rateLimitRecord: {
         count: vi.fn(),
@@ -224,26 +226,57 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
       expect(req.adminUser?.permissions.has("staff:view")).toBe(false);
     });
 
-    it("requirePermission allows authorized users and Super Admin", () => {
-      const superAdminReq = {
+    it("requirePermission allows authorized users, Super Admin profile, and wildcard, rejecting plain roleName=ADMIN", () => {
+      // 1. Super Admin Profile bypass
+      const superAdminProfileReq = {
         adminUser: {
           id: adminUserId,
           roleName: "ADMIN",
+          profileNames: ["Super Admin"],
           permissions: new Set<string>(),
         },
-      } as AdminAuthRequest;
+      } as unknown as AdminAuthRequest;
 
-      const next = vi.fn();
-      requirePermission("staff", "view")(superAdminReq, {} as Response, next);
-      expect(next).toHaveBeenCalledWith();
+      const next1 = vi.fn();
+      requirePermission("staff", "view")(superAdminProfileReq, {} as Response, next1);
+      expect(next1).toHaveBeenCalledWith();
 
+      // 2. Wildcard permission bypass
+      const wildcardReq = {
+        adminUser: {
+          id: adminUserId,
+          profileNames: [],
+          permissions: new Set(["*:*"]),
+        },
+      } as unknown as AdminAuthRequest;
+
+      const next2 = vi.fn();
+      requirePermission("staff", "view")(wildcardReq, {} as Response, next2);
+      expect(next2).toHaveBeenCalledWith();
+
+      // 3. Rejects plain roleName: "ADMIN" if not in Super Admin profile or lacking permission
+      const plainAdminRoleReq = {
+        adminUser: {
+          id: adminUserId,
+          roleName: "ADMIN",
+          profileNames: ["Finance Manager"],
+          permissions: new Set(["finance:read"]),
+        },
+      } as unknown as AdminAuthRequest;
+
+      const plainAdminNext = vi.fn();
+      requirePermission("staff", "view")(plainAdminRoleReq, {} as Response, plainAdminNext);
+      expect(plainAdminNext).toHaveBeenCalledWith(expect.any(ForbiddenError));
+
+      // 4. Forbidden user lacking required permission
       const forbiddenReq = {
         adminUser: {
           id: adminUserId,
           roleName: "SUPPORT",
+          profileNames: ["Support Agent"],
           permissions: new Set(["orders:view"]),
         },
-      } as AdminAuthRequest;
+      } as unknown as AdminAuthRequest;
       const forbiddenNext = vi.fn();
       requirePermission("staff", "view")(forbiddenReq, {} as Response, forbiddenNext);
       expect(forbiddenNext).toHaveBeenCalledWith(expect.any(ForbiddenError));
@@ -311,6 +344,29 @@ describe("Super Admin Backend Phase 1 Unit Tests", () => {
           }),
         })
       );
+    });
+
+    it("ensures master password values cannot unlock settings without valid admin credential", async () => {
+      // Simulate environment or attacker passing arbitrary master value
+      process.env.SETTINGS_MASTER_PASSWORD = "MasterAdminPassword123!";
+      const passwordHash = await PasswordService.hashPassword(validPassword);
+      mockPrisma.rateLimitRecord.count.mockResolvedValue(0);
+      mockPrisma.credential.findFirst.mockResolvedValue({
+        id: "cred-1",
+        userId: adminUserId,
+        type: "PASSWORD",
+        secretHash: passwordHash,
+      });
+
+      // Calling with master password value must be rejected with UnauthorizedError
+      await expect(
+        adminAuthService.verifySettingsAccess({
+          userId: adminUserId,
+          password: "MasterAdminPassword123!",
+        })
+      ).rejects.toThrow(UnauthorizedError);
+
+      delete process.env.SETTINGS_MASTER_PASSWORD;
     });
 
     it("locks out user after 5 failed attempts in 60s and logs lockout audit log", async () => {
