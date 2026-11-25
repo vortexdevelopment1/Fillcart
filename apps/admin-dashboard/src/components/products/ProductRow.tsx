@@ -24,8 +24,19 @@ export const ProductRow: React.FC<ProductRowProps> = ({
       {/* 1. Item Column: initials tile + name (matches reference, sticky first column) */}
       <td className="py-1 px-3 min-w-[200px] sticky left-0 bg-white z-10 shadow-[1px_0_0_rgba(18,55,71,0.08)]">
         <div className="flex items-center gap-2.5">
-          <div className="w-[36px] h-[36px] rounded-[12px] bg-neutral text-primary font-sans text-xs flex items-center justify-center font-medium flex-shrink-0 select-none">
-            {(product.brand || product.name || 'PR').substring(0, 2).toUpperCase()}
+          <div className="w-[36px] h-[36px] rounded-[12px] bg-neutral text-primary font-sans text-xs flex items-center justify-center font-medium flex-shrink-0 select-none overflow-hidden border border-primary/10">
+            {product.imageUrl ? (
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLElement).style.display = 'none';
+                }}
+              />
+            ) : (
+              (product.brand || product.name || 'PR').substring(0, 2).toUpperCase()
+            )}
           </div>
           <div className="min-w-0">
             <h4 className="font-sans text-[12px] font-normal text-ink truncate leading-tight">

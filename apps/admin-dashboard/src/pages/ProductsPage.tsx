@@ -198,6 +198,7 @@ export const ProductsPage: React.FC = () => {
         brand: productData.brand || 'Fillkart Essentials',
         unit: productData.unit || '1 kg',
         description: productData.description || '',
+        imageUrl: productData.imageUrl,
         isActive: productData.isActive ?? true,
       };
       setProducts((prev) => [newProduct, ...prev]);

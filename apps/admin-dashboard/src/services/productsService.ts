@@ -105,6 +105,7 @@ export const productsService = {
       brand: product.brand || 'Fillkart Essentials',
       unit: product.unit || '1 pc',
       description: product.description || '',
+      imageUrl: product.imageUrl,
       isActive: product.isActive ?? true,
     };
 
@@ -173,6 +174,7 @@ export const productsService = {
       brand: product.brand || 'Fillkart Essentials',
       unit: product.unit || '1 pc',
       description: product.description || '',
+      imageUrl: product.imageUrl,
       isActive: product.isActive ?? true,
     };
 

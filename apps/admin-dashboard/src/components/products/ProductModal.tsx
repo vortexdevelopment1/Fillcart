@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Product, Category } from '../../data/products';
 import { CustomSelect } from '../common/CustomSelect';
-import { X, Image as ImageIcon } from 'lucide-react';
+import { X, Image as ImageIcon, Loader2, Trash2, UploadCloud } from 'lucide-react';
+import { uploadToCloudinary } from '../../services/cloudinaryService';
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -38,12 +39,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   onSave,
 }) => {
   const isEditing = Boolean(product);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [vendor, setVendor] = useState('Fresh Mart Hub');
   const [sku, setSku] = useState('');
-  const [brand, setBrand] = useState('');
+  const [brandChoice, setBrandChoice] = useState('Aashirvaad');
+  const [customBrand, setCustomBrand] = useState('');
   const [mrp, setMrp] = useState<number>(0);
   const [salePrice, setSalePrice] = useState<number>(0);
   const [unit, setUnit] = useState('1 kg');
@@ -51,31 +54,51 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(true);
 
+  // Image upload states
+  const [imageUrl, setImageUrl] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
   useEffect(() => {
     if (product) {
       setName(product.name);
       setCategory(product.category);
       setVendor(product.vendor || 'Fresh Mart Hub');
       setSku(product.sku);
-      setBrand(product.brand);
+
+      const isKnown = AVAILABLE_BRANDS.includes(product.brand) && product.brand !== 'Other';
+      if (isKnown) {
+        setBrandChoice(product.brand);
+        setCustomBrand('');
+      } else {
+        setBrandChoice('Other');
+        setCustomBrand(product.brand || '');
+      }
+
       setMrp(product.mrp);
       setSalePrice(product.salePrice);
       setUnit(product.unit);
       setStatus(product.status || 'Active');
       setDescription(product.description || '');
       setIsActive(product.isActive);
+      setImageUrl(product.imageUrl || '');
+      setUploadError(null);
     } else {
       setName('');
       setCategory(categories[0]?.name || 'Grocery & Staples');
       setVendor('Fresh Mart Hub');
       setSku(`SKU-${Math.floor(1000 + Math.random() * 9000)}`);
-      setBrand('');
+      setBrandChoice('Aashirvaad');
+      setCustomBrand('');
       setMrp(100);
       setSalePrice(90);
       setUnit('1 kg');
       setStatus('Active');
       setDescription('');
       setIsActive(true);
+      setImageUrl('');
+      setUploadError(null);
     }
   }, [product, categories, isOpen]);
 
@@ -99,9 +122,62 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
   if (!isOpen) return null;
 
+  const handleProcessImage = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please select a valid image file (PNG, JPG, WebP).');
+      return;
+    }
+
+    setUploadError(null);
+    setIsUploading(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      setImageUrl(url);
+    } catch (err: any) {
+      console.warn('Image processing failed:', err);
+      setUploadError('Failed to process image. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleProcessImage(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      handleProcessImage(file);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
+
+    const finalBrand =
+      brandChoice === 'Other'
+        ? customBrand.trim() || 'Other'
+        : brandChoice;
 
     const discountPct = mrp > 0 ? Math.max(0, Math.round(((mrp - salePrice) / mrp) * 100)) : 0;
 
@@ -111,7 +187,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       category,
       vendor,
       sku: sku.trim(),
-      brand: brand.trim() || 'Fillkart Essentials',
+      brand: finalBrand,
       mrp: Number(mrp),
       salePrice: Number(salePrice),
       unit,
@@ -120,6 +196,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       itemsSold: product?.itemsSold || 0,
       status,
       isActive,
+      imageUrl: imageUrl.trim() || undefined,
     });
   };
 
@@ -221,20 +298,39 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               />
             </div>
 
-            {/* 5. Brand */}
-            <div>
-              <label className="block text-ink/70 mb-1">Brand Name *</label>
-              <CustomSelect
-                value={brand || AVAILABLE_BRANDS[0]}
-                onChange={(e) => setBrand(e.target.value)}
-                className="w-full h-[38px] px-3 rounded-lg border border-black/[0.12] bg-white focus:outline-none focus:ring-2 focus:ring-secondary"
-              >
-                {AVAILABLE_BRANDS.map((b) => (
-                  <option key={b} value={b}>
-                    {b}
-                  </option>
-                ))}
-              </CustomSelect>
+            {/* 5. Brand with conditional Other input */}
+            <div className="space-y-2">
+              <div>
+                <label className="block text-ink/70 mb-1">Brand Name *</label>
+                <CustomSelect
+                  value={brandChoice}
+                  onChange={(e) => setBrandChoice(e.target.value)}
+                  className="w-full h-[38px] px-3 rounded-lg border border-black/[0.12] bg-white focus:outline-none focus:ring-2 focus:ring-secondary"
+                >
+                  {AVAILABLE_BRANDS.map((b) => (
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
+                  ))}
+                </CustomSelect>
+              </div>
+
+              {brandChoice === 'Other' && (
+                <div className="animate-fade-in">
+                  <label className="block text-[11px] font-medium text-secondary mb-1">
+                    Custom Brand Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={customBrand}
+                    onChange={(e) => setCustomBrand(e.target.value)}
+                    placeholder="Enter brand name (e.g. Lakme, Nivea, Mamaearth)"
+                    className="w-full h-[36px] px-3 rounded-lg border border-secondary/40 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30 bg-secondary/5 text-ink text-xs transition-all"
+                    autoFocus
+                  />
+                </div>
+              )}
             </div>
 
             {/* 6. Measurement Unit */}
@@ -308,22 +404,99 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               />
             </div>
 
-            {/* 11. Image Upload Box (Dashed placeholder) */}
+            {/* 11. Image Upload Box (Cloudinary Supported with live preview) */}
             <div className="sm:col-span-2">
-              <label className="block text-ink/70 mb-1">Product Image</label>
-              <div className="w-full border-2 border-dashed border-primary/15 hover:border-primary rounded-[16px] p-4 flex items-center justify-center gap-4 bg-white/70 cursor-pointer transition-colors group">
-                <div className="w-12 h-12 rounded-[12px] bg-neutral flex items-center justify-center border border-primary/10">
-                  <ImageIcon className="w-5 h-5 text-ink/60 group-hover:text-ink transition-colors" />
-                </div>
-                <div className="text-left">
-                  <span className="text-xs font-normal text-ink block">
-                    Click to browse or drop product PNG / JPG
-                  </span>
-                  <span className="text-[11px] text-ink/50 block mt-0.5">
-                    Recommended 600x600 px
-                  </span>
-                </div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-ink/70 text-xs">Product Image</label>
+                {imageUrl && !isUploading && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageUrl('');
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                    }}
+                    className="text-[11px] text-red-600 hover:text-red-700 flex items-center gap-1 font-sans transition-colors"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    <span>Remove</span>
+                  </button>
+                )}
               </div>
+
+              {/* Hidden real file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/jpg"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+
+              {imageUrl ? (
+                <div className="w-full border border-primary/20 bg-neutral/20 rounded-[16px] p-3 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img
+                      src={imageUrl}
+                      alt="Product preview"
+                      className="w-14 h-14 rounded-[12px] object-cover border border-primary/10 bg-white flex-shrink-0 shadow-sm"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium text-ink truncate">
+                        Product image attached
+                      </p>
+                      <p className="text-[10px] text-ink/50 truncate mt-0.5">
+                        {imageUrl.startsWith('data:') ? 'Local preview saved' : 'Cloudinary URL linked'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="px-3 py-1.5 rounded-lg border border-primary/20 text-xs font-sans text-primary bg-white hover:bg-neutral transition-colors flex items-center gap-1.5 flex-shrink-0 shadow-sm"
+                  >
+                    <UploadCloud className="w-3.5 h-3.5" />
+                    <span>Change Image</span>
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`w-full border-2 border-dashed ${
+                    isDragging
+                      ? 'border-secondary bg-secondary/10'
+                      : isUploading
+                      ? 'border-secondary/50 bg-secondary/5 cursor-wait'
+                      : 'border-primary/15 hover:border-primary/40 bg-white/70 cursor-pointer'
+                  } rounded-[16px] p-4 flex items-center justify-center gap-4 transition-all group`}
+                >
+                  <div className="w-12 h-12 rounded-[12px] bg-neutral flex items-center justify-center border border-primary/10 flex-shrink-0">
+                    {isUploading ? (
+                      <Loader2 className="w-5 h-5 text-secondary animate-spin" />
+                    ) : (
+                      <ImageIcon className="w-5 h-5 text-ink/60 group-hover:text-ink transition-colors" />
+                    )}
+                  </div>
+                  <div className="text-left">
+                    <span className="text-xs font-normal text-ink block">
+                      {isUploading
+                        ? 'Uploading image to Cloudinary...'
+                        : 'Click to browse or drop product PNG / JPG'}
+                    </span>
+                    <span className="text-[11px] text-ink/50 block mt-0.5">
+                      {isUploading ? 'Optimizing and attaching...' : 'Recommended 600x600 px'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {uploadError && (
+                <p className="text-[11px] text-red-500 mt-1 font-sans">{uploadError}</p>
+              )}
             </div>
 
             {/* 12. Visibility Toggle */}
@@ -363,7 +536,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-full text-xs font-sans bg-primary text-white font-medium hover:opacity-90 active:scale-95 transition-all shadow-sm"
+              disabled={isUploading}
+              className="px-6 py-2.5 rounded-full text-xs font-sans bg-primary text-white font-medium hover:opacity-90 active:scale-95 transition-all shadow-sm disabled:opacity-50"
             >
               {isEditing ? 'Update Product' : 'Save Product'}
             </button>

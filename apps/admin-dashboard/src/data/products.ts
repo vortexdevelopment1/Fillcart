@@ -12,6 +12,7 @@ export interface Product {
   brand: string;
   unit: string;
   description?: string;
+  imageUrl?: string;
   isActive: boolean;
   rejectReason?: string;
 }
