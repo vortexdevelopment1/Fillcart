@@ -160,8 +160,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                                     const SizedBox(height: 12),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFFC8F169),
-                                        foregroundColor: const Color(0xFF111827),
+                                        backgroundColor: const Color(0xFF000000),
+                                        foregroundColor: Colors.white,
                                         elevation: 0,
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 14,
@@ -186,7 +186,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                                           fontFamily: 'Inter',
                                           fontSize: 12.5,
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFF111827),
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),
@@ -389,8 +389,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffC8F169),
-                    foregroundColor: const Color(0xFF111827),
+                    backgroundColor: const Color(0xFF000000),
+                    foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),

@@ -1,4 +1,5 @@
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
+import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
 import 'package:fillcart_vendor/features/profile/presentation/screens/bank_account_screen.dart';
 import 'package:fillcart_vendor/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:fillcart_vendor/features/profile/presentation/screens/help_support_screen.dart';
@@ -10,7 +11,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 /// Main Vendor Profile Screen (Profile Tab).
 /// Matches Figma design: Profile (Image 1).
 class VendorProfileScreen extends StatelessWidget {
-  const VendorProfileScreen({super.key});
+  const VendorProfileScreen({
+    super.key,
+    this.onBackToHome,
+  });
+
+  final VoidCallback? onBackToHome;
 
   void _showLogoutDialog(BuildContext context) {
     showDialog<void>(
@@ -56,8 +62,8 @@ class VendorProfileScreen extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFC8F169),
-              foregroundColor: const Color(0xFF111827),
+              backgroundColor: const Color(0xFF000000),
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -67,7 +73,7 @@ class VendorProfileScreen extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF111827),
+                color: Colors.white,
               ),
             ),
           ),
@@ -80,26 +86,80 @@ class VendorProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 52,
+        leadingWidth: 52,
+        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Center(
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFFFF),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 2,
+                    color: Color(0x1A000000),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                key: const Key('profile_back_button'),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: SvgPicture.asset(
+                  AppAssets.svgBackArrow,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF111827),
+                    BlendMode.srcIn,
+                  ),
+                ),
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else if (onBackToHome != null) {
+                    onBackToHome!();
+                  } else {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const MainVendorScreen(initialIndex: 0),
+                      ),
+                      (route) => false,
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+        ),
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF111827),
+            height: 28 / 20,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Screen Title: Profile
-              const Padding(
-                padding: EdgeInsets.only(left: 4, bottom: 16),
-                child: Text(
-                  'Profile',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF111827),
-                  ),
-                ),
-              ),
 
               // 1. Lime Green Profile Banner Card
               GestureDetector(

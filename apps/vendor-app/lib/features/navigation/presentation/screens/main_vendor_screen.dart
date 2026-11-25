@@ -29,12 +29,18 @@ class _MainVendorScreenState extends State<MainVendorScreen> {
     _currentIndex = widget.initialIndex;
     _screens = [
       const VendorDashboardScreen(),
-      const VendorEarningsScreen(),
-      const VendorOrdersScreen(),
+      VendorEarningsScreen(
+        onBackToHome: () => _onTabTapped(0),
+      ),
+      VendorOrdersScreen(
+        onBackToHome: () => _onTabTapped(0),
+      ),
       VendorInventoryScreen(
         onBackToHome: () => _onTabTapped(0),
       ),
-      const VendorProfileScreen(),
+      VendorProfileScreen(
+        onBackToHome: () => _onTabTapped(0),
+      ),
     ];
   }
 
@@ -48,19 +54,27 @@ class _MainVendorScreenState extends State<MainVendorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0F0F0),
-      extendBody: true,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: VendorBottomNavBar(
-            currentIndex: _currentIndex,
-            onTap: _onTabTapped,
+    return PopScope(
+      canPop: _currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _currentIndex != 0) {
+          _onTabTapped(0);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF0F0F0),
+        extendBody: true,
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: VendorBottomNavBar(
+              currentIndex: _currentIndex,
+              onTap: _onTabTapped,
+            ),
           ),
         ),
       ),

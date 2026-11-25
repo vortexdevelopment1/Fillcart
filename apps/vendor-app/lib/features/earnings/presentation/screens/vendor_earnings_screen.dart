@@ -5,6 +5,7 @@ import 'package:fillcart_vendor/features/earnings/presentation/screens/earning_d
 import 'package:fillcart_vendor/features/earnings/presentation/screens/payout_settlement_screen.dart';
 import 'package:fillcart_vendor/features/earnings/presentation/screens/transactions_screen.dart';
 import 'package:fillcart_vendor/features/earnings/presentation/screens/withdraw_earnings_screen.dart';
+import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
 import 'package:fillcart_vendor/features/profile/presentation/screens/contact_support_screen.dart';
 
 /// Vendor Earnings Main Screen (Bottom Navigation Tab & Standalone Screen).
@@ -41,7 +42,7 @@ class VendorEarningsScreen extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -52,6 +53,7 @@ class VendorEarningsScreen extends StatelessWidget {
                 ],
               ),
               child: IconButton(
+                key: const Key('earnings_back_button'),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 icon: SvgPicture.asset(
@@ -68,6 +70,13 @@ class VendorEarningsScreen extends StatelessWidget {
                     Navigator.of(context).pop();
                   } else if (onBackToHome != null) {
                     onBackToHome!();
+                  } else {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const MainVendorScreen(initialIndex: 0),
+                      ),
+                      (route) => false,
+                    );
                   }
                 },
               ),
@@ -384,77 +393,97 @@ class VendorEarningsScreen extends StatelessWidget {
 
           // Two Action Buttons Row
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: SizedBox(
-                  height: 46,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => const PayoutSettlementScreen(),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: SizedBox(
+                    height: 42,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const PayoutSettlementScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF000000),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        side: const BorderSide(
+                          color: Color(0xFF000000),
+                          width: 1,
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: brandLime,
-                      foregroundColor: textBlack,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: const FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'View payouts',
+                      child: const Text(
+                        'View Payouts',
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: SizedBox(
-                  height: 46,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => const WithdrawEarningsScreen(),
+              const SizedBox(width: 2),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: SizedBox(
+                    height: 42,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const WithdrawEarningsScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC8F169),
+                        foregroundColor: const Color(0xFF000000),
+                        elevation: 0,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        side: const BorderSide(
+                          color: Color(0xFFC8F169),
+                          width: 1,
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: brandLime,
-                      foregroundColor: textBlack,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: const FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Withdraw earnings',
+                            'Withdraw Earnings',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
+                              color: Color(0xFF000000),
                             ),
                           ),
-                          SizedBox(width: 4),
-                          Icon(Icons.arrow_forward, size: 16, color: textBlack),
+                          SizedBox(width: 8),
+                          Icon(
+                            Icons.arrow_forward,
+                            size: 16,
+                            color: Color(0xFF000000),
+                          ),
                         ],
                       ),
                     ),

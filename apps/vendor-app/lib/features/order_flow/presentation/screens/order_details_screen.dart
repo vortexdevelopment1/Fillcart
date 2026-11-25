@@ -32,7 +32,7 @@ class OrderDetailsScreen extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -101,9 +101,9 @@ class OrderDetailsScreen extends StatelessWidget {
                                 'New order',
                                 style: TextStyle(
                                   fontFamily: 'Inter',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF111827),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFF6B7280),
                                 ),
                               ),
                               const SizedBox(height: 3),
@@ -111,9 +111,9 @@ class OrderDetailsScreen extends StatelessWidget {
                                 'Order Id : ${order.orderId}',
                                 style: const TextStyle(
                                   fontFamily: 'Inter',
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF6B7280),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF111827),
                                 ),
                               ),
                             ],
@@ -417,8 +417,8 @@ class OrderDetailsScreen extends StatelessWidget {
                       height: 52,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFC8F169),
-                          foregroundColor: const Color(0xFF111827),
+                          backgroundColor: const Color(0xFF000000),
+                          foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(26),
@@ -444,14 +444,14 @@ class OrderDetailsScreen extends StatelessWidget {
                                 fontFamily: 'Inter',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF111827),
+                                color: Colors.white,
                               ),
                             ),
                             SizedBox(width: 8),
                             Icon(
                               Icons.arrow_forward_rounded,
                               size: 18,
-                              color: Color(0xFF111827),
+                              color: Colors.white,
                             ),
                           ],
                         ),

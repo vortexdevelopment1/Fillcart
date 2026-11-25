@@ -103,8 +103,8 @@ class _ProcessingWithdrawalScreenState
                 child: ElevatedButton(
                   onPressed: _proceedToSuccess,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC8F169),
-                    foregroundColor: const Color(0xFF111827),
+                    backgroundColor: const Color(0xFF000000),
+                    foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),

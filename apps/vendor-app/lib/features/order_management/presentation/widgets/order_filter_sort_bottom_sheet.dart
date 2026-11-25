@@ -285,8 +285,8 @@ class _OrderFilterSortBottomSheetState
             child: ElevatedButton(
               onPressed: _apply,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFC8F169),
-                foregroundColor: const Color(0xFF111827),
+                backgroundColor: const Color(0xFF000000),
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -298,7 +298,7 @@ class _OrderFilterSortBottomSheetState
                   fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF111827),
+                  color: Colors.white,
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
+import 'package:fillcart_vendor/features/navigation/presentation/screens/main_vendor_screen.dart';
 import 'package:fillcart_vendor/features/order_flow/presentation/screens/order_details_screen.dart';
 import 'package:fillcart_vendor/features/order_flow/presentation/screens/order_packing_status_screen.dart';
 import 'package:fillcart_vendor/features/order_flow/presentation/screens/order_ready_for_pickup_screen.dart';
@@ -15,9 +16,11 @@ class VendorOrdersScreen extends StatefulWidget {
   const VendorOrdersScreen({
     super.key,
     this.initialTab = VendorOrderTab.all,
+    this.onBackToHome,
   });
 
   final VendorOrderTab initialTab;
+  final VoidCallback? onBackToHome;
 
   @override
   State<VendorOrdersScreen> createState() => _VendorOrdersScreenState();
@@ -141,7 +144,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: const Color.fromRGBO(255, 255, 255, 0.36),
+                      color: const Color(0xFFFFFFFF),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: const [
                         BoxShadow(
@@ -152,6 +155,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                       ],
                     ),
                     child: IconButton(
+                      key: const Key('orders_back_button'),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       icon: SvgPicture.asset(
@@ -164,8 +168,18 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                         ),
                       ),
                       onPressed: () {
-                        if (Navigator.canPop(context)) {
-                          Navigator.pop(context);
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                        } else if (widget.onBackToHome != null) {
+                          widget.onBackToHome!();
+                        } else {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute<void>(
+                              builder: (_) =>
+                                  const MainVendorScreen(initialIndex: 0),
+                            ),
+                            (route) => false,
+                          );
                         }
                       },
                     ),
@@ -342,7 +356,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
       onTap: () {
         _searchController.text = query;
       },
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(16),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
         child: Row(
@@ -684,8 +698,8 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                 key: const Key('filter_button'),
                 onTap: _openFilterModal,
                 child: Container(
-                  width: 48,
-                  height: 48,
+                  width: 50,
+                  height: 37,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
@@ -724,10 +738,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              _buildTabPill(
-                tab: VendorOrderTab.all,
-                hasSvgIcon: true,
-              ),
+              _buildTabPill(tab: VendorOrderTab.all),
               const SizedBox(width: 8),
               _buildTabPill(tab: VendorOrderTab.newOrders),
               const SizedBox(width: 8),
@@ -828,7 +839,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                 if (cancelledOrders.isEmpty)
                   _buildTabEmptyState(VendorOrderTab.cancel)
                 else ...[
-                  _buildSectionTitle('Cancel Orders'),
+                  _buildSectionTitle('Cancelled Orders'),
                   const SizedBox(height: 12),
                   ...cancelledOrders.map((o) => _buildCancelledOrderCard(o)),
                   const SizedBox(height: 16),
@@ -982,7 +993,6 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
   // =========================================================================
   Widget _buildTabPill({
     required VendorOrderTab tab,
-    bool hasSvgIcon = false,
   }) {
     final isSelected = _activeTab == tab;
 
@@ -1012,27 +1022,14 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                   ),
                 ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (hasSvgIcon) ...[
-              SvgPicture.asset(
-                'assets/svg/All.svg',
-                width: 18,
-                height: 18,
-              ),
-              const SizedBox(width: 6),
-            ],
-            Text(
-              tab.label,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 13.5,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                color: isSelected ? brandLime : const Color(0xFF111827),
-              ),
-            ),
-          ],
+        child: Text(
+          tab.label,
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 13.5,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+            color: isSelected ? brandLime : const Color(0xFF111827),
+          ),
         ),
       ),
     );
@@ -1643,7 +1640,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      'Cancel',
+                      'Cancelled',
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 13,

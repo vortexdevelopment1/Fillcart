@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
+import 'package:fillcart_vendor/core/widgets/vendor_toggle_switch.dart';
 
 /// Screen 2: Notification Setting Screen matching Image 2 exactly.
 class NotificationSettingScreen extends StatefulWidget {
@@ -39,7 +40,7 @@ class _NotificationSettingScreenState extends State<NotificationSettingScreen> {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: const Color.fromRGBO(255, 255, 255, 0.36),
+                        color: const Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: const [
                           BoxShadow(
@@ -163,7 +164,7 @@ class _NotificationSettingScreenState extends State<NotificationSettingScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        _buildCustomSwitch(
+                        VendorToggleSwitch(
                           value: _enableNotification,
                           onChanged: (val) {
                             setState(() {
@@ -349,39 +350,11 @@ class _NotificationSettingScreenState extends State<NotificationSettingScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          _buildCustomSwitch(
+          VendorToggleSwitch(
             value: value,
             onChanged: onChanged,
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCustomSwitch({
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return GestureDetector(
-      onTap: () => onChanged(!value),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 48,
-        height: 28,
-        padding: const EdgeInsets.all(3),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: value ? const Color(0xFF0F172A) : const Color(0xFF9CA3AF),
-        ),
-        alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-        child: Container(
-          width: 22,
-          height: 22,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: value ? const Color(0xFFB8EE32) : Colors.white,
-          ),
-        ),
       ),
     );
   }

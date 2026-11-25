@@ -114,12 +114,12 @@ class _HandoverVerificationScreenState
                   final isFilled = digit.isNotEmpty;
 
                   return Container(
-                    width: 62,
-                    height: 72,
+                    width: 41,
+                    height: 48,
                     margin: const EdgeInsets.symmetric(horizontal: 6),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isFilled
                             ? const Color(0xFF111827)
@@ -132,7 +132,7 @@ class _HandoverVerificationScreenState
                       digit,
                       style: const TextStyle(
                         fontFamily: 'Inter',
-                        fontSize: 32,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF111827),
                       ),
@@ -145,14 +145,14 @@ class _HandoverVerificationScreenState
               // Verify & Hand Over Button
               SizedBox(
                 width: double.infinity,
-                height: 54,
+                height: 48,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC8F169),
-                    foregroundColor: const Color(0xFF111827),
+                    backgroundColor: const Color(0xFF000000),
+                    foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(27),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   onPressed: _onVerify,
@@ -162,7 +162,7 @@ class _HandoverVerificationScreenState
                       fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF111827),
+                      color: Colors.white,
                     ),
                   ),
                 ),

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 
@@ -39,7 +39,7 @@ class _AboutEarningsScreenState extends State<AboutEarningsScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -104,29 +104,7 @@ class _AboutEarningsScreenState extends State<AboutEarningsScreen> {
               _buildFormulaContainer(),
               const SizedBox(height: 24),
 
-              // 4. Section: What each item means
-              const Text(
-                'What each item means',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: textBlack,
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // 5. Explanations List Card
-              _buildMeaningsCard(),
-              const SizedBox(height: 16),
-
-              // 6. Yellow Notice Banner
-              _buildNoticeBanner(
-                'Your earnings from orders are added to your weekly settlement and will be credited to your verified bank account as per the settlement Schedule.',
-              ),
-              const SizedBox(height: 24),
-
-              // 7. Section: Quick example
+              // 4. Section: Quick example
               const Text(
                 'Quick example',
                 style: TextStyle(
@@ -138,9 +116,31 @@ class _AboutEarningsScreenState extends State<AboutEarningsScreen> {
               ),
               const SizedBox(height: 12),
 
-              // 8. Example Bill Card
+              // 5. Example Bill Card
               _buildQuickExampleCard(),
               const SizedBox(height: 28),
+
+              // 6. Section: What each item means
+              const Text(
+                'What each item means',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: textBlack,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // 7. Explanations List Card
+              _buildMeaningsCard(),
+              const SizedBox(height: 16),
+
+              // 8. Yellow Notice Banner
+              _buildNoticeBanner(
+                'Your earnings from orders are added to your weekly settlement and will be credited to your verified bank account as per the settlement Schedule.',
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -279,24 +279,56 @@ class _AboutEarningsScreenState extends State<AboutEarningsScreen> {
   }
 
   Widget _buildFormulaContainer() {
+    const formulaTextStyle = TextStyle(
+      fontFamily: 'Inter',
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      color: Color(0xFF2D3A30),
+      height: 1.45,
+    );
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
-        color: iconBgLime,
+        color: const Color(0xFFF2F8E8),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFD4FA62)),
+        border: Border.all(color: const Color(0xFFDCE8C8)),
       ),
-      child: const Text(
-        'Your earnings = Item total – Platform commission\n-GST on commission\n± Adjustments',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 13.5,
-          fontWeight: FontWeight.w700,
-          color: textBlack,
-          height: 1.45,
-        ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Your earnings',
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF0E2118),
+              height: 1.3,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '=  Item total – Platform commission',
+            style: formulaTextStyle,
+          ),
+          SizedBox(height: 2),
+          Wrap(
+            spacing: 4,
+            runSpacing: 1,
+            children: [
+              Text(
+                '– GST on commission',
+                style: formulaTextStyle,
+              ),
+              Text(
+                '± Adjustments',
+                style: formulaTextStyle,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

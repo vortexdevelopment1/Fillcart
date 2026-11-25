@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
 import 'package:fillcart_vendor/features/order_flow/models/order_flow_model.dart';
@@ -59,7 +59,7 @@ class VendorCancelledOrderDetailsScreen extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -107,12 +107,17 @@ class VendorCancelledOrderDetailsScreen extends StatelessWidget {
               // 1. TOP DARK STATUS BANNER
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(18),
+                constraints: const BoxConstraints(minHeight: 67),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: darkCharcoal,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -156,7 +161,7 @@ class VendorCancelledOrderDetailsScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         const Text(
-                          'Cancel',
+                          'Cancelled',
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 16,

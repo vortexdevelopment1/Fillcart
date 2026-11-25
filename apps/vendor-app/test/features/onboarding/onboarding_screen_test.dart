@@ -33,7 +33,7 @@ void main() {
 
       // Back and skip should NOT be visible on first page
       expect(find.byIcon(Icons.arrow_back), findsNothing);
-      expect(find.text('skip'), findsNothing);
+      expect(find.text('Skip'), findsNothing);
 
       // Next button with arrow icon should be visible
       expect(find.text('Next'), findsOneWidget);
@@ -62,7 +62,7 @@ void main() {
 
       // Back and skip should now be visible
       expect(find.byTooltip('Back'), findsOneWidget);
-      expect(find.text('skip'), findsOneWidget);
+      expect(find.text('Skip'), findsOneWidget);
 
       // Next button still present
       expect(find.text('Next'), findsOneWidget);
@@ -117,7 +117,7 @@ void main() {
 
       // Back and skip should be visible
       expect(find.byTooltip('Back'), findsOneWidget);
-      expect(find.text('skip'), findsOneWidget);
+      expect(find.text('Skip'), findsOneWidget);
     });
 
     testWidgets('tapping Get Started on screen 3 triggers completion', (
@@ -156,7 +156,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap skip
-      await tester.tap(find.text('skip'));
+      await tester.tap(find.text('Skip'));
       await tester.pumpAndSettle();
 
       expect(completed, isTrue);

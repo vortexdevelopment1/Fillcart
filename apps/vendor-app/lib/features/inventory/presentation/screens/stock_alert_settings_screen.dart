@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
+import 'package:fillcart_vendor/core/widgets/vendor_toggle_switch.dart';
 import '../../models/inventory_product.dart';
 
 /// Screen for configuring low-stock and expiry notifications for a product (Image 5).
@@ -75,7 +76,7 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -140,8 +141,8 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                 child: ElevatedButton(
                   onPressed: _saveSettings,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC8F169),
-                    foregroundColor: const Color(0xFF111827),
+                    backgroundColor: const Color(0xFF000000),
+                    foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -153,7 +154,7 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                       fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF111827),
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -273,12 +274,8 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                   color: Color(0xFF111827),
                 ),
               ),
-              Switch(
+              VendorToggleSwitch(
                 value: _lowStockAlertEnabled,
-                activeThumbColor: Colors.white,
-                activeTrackColor: const Color(0xFF84CC16),
-                inactiveThumbColor: Colors.white,
-                inactiveTrackColor: const Color(0xFFE5E7EB),
                 onChanged: (val) {
                   setState(() => _lowStockAlertEnabled = val);
                 },
@@ -405,12 +402,8 @@ class _StockAlertSettingsScreenState extends State<StockAlertSettingsScreen> {
                   color: Color(0xFF111827),
                 ),
               ),
-              Switch(
+              VendorToggleSwitch(
                 value: _expiryAlertEnabled,
-                activeThumbColor: Colors.white,
-                activeTrackColor: const Color(0xFF84CC16),
-                inactiveThumbColor: Colors.white,
-                inactiveTrackColor: const Color(0xFFE5E7EB),
                 onChanged: (val) {
                   setState(() => _expiryAlertEnabled = val);
                 },

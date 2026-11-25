@@ -1,3 +1,4 @@
+import 'package:fillcart_vendor/core/widgets/vendor_toggle_switch.dart';
 import 'package:fillcart_vendor/features/dashboard/presentation/screens/vendor_dashboard_screen.dart';
 import 'package:fillcart_vendor/features/order_flow/presentation/screens/handover_verification_screen.dart';
 import 'package:fillcart_vendor/features/order_flow/presentation/screens/order_cancelled_screen.dart';
@@ -64,6 +65,35 @@ void main() {
       expect(find.text('Business Overview'), findsOneWidget);
       expect(find.text('Sales Analytics'), findsOneWidget);
       expect(find.text('Promotions'), findsOneWidget);
+    });
+
+    testWidgets('Toggling store status updates dashboard header background between #C8F169 and #0E1512',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: VendorDashboardScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      AnimatedContainer headerContainer() => tester.widget<AnimatedContainer>(
+            find.byKey(const Key('dashboard_header_container')),
+          );
+
+      expect(find.text('Store is Online'), findsOneWidget);
+      expect(
+        (headerContainer().decoration! as BoxDecoration).color,
+        const Color(0xFFC8F169),
+      );
+
+      await tester.tap(find.byType(VendorToggleSwitch));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Store is Offline'), findsOneWidget);
+      expect(
+        (headerContainer().decoration! as BoxDecoration).color,
+        const Color(0xFF0E1512),
+      );
     });
 
     testWidgets('Tapping order card inside New Order POP navigates to OrderDetailsScreen',

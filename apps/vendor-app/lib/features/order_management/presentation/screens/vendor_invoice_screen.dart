@@ -35,7 +35,7 @@ class VendorInvoiceScreen extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -435,8 +435,8 @@ class VendorInvoiceScreen extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFC8F169),
-                        foregroundColor: const Color(0xFF111827),
+                        backgroundColor: const Color(0xFF000000),
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(26),
                         ),
@@ -450,7 +450,7 @@ class VendorInvoiceScreen extends StatelessWidget {
                             width: 20,
                             height: 20,
                             colorFilter: const ColorFilter.mode(
-                              Color(0xFF111827),
+                              Colors.white,
                               BlendMode.srcIn,
                             ),
                           ),
@@ -461,7 +461,7 @@ class VendorInvoiceScreen extends StatelessWidget {
                               fontFamily: 'Inter',
                               fontSize: 15.5,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF111827),
+                              color: Colors.white,
                             ),
                           ),
                         ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fillcart_vendor/core/constants/app_assets.dart';
+import 'package:fillcart_vendor/core/widgets/vendor_toggle_switch.dart';
 import 'package:fillcart_vendor/features/dashboard/presentation/widgets/new_order_waiting_popup.dart';
 import 'package:fillcart_vendor/features/notifications/presentation/screens/notification_screen.dart';
 import 'package:fillcart_vendor/features/analytics/revenue_analytics/presentation/screens/revenue_analytics_screen.dart';
@@ -52,12 +53,14 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ==========================================
-                // 1. TOP CURVED LIME HEADER
+                // 1. TOP CURVED HEADER (Online: #C8F169, Offline: #0E1512)
                 // ==========================================
-                Container(
-                  decoration: const BoxDecoration(
-                    color: brandLime,
-                    borderRadius: BorderRadius.vertical(
+                AnimatedContainer(
+                  key: const Key('dashboard_header_container'),
+                  duration: const Duration(milliseconds: 200),
+                  decoration: BoxDecoration(
+                    color: _isStoreOnline ? brandLime : const Color(0xFF0E1512),
+                    borderRadius: const BorderRadius.vertical(
                       bottom: Radius.circular(24),
                     ),
                   ),
@@ -90,7 +93,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  const Column(
+                                  Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
@@ -100,7 +103,9 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                                           fontFamily: 'Inter',
                                           fontSize: 12,
                                           fontWeight: FontWeight.w400,
-                                          color: Color(0xFF374151),
+                                          color: _isStoreOnline
+                                              ? const Color(0xFF374151)
+                                              : const Color(0xFF9CA3AF),
                                         ),
                                       ),
                                       Text(
@@ -109,7 +114,9 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                                           fontFamily: 'Inter',
                                           fontSize: 17,
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFF111827),
+                                          color: _isStoreOnline
+                                              ? const Color(0xFF111827)
+                                              : Colors.white,
                                         ),
                                       ),
                                     ],
@@ -169,8 +176,15 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                               vertical: 10,
                             ),
                             decoration: BoxDecoration(
-                              color: darkBg,
+                              color: _isStoreOnline
+                                  ? darkBg
+                                  : const Color(0xFF1B231F),
                               borderRadius: BorderRadius.circular(16),
+                              border: _isStoreOnline
+                                  ? null
+                                  : Border.all(
+                                      color: Colors.white.withValues(alpha: 0.10),
+                                    ),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -204,20 +218,13 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                                   ],
                                 ),
                                 // Switch
-                                Transform.scale(
-                                  scale: 0.85,
-                                  child: Switch(
-                                    value: _isStoreOnline,
-                                    activeThumbColor: darkBg,
-                                    activeTrackColor: const Color(0xFFC8F169),
-                                    inactiveThumbColor: Colors.white,
-                                    inactiveTrackColor: const Color(0xFF4B5563),
-                                    onChanged: (val) {
-                                      setState(() {
-                                        _isStoreOnline = val;
-                                      });
-                                    },
-                                  ),
+                                VendorToggleSwitch(
+                                  value: _isStoreOnline,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _isStoreOnline = val;
+                                    });
+                                  },
                                 ),
                               ],
                             ),
@@ -313,7 +320,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: darkBg,
+                          color: const Color(0xFF0E1512),
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: Column(
@@ -623,7 +630,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                 width: 54,
                 height: 54,
                 decoration: BoxDecoration(
-                  color: brandLime,
+                  color: const Color(0xFF000000),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: const [
                     BoxShadow(
@@ -633,7 +640,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.add, color: darkBg, size: 28),
+                child: const Icon(Icons.add, color: Colors.white, size: 28),
               ),
             ),
           ),

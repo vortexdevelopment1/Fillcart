@@ -6,7 +6,7 @@ class OrderCancelledScreen extends StatelessWidget {
     super.key,
     this.orderId = '#FC2841',
     this.title = 'Order Ready for Pickup.',
-    this.subtitle = 'The customer canceled #FC2841 at 7:50 PM. Stop packing this order.',
+    this.subtitle = 'The customer cancelled #FC2841 at 7:50 PM. Stop packing this order.',
     this.customerReason = 'Changed my mind',
     this.orderValue = '₹386',
     this.packedStatus = '4 of 6 items',
@@ -132,8 +132,8 @@ class OrderCancelledScreen extends StatelessWidget {
                 height: 54,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC8F169),
-                    foregroundColor: const Color(0xFF111827),
+                    backgroundColor: const Color(0xFF000000),
+                    foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(27),
@@ -148,7 +148,7 @@ class OrderCancelledScreen extends StatelessWidget {
                       fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF111827),
+                      color: Colors.white,
                     ),
                   ),
                 ),

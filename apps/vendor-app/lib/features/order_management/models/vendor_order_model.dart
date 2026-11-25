@@ -7,7 +7,7 @@ enum VendorOrderTab {
   preparing(label: 'Preparing'),
   riderAtStore(label: 'Rider at store'),
   completed(label: 'Completed'),
-  cancel(label: 'Cancel');
+  cancel(label: 'Cancelled');
 
   const VendorOrderTab({required this.label});
   final String label;

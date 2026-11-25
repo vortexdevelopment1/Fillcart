@@ -73,7 +73,7 @@ class _RejectOrderScreenState extends State<RejectOrderScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 0.36),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
@@ -295,8 +295,8 @@ class _RejectOrderScreenState extends State<RejectOrderScreen> {
                     height: 54,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFC8F169),
-                        foregroundColor: const Color(0xFF111827),
+                        backgroundColor: const Color(0xFFB42318),
+                        foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(27),
@@ -309,7 +309,7 @@ class _RejectOrderScreenState extends State<RejectOrderScreen> {
                           fontFamily: 'Inter',
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF111827),
+                          color: Colors.white,
                         ),
                       ),
                     ),
