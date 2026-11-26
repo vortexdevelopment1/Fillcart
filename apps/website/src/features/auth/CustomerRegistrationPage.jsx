@@ -4,14 +4,17 @@ import {
   ArrowLeft, ArrowRight, UserRound, Phone, Mail, MapPin,
   Lock, CheckCircle2, ShieldCheck, Sparkles, Eye, EyeOff
 } from "lucide-react";
-import api from "../../services/api.js";
+import authClient from "../../services/authClient.js";
 import Logo from "../../components/common/Logo.jsx";
 
 const getErrorMessage = (err) => {
-  const responseData = err?.response?.data;
-  if (typeof responseData === "string") return responseData;
-  if (responseData && typeof responseData === "object") {
-    return responseData.message || "Something went wrong on the server.";
+  const errorDetail = err?.response?.data?.error;
+  if (errorDetail?.message) return errorDetail.message;
+  const msg = err?.response?.data?.message;
+  if (msg) return msg;
+  if (typeof err?.response?.data === "string") return err.response.data;
+  if (!err?.response && (err?.code === "ERR_NETWORK" || err?.message?.includes("Network Error"))) {
+    return "Central Auth service is currently unreachable. Please try again shortly.";
   }
   return err?.message || "Failed to create customer profile.";
 };
@@ -82,8 +85,8 @@ export default function CustomerRegistrationPage() {
       return;
     }
 
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+    if (form.password.length < 8) {
+      setError("Password must be at least 8 characters long.");
       return;
     }
 
@@ -100,16 +103,19 @@ export default function CustomerRegistrationPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await api.post("/register-customer", {
-        name: form.name.trim(),
-        phone: form.phone.trim(),
+      const formattedPhone = form.phone.trim().startsWith("+")
+        ? form.phone.trim()
+        : `+91${form.phone.trim()}`;
+
+      await authClient.register({
         email: form.email.trim(),
         password: form.password,
-        address: form.address.trim(),
-        pincode: form.pincode.trim(),
+        fullName: form.name.trim(),
+        phone: formattedPhone,
+        accountType: "CUSTOMER",
       });
 
-      setSuccess(res.data.message || "Account registered successfully! Redirecting to login...");
+      setSuccess("Account registered successfully! Redirecting to login...");
       setTimeout(() => {
         navigate("/login");
       }, 1500);
