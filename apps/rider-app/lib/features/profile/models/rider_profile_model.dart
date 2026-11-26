@@ -9,6 +9,7 @@ enum ProfileDocumentStatus { verified, pendingVerification, rejected }
 /// Immutable model representing the rider's personal profile & emergency contact.
 class RiderProfileModel extends Equatable {
   final String fullName;
+  final String address;
   final String mobileNumber;
   final String editMobileNumber;
   final String email;
@@ -20,10 +21,11 @@ class RiderProfileModel extends Equatable {
   final ProfilePhotoSource photoSource;
 
   const RiderProfileModel({
-    this.fullName = 'Ms Dhoni',
+    this.fullName = 'Virat kohli (khachedu)',
+    this.address = 'London',
     this.mobileNumber = '+91 9350254862',
     this.editMobileNumber = '9350264022',
-    this.email = 'MSdhoni@gmail.com',
+    this.email = 'viratkholi@gmail.com',
     this.dateOfBirth = '01/04/2003',
     this.rating = 4.7,
     this.riderId = 'AYM451202',
@@ -35,18 +37,18 @@ class RiderProfileModel extends Equatable {
   bool get hasPhoto => photoSource != ProfilePhotoSource.removed;
 
   String get initials {
-    final parts = fullName
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((p) => p.isNotEmpty)
+    final words = RegExp(r'[A-Za-z]+')
+        .allMatches(fullName)
+        .map((m) => m.group(0)!)
         .toList();
-    if (parts.isEmpty) return 'R';
-    if (parts.length == 1) return parts.first[0].toUpperCase();
-    return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    if (words.isEmpty) return 'R';
+    if (words.length == 1) return words.first[0].toUpperCase();
+    return '${words[0][0]}${words[1][0]}'.toUpperCase();
   }
 
   RiderProfileModel copyWith({
     String? fullName,
+    String? address,
     String? mobileNumber,
     String? editMobileNumber,
     String? email,
@@ -59,6 +61,7 @@ class RiderProfileModel extends Equatable {
   }) {
     return RiderProfileModel(
       fullName: fullName ?? this.fullName,
+      address: address ?? this.address,
       mobileNumber: mobileNumber ?? this.mobileNumber,
       editMobileNumber: editMobileNumber ?? this.editMobileNumber,
       email: email ?? this.email,
@@ -75,6 +78,7 @@ class RiderProfileModel extends Equatable {
   @override
   List<Object?> get props => [
     fullName,
+    address,
     mobileNumber,
     editMobileNumber,
     email,
@@ -153,7 +157,7 @@ class ProfileBankModel extends Equatable {
   final bool hasLinkedAccount;
 
   const ProfileBankModel({
-    this.accountHolderName = 'Ms Dhoni',
+    this.accountHolderName = 'Virat kohli (khachedu)',
     this.bankName = 'State Bank Of India',
     this.ifscCode = 'SBIN0001234',
     this.accountNumber = '123456781224',

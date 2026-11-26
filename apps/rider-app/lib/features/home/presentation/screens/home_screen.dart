@@ -17,8 +17,8 @@ import '../widgets/today_earnings_bar.dart';
 /// - Status Bar spacer: 48 px
 /// - Profile Row (1470:54670): 328 x 42 px at x=16, y=64
 ///   - Avatar: 36 x 36 px circular
-///   - Name: "Ms Dhoni" (Poppins Medium 14 px, #080808)
-///   - Location: "Vijay Nagar, Indore" (Poppins Regular 12 px, #0A0A0A)
+///   - Name: "Virat kholi (khachedu)" (Poppins Medium 14 px, #080808)
+///   - Location: "London" (Poppins Regular 12 px, #0A0A0A)
 ///   - Notification bell: 24 x 24 px
 /// - Online / Offline toggle bar (1470:54683 / 153:1171): 328 x 36 px
 /// - Today's Earnings bar (1048:14779): 328 x 40 px, #C1FE03
@@ -78,68 +78,81 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Left: Avatar + Name & Location (tap opens Profile)
-                          InkWell(
-                            key: const Key('home_profile_button'),
-                            onTap: () {
-                              try {
-                                GoRouter.of(context).push('/profile');
-                              } catch (_) {}
-                            },
-                            borderRadius: BorderRadius.circular(12),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: const Color(0xFFF0F0F0),
-                                    border: Border.all(
-                                      color: const Color(0x22000000),
-                                      width: 1,
+                          Expanded(
+                            child: InkWell(
+                              key: const Key('home_profile_button'),
+                              onTap: () {
+                                try {
+                                  GoRouter.of(context).push('/profile');
+                                } catch (_) {}
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color(0xFFF0F0F0),
+                                      border: Border.all(
+                                        color: const Color(0x22000000),
+                                        width: 1,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Builder(
-                                  builder: (context) {
-                                    String riderName = 'Ms Dhoni';
-                                    try {
-                                      riderName = context
-                                          .watch<ProfileBloc>()
-                                          .state
-                                          .profile
-                                          .fullName;
-                                    } catch (_) {}
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          riderName,
-                                          key: const Key('home_rider_name'),
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: const Color(0xFF080808),
-                                          ),
-                                        ),
-                                        Text(
-                                          'Vijay Nagar, Indore',
-                                          key: const Key('home_rider_location'),
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                            color: const Color(0xFF0A0A0A),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Builder(
+                                      builder: (context) {
+                                        String riderName =
+                                            'Virat kohli (khachedu)';
+                                        String riderAddress = 'London';
+                                        try {
+                                          final profile = context
+                                              .watch<ProfileBloc>()
+                                              .state
+                                              .profile;
+                                          riderName = profile.fullName;
+                                          riderAddress = profile.address;
+                                        } catch (_) {}
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              riderName,
+                                              key: const Key('home_rider_name'),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: const Color(0xFF080808),
+                                              ),
+                                            ),
+                                            Text(
+                                              riderAddress,
+                                              key: const Key(
+                                                'home_rider_location',
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400,
+                                                color: const Color(0xFF0A0A0A),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
 

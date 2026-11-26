@@ -102,10 +102,13 @@ class _FaqScreenState extends State<FaqScreen> {
                       fontSize: 13.5,
                       color: ProfileTokens.textSecondary,
                     ),
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      color: Color(0xFF4B5563),
-                      size: 20,
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: SvgPicture.asset(
+                        'assets/svg/search.svg',
+                        width: 20,
+                        height: 20,
+                      ),
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -389,12 +392,12 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String firstName = 'Dhoni';
+    String firstName = 'Virat';
     try {
       final fullName = context.watch<ProfileBloc>().state.profile.fullName;
       final parts = fullName.trim().split(RegExp(r'\s+'));
-      if (parts.isNotEmpty && parts.last.isNotEmpty) {
-        firstName = parts.last;
+      if (parts.isNotEmpty && parts.first.isNotEmpty) {
+        firstName = parts.first;
       }
     } catch (_) {}
 
@@ -656,9 +659,44 @@ class AboutAppScreen extends StatelessWidget {
   }
 }
 
-/// Privacy Policy Screen accessible from Profile -> About App -> Privacy Policy.
-class PrivacyPolicyScreen extends StatelessWidget {
+/// Privacy Policy Screen matching Figma Privacy Policy accordion design.
+class PrivacyPolicyScreen extends StatefulWidget {
   const PrivacyPolicyScreen({super.key});
+
+  @override
+  State<PrivacyPolicyScreen> createState() => _PrivacyPolicyScreenState();
+}
+
+class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
+  static const List<({String title, String body})> _sections = [
+    (
+      title: '1. Information We Collect',
+      body:
+          'We collect information you provide directly, such as your name, contact details, payment information, delivery addresses, and order history when placing orders.',
+    ),
+    (
+      title: '2. How We Use Your Information',
+      body:
+          'We use your information to verify your rider account, assign nearby delivery orders, process payouts and incentives, and provide timely support.',
+    ),
+    (
+      title: '3. Data Sharing',
+      body:
+          'We share necessary delivery information only with partner stores, customers during active orders, and verified payment or KYC service providers.',
+    ),
+    (
+      title: '4. Data Security',
+      body:
+          'We safeguard your personal, document, and bank details using encrypted storage, secure transport protocols, and strict access controls.',
+    ),
+    (
+      title: '5. Your Rights',
+      body:
+          'You may review, update, or request deletion of your profile and linked bank information through your account settings or support.',
+    ),
+  ];
+
+  int? _expandedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -671,63 +709,108 @@ class PrivacyPolicyScreen extends StatelessWidget {
             const ProfileScreenHeader(title: 'Privacy Policy'),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Image.asset(
-                          'assets/icons/profile_privacypolicy.png',
-                          width: 96,
-                          height: 96,
-                          fit: BoxFit.contain,
+                physics: const ClampingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Image.asset(
+                        'assets/icons/profile_privacypolicy.png',
+                        width: 128,
+                        height: 128,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'Privacy Policy',
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Last updated: 24 Nov 2026',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF4B5563),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'We are committed to protecting your privacy. This Privacy Policy explains how FillCarts collects, uses and safeguards your information.',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF4B5563),
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    for (int i = 0; i < _sections.length; i++) ...[
+                      InkWell(
+                        key: Key('privacy_section_$i'),
+                        onTap: () {
+                          setState(() {
+                            _expandedIndex = _expandedIndex == i ? null : i;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _sections[i].title,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  AnimatedRotation(
+                                    turns: _expandedIndex == i ? 0.5 : 0,
+                                    duration: const Duration(milliseconds: 200),
+                                    child: SvgPicture.asset(
+                                      'assets/svg/bottom_arrow.svg',
+                                      width: 14,
+                                      height: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (_expandedIndex == i) ...[
+                                const SizedBox(height: 10),
+                                Text(
+                                  _sections[i].body,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12.5,
+                                    color: const Color(0xFF4B5563),
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Your Data & Security',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                      if (i < _sections.length - 1)
+                        const Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: Color(0xFFDADCD0),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Fillcart collects only the information necessary to verify your rider account, assign nearby deliveries, and settle payouts safely to your linked bank account.',
-                        style: GoogleFonts.poppins(
-                          fontSize: 13.5,
-                          color: const Color(0xFF4B5563),
-                          height: 1.55,
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Text(
-                        'Location Usage',
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Location access is used while you are online to match nearby orders and provide live delivery tracking to customers.',
-                        style: GoogleFonts.poppins(
-                          fontSize: 13.5,
-                          color: const Color(0xFF4B5563),
-                          height: 1.55,
-                        ),
-                      ),
                     ],
-                  ),
+                  ],
                 ),
               ),
             ),

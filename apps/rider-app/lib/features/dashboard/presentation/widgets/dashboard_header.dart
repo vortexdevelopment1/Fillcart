@@ -15,8 +15,8 @@ import '../../../profile/bloc/profile_bloc.dart';
 /// - Safe area / status bar spacing: 48 px
 /// - Profile row (1076:14893): 328 x 36 px at padding 16 px
 ///   - Avatar: 36 x 36 px blank grey circle (#D9D9D9)
-///   - Name: "Ms Dhoni" (Poppins Medium 12 px, #080808)
-///   - Location: "Vijay Nagar, Indore" (Poppins Regular 12 px, #0A0A0A)
+///   - Name: "Virat kholi (khachedu)" (Poppins Medium 12 px, #080808)
+///   - Location: "London" (Poppins Regular 12 px, #0A0A0A)
 ///   - Notification bell: 24 x 24 px
 /// - Toggle & Earnings bars container (1076:14904): 328 x 84 px with 8 px gap
 ///   - Online / Offline toggle bar (328 x 36 px)
@@ -91,13 +91,15 @@ class DashboardHeader extends StatelessWidget {
                             Expanded(
                               child: Builder(
                                 builder: (context) {
-                                  String riderName = 'Ms Dhoni';
+                                  String riderName = 'Virat kohli (khachedu)';
+                                  String riderAddress = 'London';
                                   try {
-                                    riderName = context
+                                    final profile = context
                                         .watch<ProfileBloc>()
                                         .state
-                                        .profile
-                                        .fullName;
+                                        .profile;
+                                    riderName = profile.fullName;
+                                    riderAddress = profile.address;
                                   } catch (_) {}
                                   return Column(
                                     crossAxisAlignment:
@@ -118,7 +120,7 @@ class DashboardHeader extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        'Vijay Nagar, Indore',
+                                        riderAddress,
                                         key: const Key(
                                           'dashboard_rider_location',
                                         ),

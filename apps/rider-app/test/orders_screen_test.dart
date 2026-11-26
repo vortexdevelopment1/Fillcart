@@ -165,7 +165,7 @@ void main() {
 
       // Verify HomeScreen is loaded
       expect(find.byType(HomeScreen), findsOneWidget);
-      expect(find.text('Ms Dhoni'), findsOneWidget);
+      expect(find.text('Virat kohli (khachedu)'), findsOneWidget);
 
       await tester.binding.setSurfaceSize(null);
     });

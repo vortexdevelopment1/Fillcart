@@ -112,6 +112,16 @@ class ProfileScreen extends StatelessWidget {
                             color: Colors.black,
                           ),
                         ),
+                        const SizedBox(height: 4),
+                        Text(
+                          profile.address,
+                          key: const Key('profile_rider_address'),
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: ProfileTokens.textSecondary,
+                          ),
+                        ),
                         const SizedBox(height: 12),
                         _EditProfileButton(
                           key: const Key('edit_profile_button'),

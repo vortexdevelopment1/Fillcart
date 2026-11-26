@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -118,9 +119,9 @@ void main() {
 
       // 1. Profile Row
       expect(find.byKey(const Key('home_rider_name')), findsOneWidget);
-      expect(find.text('Ms Dhoni'), findsOneWidget);
+      expect(find.text('Virat kohli (khachedu)'), findsOneWidget);
       expect(find.byKey(const Key('home_rider_location')), findsOneWidget);
-      expect(find.text('Vijay Nagar, Indore'), findsOneWidget);
+      expect(find.text('London'), findsOneWidget);
       expect(find.byKey(const Key('home_notification_button')), findsOneWidget);
 
       // 2. Toggle Bar

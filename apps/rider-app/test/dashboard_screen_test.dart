@@ -30,12 +30,12 @@ void main() {
       expect(find.byKey(const Key('dashboard_rider_name')), findsOneWidget);
       expect(
         tester.widget<Text>(find.byKey(const Key('dashboard_rider_name'))).data,
-        equals('Ms Dhoni'),
+        equals('Virat kohli (khachedu)'),
       );
       expect(find.byKey(const Key('dashboard_rider_location')), findsOneWidget);
       expect(
         tester.widget<Text>(find.byKey(const Key('dashboard_rider_location'))).data,
-        equals('Vijay Nagar, Indore'),
+        equals('London'),
       );
       expect(find.byKey(const Key('dashboard_notification_button')), findsOneWidget);
 

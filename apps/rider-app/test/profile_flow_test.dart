@@ -106,7 +106,8 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byKey(const Key('profile_screen_scaffold')), findsOneWidget);
-        expect(find.text('Ms Dhoni'), findsOneWidget);
+        expect(find.text('Virat kohli (khachedu)'), findsOneWidget);
+        expect(find.text('London'), findsOneWidget);
         expect(find.text('+91 9350254862'), findsOneWidget);
         expect(find.text('4.7'), findsOneWidget);
         expect(find.text('AYM451202'), findsOneWidget);
@@ -132,7 +133,7 @@ void main() {
 
         await tester.tap(find.byKey(const Key('photo_option_remove')));
         await tester.pumpAndSettle();
-        expect(find.text('MD'), findsOneWidget);
+        expect(find.text('VK'), findsOneWidget);
 
         // Edit full name and save
         await tester.enterText(
@@ -362,6 +363,18 @@ void main() {
         await tester.pumpAndSettle();
         expect(
           find.byKey(const Key('privacy_policy_screen_scaffold')),
+          findsOneWidget,
+        );
+        expect(find.text('Last updated: 24 Nov 2026'), findsOneWidget);
+        expect(find.text('1. Information We Collect'), findsOneWidget);
+        expect(find.text('5. Your Rights'), findsOneWidget);
+        await tester.ensureVisible(find.byKey(const Key('privacy_section_1')));
+        await tester.tap(find.byKey(const Key('privacy_section_1')));
+        await tester.pumpAndSettle();
+        expect(
+          find.text(
+            'We use your information to verify your rider account, assign nearby delivery orders, process payouts and incentives, and provide timely support.',
+          ),
           findsOneWidget,
         );
         await tester.tap(find.byKey(const Key('profile_back_button')));

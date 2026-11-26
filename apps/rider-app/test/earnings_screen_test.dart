@@ -162,7 +162,7 @@ void main() {
       await tester.tap(find.byKey(const Key('nav_tab_home')));
       await tester.pumpAndSettle();
       expect(find.byType(HomeScreen), findsOneWidget);
-      expect(find.text('Ms Dhoni'), findsOneWidget);
+      expect(find.text('Virat kohli (khachedu)'), findsOneWidget);
 
       // 3. From Home, tap Earnings Tab
       await tester.tap(find.byKey(const Key('nav_tab_earnings')));

@@ -541,10 +541,11 @@ class _IncentiveProgressBannerCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SvgPicture.asset(
-                            'assets/svg/incentives.svg',
+                          Image.asset(
+                            'assets/icons/incentive_gift_emoji.png',
                             width: 16,
                             height: 16,
+                            fit: BoxFit.contain,
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -571,7 +572,7 @@ class _IncentiveProgressBannerCard extends StatelessWidget {
                         Text(
                           'COMPLETE WITHIN',
                           style: GoogleFonts.poppins(
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: FontWeight.w400,
                             color: const Color(0xFF4B5563),
                           ),
@@ -579,7 +580,7 @@ class _IncentiveProgressBannerCard extends StatelessWidget {
                         Text(
                           '5:00 AM – 7:00 PM',
                           style: GoogleFonts.poppins(
-                            fontSize: 12.5,
+                            fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: Colors.black,
                           ),
@@ -591,7 +592,7 @@ class _IncentiveProgressBannerCard extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: 1, thickness: 1, color: Color(0x339333EA)),
+          const Divider(height: 1, thickness: 1, color: Color(0xffFFFFFF)),
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 16, 14, 16),
             child: Column(
@@ -660,10 +661,11 @@ class _IncentiveProgressBannerCard extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset(
-                        'assets/svg/light.svg',
+                      Image.asset(
+                        'assets/icons/incentive_lightning_emoji.png',
                         width: 16,
                         height: 16,
+                        fit: BoxFit.contain,
                       ),
                       const SizedBox(width: 8),
                       Flexible(
