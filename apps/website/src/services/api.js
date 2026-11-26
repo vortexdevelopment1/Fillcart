@@ -1,4 +1,5 @@
 import axios from "axios";
+import authClient, { getAccessToken, clearAccessToken } from "./authClient.js";
 
 // Resolve backend base URL from Vite environment variables with production fallback
 const rawBaseUrl =
@@ -19,10 +20,10 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Attach Authorization header if JWT token exists in localStorage (supports cookies + Bearer token)
+// Attach Authorization header from in-memory token (no localStorage/sessionStorage)
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (token && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -37,9 +38,38 @@ export const setOnUnauthorized = (cb) => {
   onUnauthorizedCallback = cb;
 };
 
+// Handle 401: perform one coordinated refresh via Web Locks and retry once; else clear session and redirect to /login
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes("/auth/")
+    ) {
+      originalRequest._retry = true;
+      try {
+        const refreshedToken = await authClient.refreshAccessToken();
+        if (refreshedToken) {
+          originalRequest.headers.Authorization = `Bearer ${refreshedToken}`;
+          return api(originalRequest);
+        }
+      } catch (refreshErr) {
+        clearAccessToken();
+        if (typeof onUnauthorizedCallback === "function") {
+          onUnauthorizedCallback(refreshErr);
+        }
+        if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+        return Promise.reject(refreshErr);
+      }
+    }
+
     if (error.response && error.response.status === 401) {
       if (typeof onUnauthorizedCallback === "function") {
         onUnauthorizedCallback(error);

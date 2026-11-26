@@ -1,24 +1,27 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import api, { setOnUnauthorized } from "../../services/api.js";
+import { useAuth } from "./AuthContext.jsx";
 import { Lock, X } from "lucide-react";
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loadingUser, setLoadingUser] = useState(true);
+  const { user: authUser, setUser: setAuthUser, logout: authLogout, loading: authLoading } = useAuth();
+  const user = authUser;
+  const setUser = setAuthUser;
+  const loadingUser = authLoading;
+
   const [cart, setCart] = useState([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Register global 401 unauthorized handler to clear invalid user session
+  // Register global 401 unauthorized handler to clear invalid cart state
   useEffect(() => {
     setOnUnauthorized(() => {
-      localStorage.removeItem("token");
-      setUser(null);
+      setCart([]);
     });
   }, []);
 
-  // Global Location State
+  // Global Location State (Non-secret UI preference, preserved in localStorage)
   const [userLocation, setUserLocation] = useState(() => {
     const saved = localStorage.getItem("fillcarts_user_location");
     if (saved) {
@@ -32,7 +35,7 @@ export function CartProvider({ children }) {
       pincode: "452010",
       state: "M.P.",
       formatted: "Vijay Nagar, Indore (452010)",
-      isGps: false
+      isGps: false,
     };
   });
 
@@ -41,32 +44,10 @@ export function CartProvider({ children }) {
     localStorage.setItem("fillcarts_user_location", JSON.stringify(newLoc));
   };
 
-  // Fetch authenticated user profile on mount
+  // Backwards-compatible checkUserProfile using Central Auth in-memory state
   const checkUserProfile = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setUser(null);
-      setLoadingUser(false);
-      return;
-    }
-
-    try {
-      const res = await api.get("/profile");
-      if (res.data && res.data.customer) {
-        setUser(res.data.customer);
-      } else {
-        setUser(null);
-      }
-    } catch (e) {
-      setUser(null);
-    } finally {
-      setLoadingUser(false);
-    }
+    return authUser;
   };
-
-  useEffect(() => {
-    checkUserProfile();
-  }, []);
 
   // When user logs in/out, load the user-specific cart from database or guest local storage
   useEffect(() => {
@@ -102,7 +83,7 @@ export function CartProvider({ children }) {
           }
         } catch (e) {
           if (e.response?.status === 401) {
-            setUser(null);
+            // Handled by api interceptor
           } else {
             console.error("Failed to fetch cart from server", e);
           }
@@ -121,7 +102,7 @@ export function CartProvider({ children }) {
   // When cart changes, save to user-specific localStorage and backend if logged in
   useEffect(() => {
     if (user) {
-      const userKey = `fillcarts_cart_${user.phone || user.email}`;
+      const userKey = `fillcarts_cart_${user.phone || user.email || user.id}`;
       localStorage.setItem(userKey, JSON.stringify(cart));
 
       const saveCartToServer = async () => {
@@ -129,7 +110,7 @@ export function CartProvider({ children }) {
           await api.post("/cart", { cart });
         } catch (e) {
           if (e.response?.status === 401) {
-            setUser(null);
+            // Handled by api interceptor
           } else {
             console.error("Failed to save cart to server", e);
           }
@@ -202,12 +183,10 @@ export function CartProvider({ children }) {
 
   const logoutUser = async () => {
     try {
-      await api.post("/logout");
+      await authLogout();
     } catch (e) {
-      console.error("Logout failed", e);
+      console.warn("Logout failed", e);
     }
-    localStorage.removeItem("token");
-    setUser(null);
     setCart([]);
   };
 
@@ -236,7 +215,7 @@ export function CartProvider({ children }) {
         checkUserProfile,
         setShowLoginModal,
         userLocation,
-        changeLocation
+        changeLocation,
       }}
     >
       {children}
