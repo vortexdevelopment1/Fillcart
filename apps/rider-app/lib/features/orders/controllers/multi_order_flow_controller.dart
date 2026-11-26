@@ -1,27 +1,103 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import '../data/mock_multi_order_data.dart';
+import '../data/multi_order_persistence_store.dart';
 import '../domain/models/multi_order_batch.dart';
 import '../domain/models/order_item.dart';
 import '../domain/models/payment_summary.dart';
 import '../domain/models/sub_order.dart';
 
-/// Lightweight, self-contained local state controller for the Multi Order demo flow.
+/// Clock callback for deterministic assignment-expiry testing.
+typedef MultiOrderClock = DateTime Function();
+
+/// The three independent safety checks required before pickup OTP verification.
+enum MultiOrderSafetyCheckType {
+  orderIdChecked,
+  customerDetailsChecked,
+  allItemsCollected,
+}
+
+/// Self-contained local state controller for the Multi Order demo flow.
 ///
-/// Implemented strictly with Flutter's built-in [ChangeNotifier] without any
-/// external packages (zero dependencies). Enforces strict sequential transitions,
-/// individual OTP verification per store, itemized checklist tracking, and
-/// payment verification gates.
+/// Implemented with Flutter's [ChangeNotifier] and backed by
+/// [MultiOrderPersistenceStore] for local restoration across restarts.
 class MultiOrderFlowController extends ChangeNotifier {
   late MultiOrderBatch _batch;
-  String? _lastErrorMessage;
+  final MultiOrderPersistenceStore _persistenceStore;
+  final MultiOrderClock _nowProvider;
+  final List<MultiOrderBatch> _archivedBatches = <MultiOrderBatch>[];
+  final bool _hasCustomInitialBatch;
 
-  /// Creates a new [MultiOrderFlowController] initialized with a fresh sample batch.
-  MultiOrderFlowController({MultiOrderBatch? initialBatch}) {
-    _batch = initialBatch ?? MockMultiOrderData.createSampleBatch();
+  bool _isOnline;
+  String? _lastErrorMessage;
+  bool _isRestored = false;
+  bool _hasPersistedState = false;
+  bool _hasRestoreError = false;
+
+  /// Creates a new [MultiOrderFlowController].
+  MultiOrderFlowController({
+    MultiOrderBatch? initialBatch,
+    MultiOrderPersistenceStore? persistenceStore,
+    MultiOrderClock? nowProvider,
+    bool initialOnline = true,
+  })  : _persistenceStore =
+            persistenceStore ?? SharedPreferencesMultiOrderPersistenceStore(),
+        _nowProvider = nowProvider ?? DateTime.now,
+        _hasCustomInitialBatch = initialBatch != null,
+        _isOnline = initialOnline {
+    _batch = initialBatch ??
+        MockMultiOrderData.createSampleBatch(
+          assignedAtEpochMs: _nowProvider().millisecondsSinceEpoch,
+        );
   }
 
   /// Current state of the Multi Order batch.
   MultiOrderBatch get batch => _batch;
+
+  /// Whether the rider is currently online.
+  bool get isOnline => _isOnline;
+
+  /// Whether the rider is allowed to go offline right now.
+  ///
+  /// Going offline is blocked during active pickup, delivery, or payment.
+  bool get canGoOffline =>
+      _batch.batchStatus != MultiOrderBatchStatus.inPickup &&
+      _batch.batchStatus != MultiOrderBatchStatus.delivering &&
+      _batch.batchStatus != MultiOrderBatchStatus.collectingPayment;
+
+  /// Whether [restoreState] has completed.
+  bool get isRestored => _isRestored;
+
+  /// Whether persisted Multi-Order state existed (or was provisioned) on device.
+  bool get hasPersistedState => _hasPersistedState;
+
+  /// Whether the current batch is in an active delivery stage.
+  bool get hasActiveBatch =>
+      _batch.batchStatus == MultiOrderBatchStatus.inPickup ||
+      _batch.batchStatus == MultiOrderBatchStatus.delivering ||
+      _batch.batchStatus == MultiOrderBatchStatus.collectingPayment;
+
+  /// Previously completed, cancelled, or expired batches preserved during dev
+  /// fresh-assignment operations.
+  List<MultiOrderBatch> get archivedBatches =>
+      List<MultiOrderBatch>.unmodifiable(_archivedBatches);
+
+  /// Remaining assignment countdown in seconds based on elapsed real time.
+  int get remainingAssignmentSeconds {
+    if (_batch.batchStatus != MultiOrderBatchStatus.assigned) return 0;
+    return _batch.remainingAssignmentSeconds(
+      _nowProvider().millisecondsSinceEpoch,
+    );
+  }
+
+  /// Whether the pending assignment has expired.
+  bool get isAssignmentExpired =>
+      _batch.batchStatus == MultiOrderBatchStatus.expired ||
+      (_batch.batchStatus == MultiOrderBatchStatus.assigned &&
+          _batch.isAssignmentExpiredAt(
+            _nowProvider().millisecondsSinceEpoch,
+          ));
 
   /// Last error message, if any transition or validation failed.
   String? get lastErrorMessage => _lastErrorMessage;
@@ -37,13 +113,243 @@ class MultiOrderFlowController extends ChangeNotifier {
     }
   }
 
+  void _persistCurrentState() {
+    unawaited(
+      _persistenceStore.save(
+        MultiOrderPersistedState(
+          batch: _batch,
+          isOnline: _isOnline,
+        ),
+      ),
+    );
+  }
+
   // ===========================================================================
-  // 1. Checklist Management (Store-specific itemized checklist)
+  // 0. Persistence Restoration & Online/Offline Management
   // ===========================================================================
 
-  /// Toggles the checked status of a specific item within an order's checklist.
+  /// Restores the last saved Multi-Order state from local storage.
   ///
-  /// Each order retains its own checklist items independently.
+  /// Evaluates elapsed real time against [MultiOrderBatch.assignedAtEpochMs]
+  /// so expired assignments never reappear as acceptable.
+  Future<bool> restoreState() async {
+    final result = await _persistenceStore.load();
+    _isRestored = true;
+
+    if (result.hasError) {
+      _hasRestoreError = true;
+      _lastErrorMessage = result.errorMessage;
+      notifyListeners();
+      return false;
+    }
+
+    _hasRestoreError = false;
+    final loaded = result.state;
+    if (loaded == null) {
+      _hasPersistedState = false;
+      notifyListeners();
+      return true;
+    }
+
+    _hasPersistedState = true;
+    _batch = loaded.batch;
+    _isOnline = loaded.isOnline;
+    _lastErrorMessage = null;
+
+    if (_batch.batchStatus == MultiOrderBatchStatus.assigned &&
+        _batch.isAssignmentExpiredAt(_nowProvider().millisecondsSinceEpoch)) {
+      _batch = _batch.copyWith(batchStatus: MultiOrderBatchStatus.expired);
+      await _persistenceStore.save(
+        MultiOrderPersistedState(batch: _batch, isOnline: _isOnline),
+      );
+    }
+
+    notifyListeners();
+    return true;
+  }
+
+  /// Provisions and persists a single clean-install sample assignment when no
+  /// persisted state exists yet, starting the 7-second countdown at that moment.
+  ///
+  /// Safe to call across rebuilds or route changes: no-ops once persisted state
+  /// exists or if restoration has not completed.
+  bool provisionCleanInstallAssignmentIfNeeded() {
+    if (!_isRestored ||
+        _hasPersistedState ||
+        _hasRestoreError ||
+        _hasCustomInitialBatch) {
+      return false;
+    }
+
+    _batch = MockMultiOrderData.createSampleBatch(
+      assignedAtEpochMs: _nowProvider().millisecondsSinceEpoch,
+    );
+    _hasPersistedState = true;
+    _lastErrorMessage = null;
+    _persistCurrentState();
+    notifyListeners();
+    return true;
+  }
+
+  /// Updates the rider's online/offline status with active-delivery protection.
+  ///
+  /// - Prevented during active pickup, delivery, or payment collection.
+  /// - Permitted while an assignment is pending; going offline cancels the
+  ///   pending assignment so it cannot be accepted later.
+  bool setOnlineStatus(bool online) {
+    _lastErrorMessage = null;
+
+    if (_isOnline == online) {
+      return true;
+    }
+
+    if (!online && !canGoOffline) {
+      _lastErrorMessage =
+          'Cannot go offline during an active delivery (${_batch.batchStatus.name}).';
+      notifyListeners();
+      return false;
+    }
+
+    _isOnline = online;
+    if (!online && _batch.batchStatus == MultiOrderBatchStatus.assigned) {
+      _batch = _batch.copyWith(batchStatus: MultiOrderBatchStatus.cancelled);
+    }
+
+    _persistCurrentState();
+    notifyListeners();
+    return true;
+  }
+
+  // ===========================================================================
+  // 1. Checklist & Safety-Check Management
+  // ===========================================================================
+
+  /// Validates whether checklist interaction is permitted for [targetOrder].
+  ///
+  /// Checklist changes are allowed ONLY for the currently active pickup stop
+  /// while the rider has arrived at that stop (`arrivedAtPickup` / `*Verify`)
+  /// and before the pickup has been verified.
+  bool _validateChecklistMutationAllowed(SubOrder targetOrder) {
+    if (_batch.batchStatus != MultiOrderBatchStatus.inPickup) {
+      _lastErrorMessage =
+          'Cannot modify checklist while batch status is ${_batch.batchStatus.name}.';
+      return false;
+    }
+
+    if (targetOrder.isPickupVerified ||
+        targetOrder.status == SubOrderStatus.pickedUp) {
+      _lastErrorMessage =
+          'Cannot modify checklist for ${targetOrder.merchantName}; pickup is already verified.';
+      return false;
+    }
+
+    if (targetOrder.sequenceNumber != _batch.currentPickupSequence) {
+      _lastErrorMessage =
+          'Cannot modify checklist for stop ${targetOrder.sequenceNumber} while active stop is ${_batch.currentPickupSequence}.';
+      return false;
+    }
+
+    final expectedVerifyStep = targetOrder.sequenceNumber == 1
+        ? MultiOrderStep.pickup1Verify
+        : targetOrder.sequenceNumber == 2
+            ? MultiOrderStep.pickup2Verify
+            : MultiOrderStep.pickup3Verify;
+
+    if (targetOrder.status != SubOrderStatus.arrivedAtPickup ||
+        _batch.currentStep != expectedVerifyStep) {
+      _lastErrorMessage =
+          'Cannot modify checklist before arriving at ${targetOrder.merchantName} (current step: ${_batch.currentStep.name}).';
+      return false;
+    }
+
+    return true;
+  }
+
+  /// Toggles one of the three independent safety checks for [orderId].
+  bool toggleSafetyCheck(
+    String orderId,
+    MultiOrderSafetyCheckType checkType,
+  ) {
+    _lastErrorMessage = null;
+    final orderIndex = _batch.subOrders.indexWhere((o) => o.id == orderId);
+    if (orderIndex == -1) {
+      _lastErrorMessage = 'Order $orderId not found in batch.';
+      notifyListeners();
+      return false;
+    }
+
+    final targetOrder = _batch.subOrders[orderIndex];
+    if (!_validateChecklistMutationAllowed(targetOrder)) {
+      notifyListeners();
+      return false;
+    }
+
+    final updatedOrder = switch (checkType) {
+      MultiOrderSafetyCheckType.orderIdChecked =>
+        targetOrder.copyWith(isOrderIdChecked: !targetOrder.isOrderIdChecked),
+      MultiOrderSafetyCheckType.customerDetailsChecked => targetOrder.copyWith(
+          isCustomerDetailsChecked: !targetOrder.isCustomerDetailsChecked,
+        ),
+      MultiOrderSafetyCheckType.allItemsCollected => targetOrder.copyWith(
+          isAllItemsCollected: !targetOrder.isAllItemsCollected,
+        ),
+    };
+
+    final updatedSubOrders = List<SubOrder>.from(_batch.subOrders);
+    updatedSubOrders[orderIndex] = updatedOrder;
+
+    _batch = _batch.copyWith(subOrders: updatedSubOrders);
+    _persistCurrentState();
+    notifyListeners();
+    return true;
+  }
+
+  /// Explicitly sets one of the three independent safety checks for [orderId].
+  bool setSafetyCheck(
+    String orderId,
+    MultiOrderSafetyCheckType checkType,
+    bool value,
+  ) {
+    _lastErrorMessage = null;
+    final orderIndex = _batch.subOrders.indexWhere((o) => o.id == orderId);
+    if (orderIndex == -1) {
+      _lastErrorMessage = 'Order $orderId not found in batch.';
+      notifyListeners();
+      return false;
+    }
+
+    final targetOrder = _batch.subOrders[orderIndex];
+    if (!_validateChecklistMutationAllowed(targetOrder)) {
+      notifyListeners();
+      return false;
+    }
+
+    final updatedOrder = switch (checkType) {
+      MultiOrderSafetyCheckType.orderIdChecked =>
+        targetOrder.copyWith(isOrderIdChecked: value),
+      MultiOrderSafetyCheckType.customerDetailsChecked =>
+        targetOrder.copyWith(isCustomerDetailsChecked: value),
+      MultiOrderSafetyCheckType.allItemsCollected =>
+        targetOrder.copyWith(isAllItemsCollected: value),
+    };
+
+    if (updatedOrder == targetOrder) {
+      return true;
+    }
+
+    final updatedSubOrders = List<SubOrder>.from(_batch.subOrders);
+    updatedSubOrders[orderIndex] = updatedOrder;
+
+    _batch = _batch.copyWith(subOrders: updatedSubOrders);
+    _persistCurrentState();
+    notifyListeners();
+    return true;
+  }
+
+  /// Legacy method: toggles the checked status of a specific [OrderItem].
+  ///
+  /// Preserved for backward compatibility; separate from the three safety
+  /// checks required for pickup OTP verification.
   void toggleChecklistItem(String orderId, String itemId) {
     _lastErrorMessage = null;
     final orderIndex = _batch.subOrders.indexWhere((o) => o.id == orderId);
@@ -54,6 +360,11 @@ class MultiOrderFlowController extends ChangeNotifier {
     }
 
     final targetOrder = _batch.subOrders[orderIndex];
+    if (!_validateChecklistMutationAllowed(targetOrder)) {
+      notifyListeners();
+      return;
+    }
+
     final itemIndex = targetOrder.items.indexWhere((i) => i.id == itemId);
     if (itemIndex == -1) {
       _lastErrorMessage = 'Item $itemId not found in order $orderId.';
@@ -72,16 +383,27 @@ class MultiOrderFlowController extends ChangeNotifier {
     updatedSubOrders[orderIndex] = updatedOrder;
 
     _batch = _batch.copyWith(subOrders: updatedSubOrders);
+    _persistCurrentState();
     notifyListeners();
   }
 
-  /// Marks all items in the specified sub-order as checked or unchecked.
+  /// Legacy method: marks all [OrderItem]s in the specified sub-order as
+  /// checked or unchecked.
   void setAllItemsCheckedForOrder(String orderId, bool isChecked) {
     _lastErrorMessage = null;
     final orderIndex = _batch.subOrders.indexWhere((o) => o.id == orderId);
-    if (orderIndex == -1) return;
+    if (orderIndex == -1) {
+      _lastErrorMessage = 'Order $orderId not found in batch.';
+      notifyListeners();
+      return;
+    }
 
     final targetOrder = _batch.subOrders[orderIndex];
+    if (!_validateChecklistMutationAllowed(targetOrder)) {
+      notifyListeners();
+      return;
+    }
+
     final updatedItems = targetOrder.items
         .map((item) => item.copyWith(isChecked: isChecked))
         .toList();
@@ -91,32 +413,88 @@ class MultiOrderFlowController extends ChangeNotifier {
     updatedSubOrders[orderIndex] = updatedOrder;
 
     _batch = _batch.copyWith(subOrders: updatedSubOrders);
+    _persistCurrentState();
     notifyListeners();
   }
 
   // ===========================================================================
-  // 2. The 12 Sequential Multi-Order Flow Transitions
+  // 2. Sequential Multi-Order Flow Transitions
   // ===========================================================================
 
   /// [Transition 1] Batch Assigned
-  /// Places the batch into the initial assigned state (`1523:40712`).
+  /// Places the batch into the initial assigned state (`1523:40712`) ONLY when
+  /// the batch has not yet progressed beyond initial assignment.
   void batchAssigned() {
     _lastErrorMessage = null;
+    if (_batch.batchStatus != MultiOrderBatchStatus.assigned ||
+        _batch.currentStep != MultiOrderStep.batchAssigned ||
+        _batch.currentPickupSequence != 1 ||
+        _batch.verifiedPickupsCount > 0 ||
+        _batch.isPaymentConfirmed) {
+      _lastErrorMessage =
+          'Cannot re-enter batchAssigned after flow progression (status: ${_batch.batchStatus.name}, step: ${_batch.currentStep.name}). Use resetDemo() to restart.';
+      notifyListeners();
+      return;
+    }
+
     _batch = _batch.copyWith(
       batchStatus: MultiOrderBatchStatus.assigned,
       currentStep: MultiOrderStep.batchAssigned,
     );
+    _persistCurrentState();
     notifyListeners();
   }
 
+  /// Checks whether the pending assignment has exceeded its 7-second window
+  /// and transitions it to [MultiOrderBatchStatus.expired] if so.
+  bool checkAssignmentExpiry() {
+    if (_batch.batchStatus == MultiOrderBatchStatus.assigned &&
+        _batch.isAssignmentExpiredAt(_nowProvider().millisecondsSinceEpoch)) {
+      _batch = _batch.copyWith(batchStatus: MultiOrderBatchStatus.expired);
+      _persistCurrentState();
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
+  /// Explicitly marks a pending assignment as expired if still in `assigned`.
+  bool expireAssignment() {
+    _lastErrorMessage = null;
+    if (_batch.batchStatus != MultiOrderBatchStatus.assigned) {
+      _lastErrorMessage =
+          'Cannot expire assignment while batch status is ${_batch.batchStatus.name}.';
+      notifyListeners();
+      return false;
+    }
+
+    _batch = _batch.copyWith(batchStatus: MultiOrderBatchStatus.expired);
+    _persistCurrentState();
+    notifyListeners();
+    return true;
+  }
+
+  /// Rejects a pending assignment (`X` button), marking it `cancelled`.
+  bool rejectAssignment() {
+    _lastErrorMessage = null;
+    if (_batch.batchStatus != MultiOrderBatchStatus.assigned ||
+        _batch.currentStep != MultiOrderStep.batchAssigned) {
+      _lastErrorMessage =
+          'Cannot reject assignment while batch status is ${_batch.batchStatus.name}.';
+      notifyListeners();
+      return false;
+    }
+
+    _batch = _batch.copyWith(batchStatus: MultiOrderBatchStatus.cancelled);
+    _persistCurrentState();
+    notifyListeners();
+    return true;
+  }
+
+  /// Accepts a pending Multi-Order assignment and starts Pickup 1.
+  bool acceptAssignment() => startPickup(1);
+
   /// [Transition 2 / 4 / 6] Start Pickup for Stop 1, 2, or 3
-  ///
-  /// Enforces sequential stop progression and rejects invalid out-of-sequence calls:
-  /// - Pickup 1 can start ONLY from the initial assigned stage (`batchAssigned`).
-  /// - Pickup 2 can start ONLY after Pickup 1 is verified and the flow is at the correct next-pickup stage.
-  /// - Pickup 3 can start ONLY after Pickup 2 is verified and the flow is at the correct next-pickup stage.
-  /// - Prevents restarting Pickup 1 after later pickups or delivery have started.
-  /// - Prevents backward, skipped, or repeated transitions.
   bool startPickup(int sequenceNumber) {
     _lastErrorMessage = null;
 
@@ -127,19 +505,35 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
-    // Guard: Prevent starting any pickup if delivery or payment has already started
+    if (sequenceNumber == 1) {
+      if (checkAssignmentExpiry()) {
+        _lastErrorMessage =
+            'Cannot accept assignment. The 7-second acceptance window has expired.';
+        notifyListeners();
+        return false;
+      }
+
+      if (!_isOnline) {
+        _lastErrorMessage = 'Cannot accept assignment while rider is offline.';
+        notifyListeners();
+        return false;
+      }
+    }
+
+    // Guard: Prevent starting any pickup if delivery, payment, completion,
+    // cancellation, or expiry has occurred.
     if (_batch.batchStatus == MultiOrderBatchStatus.delivering ||
         _batch.batchStatus == MultiOrderBatchStatus.collectingPayment ||
         _batch.batchStatus == MultiOrderBatchStatus.completed ||
-        _batch.batchStatus == MultiOrderBatchStatus.cancelled) {
+        _batch.batchStatus == MultiOrderBatchStatus.cancelled ||
+        _batch.batchStatus == MultiOrderBatchStatus.expired) {
       _lastErrorMessage =
-          'Cannot start pickup $sequenceNumber. Batch has already progressed to ${_batch.batchStatus.name}.';
+          'Cannot start pickup $sequenceNumber. Batch status is ${_batch.batchStatus.name}.';
       notifyListeners();
       return false;
     }
 
     if (sequenceNumber == 1) {
-      // Pickup 1 can start ONLY from the initial assigned stage
       if (_batch.currentStep != MultiOrderStep.batchAssigned ||
           _batch.batchStatus != MultiOrderBatchStatus.assigned) {
         _lastErrorMessage =
@@ -151,7 +545,6 @@ class MultiOrderFlowController extends ChangeNotifier {
       final stop1 = _batch.subOrders.firstWhere((o) => o.sequenceNumber == 1);
       final stop2 = _batch.subOrders.firstWhere((o) => o.sequenceNumber == 2);
 
-      // Pickup 2 requires Pickup 1 to be verified
       if (!stop1.isPickupVerified) {
         _lastErrorMessage =
             'Cannot start Pickup 2 before Pickup 1 is verified with its OTP.';
@@ -169,7 +562,6 @@ class MultiOrderFlowController extends ChangeNotifier {
         notifyListeners();
         return false;
       }
-      // Must be at the stage following Stop 1 verification
       if (_batch.currentStep != MultiOrderStep.pickup1Verify &&
           _batch.currentStep != MultiOrderStep.pickup2Route) {
         _lastErrorMessage =
@@ -181,7 +573,6 @@ class MultiOrderFlowController extends ChangeNotifier {
       final stop2 = _batch.subOrders.firstWhere((o) => o.sequenceNumber == 2);
       final stop3 = _batch.subOrders.firstWhere((o) => o.sequenceNumber == 3);
 
-      // Pickup 3 requires Pickup 2 to be verified
       if (!stop2.isPickupVerified) {
         _lastErrorMessage =
             'Cannot start Pickup 3 before Pickup 2 is verified with its OTP.';
@@ -199,7 +590,6 @@ class MultiOrderFlowController extends ChangeNotifier {
         notifyListeners();
         return false;
       }
-      // Must be at the stage following Stop 2 verification
       if (_batch.currentStep != MultiOrderStep.pickup2Verify &&
           _batch.currentStep != MultiOrderStep.pickup3Route) {
         _lastErrorMessage =
@@ -215,7 +605,6 @@ class MultiOrderFlowController extends ChangeNotifier {
             ? MultiOrderStep.pickup2Route
             : MultiOrderStep.pickup3Route;
 
-    // Update sub-order status
     final updatedSubOrders = _batch.subOrders.map((order) {
       if (order.sequenceNumber == sequenceNumber) {
         return order.copyWith(status: SubOrderStatus.headingToPickup);
@@ -230,12 +619,12 @@ class MultiOrderFlowController extends ChangeNotifier {
       subOrders: updatedSubOrders,
     );
 
+    _persistCurrentState();
     notifyListeners();
     return true;
   }
 
   /// Transition when the rider arrives at the merchant store and opens verification.
-  /// Moves from route view (`*Route`) to checklist/OTP view (`*Verify`).
   bool arriveAtPickup(int sequenceNumber) {
     _lastErrorMessage = null;
 
@@ -283,26 +672,13 @@ class MultiOrderFlowController extends ChangeNotifier {
       subOrders: updatedSubOrders,
     );
 
+    _persistCurrentState();
     notifyListeners();
     return true;
   }
 
-  /// [Transition 3 / 5 / 7] Verify Pickup for Stop 1, 2, or 3 with checklist check and 4-digit OTP.
-  ///
-  /// Business Rules Enforced:
-  /// 1. Sequence number must match the active pickup stop.
-  /// 2. Current step must be the corresponding verification step.
-  /// 3. Checklist Validation Gate: ALL items on the sub-order checklist MUST be checked
-  ///    before OTP verification can proceed. If any item is unchecked:
-  ///    - Returns false.
-  ///    - Sets clear error message.
-  ///    - Does not mark pickup verified.
-  ///    - Does not change order status.
-  ///    - Does not advance sequence or step.
-  /// 4. OTP Validation Gate: Only after checklist is complete is the OTP evaluated.
-  ///    - If OTP is incorrect: returns false, sets error, does not advance.
-  ///    - If OTP is correct: marks `isPickupVerified = true`, `status = SubOrderStatus.pickedUp`,
-  ///      and advances `currentPickupSequence` if more stops remain.
+  /// [Transition 3 / 5 / 7] Verify Pickup for Stop 1, 2, or 3 with the
+  /// three independent safety checks and 4-digit OTP.
   bool verifyPickup(int sequenceNumber, String enteredOtp) {
     _lastErrorMessage = null;
 
@@ -336,21 +712,15 @@ class MultiOrderFlowController extends ChangeNotifier {
 
     final targetOrder = _batch.subOrders[targetOrderIndex];
 
-    // -------------------------------------------------------------
-    // Gate 1: Checklist Completion Validation
-    // -------------------------------------------------------------
-    if (!targetOrder.areAllItemsChecked) {
-      final uncheckedCount =
-          targetOrder.items.where((item) => !item.isChecked).length;
+    // Gate 1: Three Safety Checks Completion Validation
+    if (!targetOrder.areSafetyChecksComplete) {
       _lastErrorMessage =
-          'Please verify all checklist items ($uncheckedCount pending) for ${targetOrder.merchantName} before confirming pickup.';
+          'Please complete all three safety checks for ${targetOrder.merchantName} before confirming pickup.';
       notifyListeners();
       return false;
     }
 
-    // -------------------------------------------------------------
-    // Gate 2: OTP Validation
-    // -------------------------------------------------------------
+    // Gate 2: OTP Validation (allows unlimited retries without lockout)
     if (!targetOrder.validateOtp(enteredOtp)) {
       _lastErrorMessage =
           'Incorrect OTP "$enteredOtp" for ${targetOrder.merchantName}. Pickup cannot be confirmed.';
@@ -358,7 +728,6 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
-    // Checklist complete AND OTP verified successfully!
     final verifiedOrder = targetOrder.copyWith(
       isPickupVerified: true,
       status: SubOrderStatus.pickedUp,
@@ -369,21 +738,18 @@ class MultiOrderFlowController extends ChangeNotifier {
 
     _batch = _batch.copyWith(subOrders: updatedSubOrders);
 
-    // If there is a next stop, advance sequence
     if (sequenceNumber < 3) {
       _batch = _batch.copyWith(
         currentPickupSequence: sequenceNumber + 1,
       );
     }
 
+    _persistCurrentState();
     notifyListeners();
     return true;
   }
 
   /// [Transition 8] Start Delivery
-  ///
-  /// Business Rule Enforced:
-  /// The delivery stage **CANNOT** begin until all 3 pickups are verified!
   bool startDelivery() {
     _lastErrorMessage = null;
 
@@ -395,7 +761,6 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
-    // Must be coming from the verified pickup phase
     if (_batch.currentStep != MultiOrderStep.pickup3Verify &&
         _batch.currentStep != MultiOrderStep.deliveryRoute) {
       _lastErrorMessage =
@@ -404,18 +769,23 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
+    final wasAlreadyInRoute =
+        _batch.batchStatus == MultiOrderBatchStatus.delivering &&
+            _batch.currentStep == MultiOrderStep.deliveryRoute;
+
     _batch = _batch.copyWith(
       batchStatus: MultiOrderBatchStatus.delivering,
       currentStep: MultiOrderStep.deliveryRoute,
     );
 
+    if (!wasAlreadyInRoute) {
+      _persistCurrentState();
+    }
     notifyListeners();
     return true;
   }
 
   /// [Transition 9] Arrive at Customer
-  ///
-  /// Moves rider to the customer arrival state (`1555:36537` arrived).
   bool arriveAtCustomer() {
     _lastErrorMessage = null;
 
@@ -434,25 +804,22 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
+    final changed = _batch.currentStep != MultiOrderStep.arriveAtCustomer;
     _batch = _batch.copyWith(
       currentStep: MultiOrderStep.arriveAtCustomer,
     );
 
+    if (changed) {
+      _persistCurrentState();
+    }
     notifyListeners();
     return true;
   }
 
   /// [Transition 10] Select Payment Method (Cash vs UPI)
-  ///
-  /// Business Rules Enforced:
-  /// - Allowed ONLY while payment selection stage is active and all 3 pickups are verified.
-  /// - Rejects `PaymentMethod.unselected` as an actual selection.
-  /// - Does not let payment selection advance the flow from earlier pickup or delivery route stages.
-  /// - Rejects changes if payment is already confirmed.
   bool selectPaymentMethod(PaymentMethod method) {
     _lastErrorMessage = null;
 
-    // Reject PaymentMethod.unselected
     if (method == PaymentMethod.unselected) {
       _lastErrorMessage =
           'Cannot select unselected as a payment method. Must choose Cash or UPI.';
@@ -460,7 +827,6 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
-    // All pickups must be verified
     if (!_batch.allPickupsVerified) {
       _lastErrorMessage =
           'Cannot select payment method before all pickups are verified.';
@@ -468,17 +834,14 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
-    // Payment selection stage must be active
     if (_batch.currentStep != MultiOrderStep.paymentSelect &&
-        _batch.currentStep != MultiOrderStep.arriveAtCustomer &&
         _batch.currentStep != MultiOrderStep.paymentProcessing) {
       _lastErrorMessage =
-          'Payment method selection is only allowed after reaching the customer. Current step is ${_batch.currentStep.name}.';
+          'Payment method selection requires entering the payment selection stage first. Current step is ${_batch.currentStep.name}.';
       notifyListeners();
       return false;
     }
 
-    // Cannot re-select after payment is already confirmed
     if (_batch.isPaymentConfirmed) {
       _lastErrorMessage =
           'Payment has already been confirmed. Cannot re-select payment method.';
@@ -488,9 +851,7 @@ class MultiOrderFlowController extends ChangeNotifier {
 
     final label = method == PaymentMethod.cash
         ? 'Cash on Delivery (COD)'
-        : method == PaymentMethod.upi
-            ? 'Dynamic UPI QR'
-            : 'Unselected';
+        : 'Dynamic UPI QR';
 
     final updatedPayment = _batch.paymentSummary.copyWith(
       paymentMethod: method,
@@ -504,13 +865,12 @@ class MultiOrderFlowController extends ChangeNotifier {
       currentStep: MultiOrderStep.paymentProcessing,
     );
 
+    _persistCurrentState();
     notifyListeners();
     return true;
   }
 
-  /// Navigation helper to open or switch the payment selection screen (`1568:58262`).
-  ///
-  /// Allowed ONLY after the rider has arrived at the customer and all 3 pickups are verified.
+  /// Opens or returns to the payment selection screen (`1568:58262`).
   bool openPaymentSelection() {
     _lastErrorMessage = null;
 
@@ -541,22 +901,15 @@ class MultiOrderFlowController extends ChangeNotifier {
       batchStatus: MultiOrderBatchStatus.collectingPayment,
       currentStep: MultiOrderStep.paymentSelect,
     );
+    _persistCurrentState();
     notifyListeners();
     return true;
   }
 
   /// [Transition 11] Simulate Payment Confirmation
-  ///
-  /// Business Rules Enforced:
-  /// - All 3 pickups must be verified.
-  /// - Rider must be in the customer arrival / payment stage (`MultiOrderStep.paymentProcessing`).
-  /// - A valid payment method must be selected (`cash` or `upi`).
-  /// - Prevents duplicate payment confirmation from changing an already completed payment.
-  /// - Converges both Cash and UPI payment paths into the same payment-confirmed stage (`1569:60680`).
   bool confirmPayment({String? transactionReference}) {
     _lastErrorMessage = null;
 
-    // Guard 1: Duplicate payment confirmation prevention
     if (_batch.isPaymentConfirmed) {
       _lastErrorMessage =
           'Payment has already been confirmed for this order. Duplicate confirmation is rejected.';
@@ -564,7 +917,6 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
-    // Guard 2: All pickups verified
     if (!_batch.allPickupsVerified) {
       _lastErrorMessage =
           'Cannot confirm payment before all pickup stops have been verified.';
@@ -572,7 +924,6 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
-    // Guard 3: Current step must be paymentProcessing
     if (_batch.currentStep != MultiOrderStep.paymentProcessing) {
       _lastErrorMessage =
           'Cannot confirm payment while current step is ${_batch.currentStep.name}. Expected paymentProcessing.';
@@ -580,7 +931,6 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
-    // Guard 4: Valid payment method must be selected (Cash or UPI)
     final method = _batch.paymentSummary.paymentMethod;
     if (method != PaymentMethod.cash && method != PaymentMethod.upi) {
       _lastErrorMessage =
@@ -592,7 +942,7 @@ class MultiOrderFlowController extends ChangeNotifier {
     final ref = transactionReference ??
         (method == PaymentMethod.upi
             ? 'UPI-TXN-4492881'
-            : 'CASH-REC-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}');
+            : 'CASH-REC-${_nowProvider().millisecondsSinceEpoch.toString().substring(7)}');
 
     final updatedPayment = _batch.paymentSummary.copyWith(
       paymentStatus: PaymentStatus.completed,
@@ -605,17 +955,131 @@ class MultiOrderFlowController extends ChangeNotifier {
       currentStep: MultiOrderStep.paymentConfirm,
     );
 
+    _persistCurrentState();
     notifyListeners();
     return true;
   }
 
-  /// [Transition 12] Complete Delivery
+  /// [Transition 12] Open 6-Digit Customer Delivery OTP Verification (`2074:44261`)
+  bool openDeliveryOtp() {
+    _lastErrorMessage = null;
+
+    if (_batch.batchStatus == MultiOrderBatchStatus.completed ||
+        _batch.isDeliveryOtpVerified) {
+      _lastErrorMessage = 'Delivery has already been completed.';
+      notifyListeners();
+      return false;
+    }
+
+    if (!_batch.isPaymentConfirmed) {
+      _lastErrorMessage =
+          'Cannot open delivery OTP before customer payment is confirmed.';
+      notifyListeners();
+      return false;
+    }
+
+    if (_batch.currentStep != MultiOrderStep.paymentConfirm &&
+        _batch.currentStep != MultiOrderStep.deliveryOtpVerify) {
+      _lastErrorMessage =
+          'Cannot open delivery OTP from current step ${_batch.currentStep.name}.';
+      notifyListeners();
+      return false;
+    }
+
+    final changed = _batch.currentStep != MultiOrderStep.deliveryOtpVerify;
+    _batch = _batch.copyWith(currentStep: MultiOrderStep.deliveryOtpVerify);
+
+    if (changed) {
+      _persistCurrentState();
+    }
+    notifyListeners();
+    return true;
+  }
+
+  /// Returns from Delivery OTP back to Payment Received (`paymentConfirm`).
+  bool returnToPaymentReceived() {
+    _lastErrorMessage = null;
+
+    if (_batch.batchStatus == MultiOrderBatchStatus.completed ||
+        _batch.isDeliveryOtpVerified) {
+      _lastErrorMessage =
+          'Cannot return to Payment Received after delivery is completed.';
+      notifyListeners();
+      return false;
+    }
+
+    if (!_batch.isPaymentConfirmed ||
+        _batch.currentStep != MultiOrderStep.deliveryOtpVerify) {
+      _lastErrorMessage =
+          'Can only return to Payment Received from deliveryOtpVerify.';
+      notifyListeners();
+      return false;
+    }
+
+    _batch = _batch.copyWith(currentStep: MultiOrderStep.paymentConfirm);
+    _persistCurrentState();
+    notifyListeners();
+    return true;
+  }
+
+  /// [Transition 13] Verify 6-Digit Customer Delivery OTP & Complete Delivery
   ///
-  /// Business Rules Enforced:
-  /// - Delivery completion is **PREVENTED** if customer payment has not been confirmed!
-  /// - Current step must be `paymentConfirm`.
+  /// Successful OTP verification (`654321`) immediately completes delivery
+  /// while keeping payment confirmed.
+  bool verifyDeliveryOtp(String enteredOtp) {
+    _lastErrorMessage = null;
+
+    if (_batch.batchStatus == MultiOrderBatchStatus.completed ||
+        _batch.isDeliveryOtpVerified) {
+      _lastErrorMessage =
+          'Delivery has already been completed. Duplicate verification is rejected.';
+      notifyListeners();
+      return false;
+    }
+
+    if (!_batch.isPaymentConfirmed) {
+      _lastErrorMessage =
+          'Cannot verify delivery OTP before customer payment is confirmed.';
+      notifyListeners();
+      return false;
+    }
+
+    if (_batch.currentStep != MultiOrderStep.deliveryOtpVerify) {
+      _lastErrorMessage =
+          'Cannot verify delivery OTP from current step ${_batch.currentStep.name}. Expected deliveryOtpVerify.';
+      notifyListeners();
+      return false;
+    }
+
+    if (!_batch.validateDeliveryOtp(enteredOtp)) {
+      _lastErrorMessage =
+          'Incorrect delivery OTP "$enteredOtp". Please ask the customer and try again.';
+      notifyListeners();
+      return false;
+    }
+
+    _batch = _batch.copyWith(
+      isDeliveryOtpVerified: true,
+      batchStatus: MultiOrderBatchStatus.completed,
+      currentStep: MultiOrderStep.deliveryComplete,
+    );
+
+    _persistCurrentState();
+    notifyListeners();
+    return true;
+  }
+
+  /// Completes delivery only after both payment confirmation and delivery OTP
+  /// verification have succeeded.
   bool completeDelivery() {
     _lastErrorMessage = null;
+
+    if (_batch.batchStatus == MultiOrderBatchStatus.completed ||
+        _batch.currentStep == MultiOrderStep.deliveryComplete) {
+      _lastErrorMessage = 'Delivery has already been completed.';
+      notifyListeners();
+      return false;
+    }
 
     if (!_batch.isPaymentConfirmed) {
       _lastErrorMessage =
@@ -624,9 +1088,9 @@ class MultiOrderFlowController extends ChangeNotifier {
       return false;
     }
 
-    if (_batch.currentStep != MultiOrderStep.paymentConfirm) {
+    if (!_batch.isDeliveryOtpVerified) {
       _lastErrorMessage =
-          'Cannot complete delivery before reaching the payment confirmation stage. Current step is ${_batch.currentStep.name}.';
+          'Cannot complete delivery before verifying the 6-digit customer delivery OTP.';
       notifyListeners();
       return false;
     }
@@ -636,14 +1100,54 @@ class MultiOrderFlowController extends ChangeNotifier {
       currentStep: MultiOrderStep.deliveryComplete,
     );
 
+    _persistCurrentState();
     notifyListeners();
     return true;
   }
 
-  /// Resets the controller back to the initial sample batch state for demo re-runs.
-  void resetDemo() {
+  // ===========================================================================
+  // 3. Development / Testing Helpers
+  // ===========================================================================
+
+  /// Development/testing helper: resets the current demo state and clears
+  /// persisted Multi-Order storage.
+  Future<void> resetDemo() async {
     _lastErrorMessage = null;
-    _batch = MockMultiOrderData.createSampleBatch();
+    _isOnline = true;
+    await _persistenceStore.clear();
+    _batch = MockMultiOrderData.createSampleBatch(
+      assignedAtEpochMs: _nowProvider().millisecondsSinceEpoch,
+    );
     notifyListeners();
+  }
+
+  /// Development/testing helper: creates a fresh assignment without erasing
+  /// previously completed, cancelled, or expired batch records.
+  ///
+  /// Returns `false` if an active delivery/pickup/payment is still in progress.
+  bool assignFreshDemoBatch({String? newBatchId}) {
+    _lastErrorMessage = null;
+
+    if (!canGoOffline) {
+      _lastErrorMessage =
+          'Cannot assign a fresh batch while an active delivery is in progress.';
+      notifyListeners();
+      return false;
+    }
+
+    if (_batch.batchStatus == MultiOrderBatchStatus.completed ||
+        _batch.batchStatus == MultiOrderBatchStatus.cancelled ||
+        _batch.batchStatus == MultiOrderBatchStatus.expired) {
+      _archivedBatches.add(_batch);
+    }
+
+    _isOnline = true;
+    final sample = MockMultiOrderData.createSampleBatch(
+      assignedAtEpochMs: _nowProvider().millisecondsSinceEpoch,
+    );
+    _batch = newBatchId != null ? sample.copyWith(id: newBatchId) : sample;
+    _persistCurrentState();
+    notifyListeners();
+    return true;
   }
 }

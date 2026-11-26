@@ -55,6 +55,34 @@ class OrderItem {
   /// Calculates total price for this line item based on quantity.
   double get lineTotal => (price ?? 0.0) * quantity;
 
+  /// Serializes this [OrderItem] to a JSON map.
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'name': name,
+        'quantity': quantity,
+        'unit': unit,
+        'price': price,
+        'isChecked': isChecked,
+      };
+
+  /// Deserializes an [OrderItem] from a JSON map.
+  factory OrderItem.fromJson(Map<String, dynamic> json) {
+    final id = json['id'];
+    final name = json['name'];
+    final quantity = json['quantity'];
+    if (id is! String || name is! String || quantity is! num) {
+      throw const FormatException('Invalid OrderItem JSON');
+    }
+    return OrderItem(
+      id: id,
+      name: name,
+      quantity: quantity.toInt(),
+      unit: json['unit'] as String?,
+      price: (json['price'] as num?)?.toDouble(),
+      isChecked: json['isChecked'] as bool? ?? false,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

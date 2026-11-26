@@ -101,6 +101,51 @@ class PaymentSummary {
     );
   }
 
+  /// Serializes this [PaymentSummary] to a JSON map.
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'subtotal': subtotal,
+        'deliveryFee': deliveryFee,
+        'totalAmountDue': totalAmountDue,
+        'amountCollected': amountCollected,
+        'paymentMethod': paymentMethod.name,
+        'paymentStatus': paymentStatus.name,
+        'transactionReference': transactionReference,
+        'paymentMethodLabel': paymentMethodLabel,
+      };
+
+  /// Deserializes a [PaymentSummary] from a JSON map.
+  factory PaymentSummary.fromJson(Map<String, dynamic> json) {
+    final subtotal = json['subtotal'];
+    final deliveryFee = json['deliveryFee'];
+    final totalAmountDue = json['totalAmountDue'];
+    if (subtotal is! num || deliveryFee is! num || totalAmountDue is! num) {
+      throw const FormatException('Invalid PaymentSummary numeric fields');
+    }
+
+    final methodName = json['paymentMethod'];
+    final method = PaymentMethod.values.firstWhere(
+      (m) => m.name == methodName,
+      orElse: () => throw FormatException('Unknown PaymentMethod: $methodName'),
+    );
+
+    final statusName = json['paymentStatus'];
+    final status = PaymentStatus.values.firstWhere(
+      (s) => s.name == statusName,
+      orElse: () => throw FormatException('Unknown PaymentStatus: $statusName'),
+    );
+
+    return PaymentSummary(
+      subtotal: subtotal.toDouble(),
+      deliveryFee: deliveryFee.toDouble(),
+      totalAmountDue: totalAmountDue.toDouble(),
+      amountCollected: (json['amountCollected'] as num?)?.toDouble() ?? 0.0,
+      paymentMethod: method,
+      paymentStatus: status,
+      transactionReference: json['transactionReference'] as String?,
+      paymentMethodLabel: json['paymentMethodLabel'] as String?,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

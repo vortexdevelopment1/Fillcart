@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../navigation/presentation/widgets/rider_bottom_nav_bar.dart';
+import '../../../orders/controllers/multi_order_flow_controller.dart';
+import '../../../orders/domain/models/multi_order_batch.dart';
+import '../../../orders/presentation/widgets/multi_order_controller_scope.dart';
+import '../widgets/multi_order_assignment_card.dart';
 import '../widgets/rider_online_toggle_bar.dart';
 import '../widgets/today_earnings_bar.dart';
 
@@ -39,10 +45,163 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isOnline = true;
+  MultiOrderFlowController? _controller;
+  MultiOrderFlowController? _ownedFallbackController;
+  Timer? _countdownTimer;
+  bool _hasRedirectedToActiveBatch = false;
+  bool _hasScheduledCleanInstallProvision = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final scoped = MultiOrderControllerScope.maybeOf(context);
+    final resolved =
+        scoped ?? (_ownedFallbackController ??= MultiOrderFlowController());
+
+    if (!identical(_controller, resolved)) {
+      _controller?.removeListener(_onControllerChanged);
+      _controller = resolved;
+      _controller!.addListener(_onControllerChanged);
+      if (!_controller!.isRestored) {
+        unawaited(_controller!.restoreState());
+      }
+    }
+    _syncWithController();
+  }
+
+  @override
+  void dispose() {
+    _stopCountdownTimer();
+    _controller?.removeListener(_onControllerChanged);
+    _ownedFallbackController?.dispose();
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    if (!mounted) return;
+    _syncWithController();
+    setState(() {});
+  }
+
+  void _syncWithController() {
+    final controller = _controller;
+    if (controller == null || !controller.isRestored) {
+      return;
+    }
+
+    if (!controller.hasPersistedState && !_hasScheduledCleanInstallProvision) {
+      _hasScheduledCleanInstallProvision = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        controller.provisionCleanInstallAssignmentIfNeeded();
+      });
+      return;
+    }
+
+    if (controller.hasActiveBatch) {
+      _stopCountdownTimer();
+      if (!_hasRedirectedToActiveBatch) {
+        _hasRedirectedToActiveBatch = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            context.go('/multi-order');
+          }
+        });
+      }
+      return;
+    }
+
+    final shouldRunCountdown =
+        controller.isOnline &&
+        controller.batch.batchStatus == MultiOrderBatchStatus.assigned &&
+        !controller.isAssignmentExpired;
+
+    if (shouldRunCountdown) {
+      _startCountdownTimer();
+    } else {
+      if (controller.batch.batchStatus == MultiOrderBatchStatus.assigned &&
+          controller.isAssignmentExpired) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            controller.checkAssignmentExpiry();
+          }
+        });
+      }
+      _stopCountdownTimer();
+    }
+  }
+
+  void _startCountdownTimer() {
+    if (_countdownTimer != null) return;
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) {
+        _stopCountdownTimer();
+        return;
+      }
+      final controller = _controller;
+      if (controller == null) {
+        _stopCountdownTimer();
+        return;
+      }
+      controller.checkAssignmentExpiry();
+      if (!controller.isOnline ||
+          controller.batch.batchStatus != MultiOrderBatchStatus.assigned ||
+          controller.isAssignmentExpired) {
+        _stopCountdownTimer();
+      }
+      setState(() {});
+    });
+  }
+
+  void _stopCountdownTimer() {
+    _countdownTimer?.cancel();
+    _countdownTimer = null;
+  }
+
+  bool _handleOnlineToggleAttempt(
+    MultiOrderFlowController controller,
+    bool targetOnline,
+  ) {
+    final allowed = controller.setOnlineStatus(targetOnline);
+    if (!allowed) {
+      final message =
+          controller.lastErrorMessage ??
+          'Cannot go offline during an active delivery.';
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)));
+      return false;
+    }
+    return true;
+  }
+
+  void _handleAcceptSwipe(MultiOrderFlowController controller) {
+    final accepted = controller.acceptAssignment();
+    if (accepted && mounted) {
+      _stopCountdownTimer();
+      context.go('/multi-order');
+    }
+  }
+
+  void _handleReject(MultiOrderFlowController controller) {
+    _stopCountdownTimer();
+    controller.rejectAssignment();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final controller = _controller!;
+    final isRestored = controller.isRestored;
+    final showPendingAssignment =
+        isRestored &&
+        controller.isOnline &&
+        controller.batch.batchStatus == MultiOrderBatchStatus.assigned &&
+        !controller.isAssignmentExpired;
+    final showRestorationLoading =
+        !isRestored ||
+        (isRestored && controller.hasActiveBatch) ||
+        (isRestored && !controller.hasPersistedState);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF3F4E5),
       bottomNavigationBar: widget.showBottomNavBar
@@ -149,12 +308,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // Online / Offline Toggle Bar (328 x 36 px)
                     RiderOnlineToggleBar(
-                      initialOnline: _isOnline,
-                      onToggleChanged: (online) {
-                        setState(() {
-                          _isOnline = online;
-                        });
-                      },
+                      initialOnline: controller.isOnline,
+                      onToggleAttempt: (targetOnline) =>
+                          _handleOnlineToggleAttempt(controller, targetOnline),
                     ),
 
                     const SizedBox(height: 8),
@@ -169,65 +325,86 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // 2. Empty-State Body (Scrollable for responsiveness on small viewports)
+          // 2. Body: Restoration Gate / Pending Assignment Card / Empty State
           Expanded(
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 16),
-
-                    // Dimensionally accurate illustration (328 x 254 px)
-                    Image.asset(
-                      'assets/images/rider_scooter_empty.png',
-                      key: const Key('home_scooter_illustration'),
-                      width: 328,
-                      height: 254,
-                      fit: BoxFit.contain,
+            child: showRestorationLoading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      key: Key('home_restoration_loader'),
                     ),
+                  )
+                : SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: showPendingAssignment
+                          ? Column(
+                              children: [
+                                const SizedBox(height: 16),
+                                MultiOrderAssignmentCard(
+                                  batch: controller.batch,
+                                  remainingSeconds:
+                                      controller.remainingAssignmentSeconds,
+                                  onAcceptSwipe: () =>
+                                      _handleAcceptSwipe(controller),
+                                  onReject: () => _handleReject(controller),
+                                ),
+                                const SizedBox(height: 24),
+                              ],
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 16),
 
-                    const SizedBox(height: 16),
+                                // Dimensionally accurate illustration (328 x 254 px)
+                                Image.asset(
+                                  'assets/images/rider_scooter_empty.png',
+                                  key: const Key('home_scooter_illustration'),
+                                  width: 328,
+                                  height: 254,
+                                  fit: BoxFit.contain,
+                                ),
 
-                    // Title & Subtitle Container (315 x 68 px)
-                    SizedBox(
-                      width: 315,
-                      child: Column(
-                        children: [
-                          Text(
-                            'No Delivery Requests Yet',
-                            key: const Key('home_empty_title'),
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              height: 1.5,
-                              color: const Color(0xFF1B1C17),
+                                const SizedBox(height: 16),
+
+                                // Title & Subtitle Container (315 x 68 px)
+                                SizedBox(
+                                  width: 315,
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'No Delivery Requests Yet',
+                                        key: const Key('home_empty_title'),
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          height: 1.5,
+                                          color: const Color(0xFF1B1C17),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Stay online and ready. We’ll notify you as soon as a delivery request  comes.',
+                                        key: const Key('home_empty_subtitle'),
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                          height: 1.5,
+                                          color: const Color(0xFF777980),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                const SizedBox(height: 24),
+                              ],
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Stay online and ready. We’ll notify you as soon as a delivery request  comes.',
-                            key: const Key('home_empty_subtitle'),
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              height: 1.5,
-                              color: const Color(0xFF777980),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
-
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
-            ),
+                  ),
           ),
         ],
       ),

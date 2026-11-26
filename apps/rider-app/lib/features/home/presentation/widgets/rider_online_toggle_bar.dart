@@ -22,11 +22,13 @@ import '../../../../shared/constants/rider_colors.dart';
 class RiderOnlineToggleBar extends StatefulWidget {
   final bool initialOnline;
   final ValueChanged<bool>? onToggleChanged;
+  final bool Function(bool targetOnline)? onToggleAttempt;
 
   const RiderOnlineToggleBar({
     super.key,
     this.initialOnline = true,
     this.onToggleChanged,
+    this.onToggleAttempt,
   });
 
   @override
@@ -42,9 +44,23 @@ class _RiderOnlineToggleBarState extends State<RiderOnlineToggleBar> {
     _isOnline = widget.initialOnline;
   }
 
+  @override
+  void didUpdateWidget(covariant RiderOnlineToggleBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialOnline != oldWidget.initialOnline &&
+        widget.initialOnline != _isOnline) {
+      _isOnline = widget.initialOnline;
+    }
+  }
+
   void _toggle() {
+    final targetOnline = !_isOnline;
+    if (widget.onToggleAttempt != null &&
+        !widget.onToggleAttempt!(targetOnline)) {
+      return;
+    }
     setState(() {
-      _isOnline = !_isOnline;
+      _isOnline = targetOnline;
     });
     widget.onToggleChanged?.call(_isOnline);
   }

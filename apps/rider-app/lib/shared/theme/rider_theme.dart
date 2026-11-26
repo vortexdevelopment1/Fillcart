@@ -5,7 +5,17 @@ import '../constants/rider_colors.dart';
 
 /// Rider App theme combining shared design tokens with Rider brand colors
 /// and Poppins font typography.
+///
+/// TextTheme note: google_fonts ≥ 9.0.0 brings in material_ui as a transitive
+/// dependency whose TextTheme class conflicts with Flutter's native TextTheme
+/// at the static type level. Using [TextTheme.apply] with the Poppins font
+/// family string keeps everything within Flutter's own type system and avoids
+/// the cross-library incompatibility entirely.
 abstract final class RiderTheme {
+  /// Poppins font family name, resolved once from google_fonts at declaration
+  /// time so it is available as a plain [String] with no cross-library types.
+  static final String _poppinsFontFamily = GoogleFonts.poppins().fontFamily!;
+
   /// Rider Light Theme Configuration
   static ThemeData get lightTheme {
     final base = FCTheme.lightTheme;
@@ -25,13 +35,21 @@ abstract final class RiderTheme {
       outline: RiderColors.inputBorder,
     );
 
-    final poppinsTextTheme = GoogleFonts.poppinsTextTheme(base.textTheme);
+    // TextTheme.apply() is a pure Flutter API: it clones the existing TextTheme
+    // and overrides the font family on every TextStyle without crossing into the
+    // google_fonts / material_ui type boundary.
+    final poppinsTextTheme = base.textTheme.apply(
+      fontFamily: _poppinsFontFamily,
+    );
+    final poppinsPrimaryTextTheme = base.primaryTextTheme.apply(
+      fontFamily: _poppinsFontFamily,
+    );
 
     return base.copyWith(
       colorScheme: riderColorScheme,
       scaffoldBackgroundColor: RiderColors.background,
       textTheme: poppinsTextTheme,
-      primaryTextTheme: GoogleFonts.poppinsTextTheme(base.primaryTextTheme),
+      primaryTextTheme: poppinsPrimaryTextTheme,
       appBarTheme: base.appBarTheme.copyWith(
         backgroundColor: RiderColors.background,
         foregroundColor: RiderColors.onSurfaceDark,
@@ -105,8 +123,11 @@ abstract final class RiderTheme {
   static ThemeData get darkTheme {
     final base = FCTheme.darkTheme;
     return base.copyWith(
-      textTheme: GoogleFonts.poppinsTextTheme(base.textTheme),
-      primaryTextTheme: GoogleFonts.poppinsTextTheme(base.primaryTextTheme),
+      textTheme: base.textTheme.apply(fontFamily: _poppinsFontFamily),
+      primaryTextTheme: base.primaryTextTheme.apply(
+        fontFamily: _poppinsFontFamily,
+      ),
     );
   }
 }
+

@@ -19,8 +19,11 @@ enum MultiOrderBatchStatus {
   /// Payment collected and delivery marked complete.
   completed,
 
-  /// Batch was cancelled.
+  /// Batch was cancelled (explicitly rejected or went offline before acceptance).
   cancelled,
+
+  /// Batch assignment timed out after 7 seconds without acceptance.
+  expired,
 }
 
 /// Granular step within the Multi Order lifecycle matching the Figma screens.
@@ -60,6 +63,9 @@ enum MultiOrderStep {
 
   /// Screen 12: Payment receipt & confirmation summary (`1569:60680`).
   paymentConfirm,
+
+  /// Screen 13: 6-digit customer delivery OTP verification (`2074:44261`).
+  deliveryOtpVerify,
 
   /// Screen 14: Final delivery complete celebration and earnings (`1569:60724`).
   deliveryComplete,
@@ -114,6 +120,18 @@ class MultiOrderBatch {
   /// Current granular screen step in the local flow.
   final MultiOrderStep currentStep;
 
+  /// Assignment timeout duration in milliseconds (strictly 7 seconds).
+  static const int assignmentTimeoutMs = 7000;
+
+  /// UTC epoch timestamp (ms) when this batch assignment was created.
+  final int? assignedAtEpochMs;
+
+  /// Expected 6-digit customer delivery OTP.
+  final String deliveryOtp;
+
+  /// Whether the customer delivery OTP has been verified.
+  final bool isDeliveryOtpVerified;
+
   const MultiOrderBatch({
     required this.id,
     this.totalOrders = 3,
@@ -130,7 +148,38 @@ class MultiOrderBatch {
     required this.paymentSummary,
     this.batchStatus = MultiOrderBatchStatus.assigned,
     this.currentStep = MultiOrderStep.batchAssigned,
+    this.assignedAtEpochMs,
+    this.deliveryOtp = '654321',
+    this.isDeliveryOtpVerified = false,
   });
+
+  /// Validates an entered 6-digit customer delivery OTP.
+  bool validateDeliveryOtp(String enteredOtp) =>
+      enteredOtp.trim() == deliveryOtp.trim();
+
+  /// Remaining assignment countdown in milliseconds at [nowEpochMs].
+  int remainingAssignmentMs(int nowEpochMs) {
+    final assignedAt = assignedAtEpochMs;
+    if (assignedAt == null) return 0;
+    final remaining = assignmentTimeoutMs - (nowEpochMs - assignedAt);
+    if (remaining <= 0) return 0;
+    if (remaining >= assignmentTimeoutMs) return assignmentTimeoutMs;
+    return remaining;
+  }
+
+  /// Remaining assignment countdown in whole seconds (ceiling) at [nowEpochMs].
+  int remainingAssignmentSeconds(int nowEpochMs) {
+    final ms = remainingAssignmentMs(nowEpochMs);
+    if (ms <= 0) return 0;
+    return (ms / 1000).ceil();
+  }
+
+  /// Whether the pending assignment has exceeded the 7-second window at [nowEpochMs].
+  bool isAssignmentExpiredAt(int nowEpochMs) {
+    final assignedAt = assignedAtEpochMs;
+    if (assignedAt == null) return false;
+    return (nowEpochMs - assignedAt) >= assignmentTimeoutMs;
+  }
 
   /// Whether all 3 pickup sub-orders have been successfully verified with OTP.
   bool get allPickupsVerified =>
@@ -181,6 +230,9 @@ class MultiOrderBatch {
     PaymentSummary? paymentSummary,
     MultiOrderBatchStatus? batchStatus,
     MultiOrderStep? currentStep,
+    int? assignedAtEpochMs,
+    String? deliveryOtp,
+    bool? isDeliveryOtpVerified,
   }) {
     return MultiOrderBatch(
       id: id ?? this.id,
@@ -199,6 +251,98 @@ class MultiOrderBatch {
       paymentSummary: paymentSummary ?? this.paymentSummary,
       batchStatus: batchStatus ?? this.batchStatus,
       currentStep: currentStep ?? this.currentStep,
+      assignedAtEpochMs: assignedAtEpochMs ?? this.assignedAtEpochMs,
+      deliveryOtp: deliveryOtp ?? this.deliveryOtp,
+      isDeliveryOtpVerified:
+          isDeliveryOtpVerified ?? this.isDeliveryOtpVerified,
+    );
+  }
+
+  /// Serializes this [MultiOrderBatch] to a JSON map.
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'totalOrders': totalOrders,
+        'currentPickupSequence': currentPickupSequence,
+        'subOrders': subOrders.map((o) => o.toJson()).toList(),
+        'customerName': customerName,
+        'customerPhone': customerPhone,
+        'deliveryAddress': deliveryAddress,
+        'totalDistanceKm': totalDistanceKm,
+        'totalRiderEarnings': totalRiderEarnings,
+        'baseEarnings': baseEarnings,
+        'multiOrderBonus': multiOrderBonus,
+        'distanceEarnings': distanceEarnings,
+        'paymentSummary': paymentSummary.toJson(),
+        'batchStatus': batchStatus.name,
+        'currentStep': currentStep.name,
+        'assignedAtEpochMs': assignedAtEpochMs,
+        'deliveryOtp': deliveryOtp,
+        'isDeliveryOtpVerified': isDeliveryOtpVerified,
+      };
+
+  /// Deserializes a [MultiOrderBatch] from a JSON map.
+  factory MultiOrderBatch.fromJson(Map<String, dynamic> json) {
+    final id = json['id'];
+    final customerName = json['customerName'];
+    final customerPhone = json['customerPhone'];
+    final deliveryAddress = json['deliveryAddress'];
+    final totalDistanceKm = json['totalDistanceKm'];
+    final totalRiderEarnings = json['totalRiderEarnings'];
+    final rawSubOrders = json['subOrders'];
+    final rawPayment = json['paymentSummary'];
+
+    if (id is! String ||
+        customerName is! String ||
+        customerPhone is! String ||
+        deliveryAddress is! String ||
+        totalDistanceKm is! num ||
+        totalRiderEarnings is! num ||
+        rawSubOrders is! List ||
+        rawPayment is! Map) {
+      throw const FormatException('Invalid MultiOrderBatch JSON');
+    }
+
+    final statusName = json['batchStatus'];
+    final batchStatus = MultiOrderBatchStatus.values.firstWhere(
+      (s) => s.name == statusName,
+      orElse: () =>
+          throw FormatException('Unknown MultiOrderBatchStatus: $statusName'),
+    );
+
+    final stepName = json['currentStep'];
+    final currentStep = MultiOrderStep.values.firstWhere(
+      (s) => s.name == stepName,
+      orElse: () => throw FormatException('Unknown MultiOrderStep: $stepName'),
+    );
+
+    final parsedSubOrders = rawSubOrders.map((entry) {
+      if (entry is! Map) {
+        throw const FormatException('Invalid SubOrder entry in MultiOrderBatch');
+      }
+      return SubOrder.fromJson(Map<String, dynamic>.from(entry));
+    }).toList();
+
+    return MultiOrderBatch(
+      id: id,
+      totalOrders: (json['totalOrders'] as num?)?.toInt() ?? 3,
+      currentPickupSequence:
+          (json['currentPickupSequence'] as num?)?.toInt() ?? 1,
+      subOrders: parsedSubOrders,
+      customerName: customerName,
+      customerPhone: customerPhone,
+      deliveryAddress: deliveryAddress,
+      totalDistanceKm: totalDistanceKm.toDouble(),
+      totalRiderEarnings: totalRiderEarnings.toDouble(),
+      baseEarnings: (json['baseEarnings'] as num?)?.toDouble(),
+      multiOrderBonus: (json['multiOrderBonus'] as num?)?.toDouble(),
+      distanceEarnings: (json['distanceEarnings'] as num?)?.toDouble(),
+      paymentSummary:
+          PaymentSummary.fromJson(Map<String, dynamic>.from(rawPayment)),
+      batchStatus: batchStatus,
+      currentStep: currentStep,
+      assignedAtEpochMs: (json['assignedAtEpochMs'] as num?)?.toInt(),
+      deliveryOtp: json['deliveryOtp'] as String? ?? '654321',
+      isDeliveryOtpVerified: json['isDeliveryOtpVerified'] as bool? ?? false,
     );
   }
 
@@ -220,6 +364,9 @@ class MultiOrderBatch {
         other.paymentSummary == paymentSummary &&
         other.batchStatus == batchStatus &&
         other.currentStep == currentStep &&
+        other.assignedAtEpochMs == assignedAtEpochMs &&
+        other.deliveryOtp == deliveryOtp &&
+        other.isDeliveryOtpVerified == isDeliveryOtpVerified &&
         listEquals(other.subOrders, subOrders);
   }
 
@@ -239,6 +386,9 @@ class MultiOrderBatch {
         paymentSummary,
         batchStatus,
         currentStep,
+        assignedAtEpochMs,
+        deliveryOtp,
+        isDeliveryOtpVerified,
         Object.hashAll(subOrders),
       );
 

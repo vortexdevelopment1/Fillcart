@@ -25,6 +25,7 @@ import '../../features/notifications/presentation/screens/notification_preferenc
 import '../../features/notifications/presentation/screens/notification_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/splash_screen.dart';
+import '../../features/orders/presentation/screens/multi_order_placeholder_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen.dart';
 
 /// Centralized application router using GoRouter.
@@ -131,6 +132,10 @@ abstract final class AppRouter {
             path: '/notifications/preferences',
             builder: (context, state) =>
                 const NotificationPreferencesScreen(),
+          ),
+          GoRoute(
+            path: '/multi-order',
+            builder: (context, state) => const MultiOrderPlaceholderScreen(),
           ),
           StatefulShellRoute.indexedStack(
             builder: (context, state, navigationShell) {

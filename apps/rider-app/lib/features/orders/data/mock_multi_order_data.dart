@@ -16,7 +16,7 @@ abstract final class MockMultiOrderData {
       'Flat 402, Royal Palms Apartments, Scheme 54, Vijay Nagar, Indore, MP 452010';
 
   /// Generates a fresh, realistic sample [MultiOrderBatch] with 3 pickup stops.
-  static MultiOrderBatch createSampleBatch() {
+  static MultiOrderBatch createSampleBatch({int? assignedAtEpochMs}) {
     return MultiOrderBatch(
       id: 'BATCH-IND-7701',
       totalOrders: 3,
@@ -31,10 +31,14 @@ abstract final class MockMultiOrderData {
       distanceEarnings: 20.0,
       batchStatus: MultiOrderBatchStatus.assigned,
       currentStep: MultiOrderStep.batchAssigned,
+      assignedAtEpochMs:
+          assignedAtEpochMs ?? DateTime.now().millisecondsSinceEpoch,
+      deliveryOtp: '654321',
+      isDeliveryOtpVerified: false,
       paymentSummary: const PaymentSummary(
-        subtotal: 405.0,
+        subtotal: 614.0,
         deliveryFee: 45.0,
-        totalAmountDue: 450.0,
+        totalAmountDue: 659.0,
         amountCollected: 0.0,
         paymentMethod: PaymentMethod.unselected,
         paymentStatus: PaymentStatus.pending,

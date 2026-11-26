@@ -69,6 +69,15 @@ class SubOrder {
   /// Current lifecycle status of this sub-order.
   final SubOrderStatus status;
 
+  /// Safety check 1: Whether the rider verified the order ID at pickup.
+  final bool isOrderIdChecked;
+
+  /// Safety check 2: Whether the rider verified customer details at pickup.
+  final bool isCustomerDetailsChecked;
+
+  /// Safety check 3: Whether the rider confirmed all items are collected.
+  final bool isAllItemsCollected;
+
   const SubOrder({
     required this.id,
     required this.sequenceNumber,
@@ -85,9 +94,16 @@ class SubOrder {
     required this.pickupOtp,
     this.isPickupVerified = false,
     this.status = SubOrderStatus.pending,
+    this.isOrderIdChecked = false,
+    this.isCustomerDetailsChecked = false,
+    this.isAllItemsCollected = false,
   });
 
-  /// Whether all individual items on this order's checklist have been verified.
+  /// Whether all three independent safety checks are completed for this pickup.
+  bool get areSafetyChecksComplete =>
+      isOrderIdChecked && isCustomerDetailsChecked && isAllItemsCollected;
+
+  /// Whether all individual items on this order's legacy checklist have been verified.
   bool get areAllItemsChecked =>
       items.isNotEmpty && items.every((item) => item.isChecked);
 
@@ -121,6 +137,9 @@ class SubOrder {
     String? pickupOtp,
     bool? isPickupVerified,
     SubOrderStatus? status,
+    bool? isOrderIdChecked,
+    bool? isCustomerDetailsChecked,
+    bool? isAllItemsCollected,
   }) {
     return SubOrder(
       id: id ?? this.id,
@@ -139,6 +158,92 @@ class SubOrder {
       pickupOtp: pickupOtp ?? this.pickupOtp,
       isPickupVerified: isPickupVerified ?? this.isPickupVerified,
       status: status ?? this.status,
+      isOrderIdChecked: isOrderIdChecked ?? this.isOrderIdChecked,
+      isCustomerDetailsChecked:
+          isCustomerDetailsChecked ?? this.isCustomerDetailsChecked,
+      isAllItemsCollected: isAllItemsCollected ?? this.isAllItemsCollected,
+    );
+  }
+
+  /// Serializes this [SubOrder] to a JSON map.
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'sequenceNumber': sequenceNumber,
+        'merchantName': merchantName,
+        'merchantAddress': merchantAddress,
+        'merchantPhone': merchantPhone,
+        'merchantInstructions': merchantInstructions,
+        'merchantLatitude': merchantLatitude,
+        'merchantLongitude': merchantLongitude,
+        'customerName': customerName,
+        'customerPhone': customerPhone,
+        'deliveryAddress': deliveryAddress,
+        'items': items.map((item) => item.toJson()).toList(),
+        'pickupOtp': pickupOtp,
+        'isPickupVerified': isPickupVerified,
+        'status': status.name,
+        'isOrderIdChecked': isOrderIdChecked,
+        'isCustomerDetailsChecked': isCustomerDetailsChecked,
+        'isAllItemsCollected': isAllItemsCollected,
+      };
+
+  /// Deserializes a [SubOrder] from a JSON map.
+  factory SubOrder.fromJson(Map<String, dynamic> json) {
+    final id = json['id'];
+    final sequenceNumber = json['sequenceNumber'];
+    final merchantName = json['merchantName'];
+    final merchantAddress = json['merchantAddress'];
+    final customerName = json['customerName'];
+    final customerPhone = json['customerPhone'];
+    final deliveryAddress = json['deliveryAddress'];
+    final pickupOtp = json['pickupOtp'];
+    final rawItems = json['items'];
+
+    if (id is! String ||
+        sequenceNumber is! num ||
+        merchantName is! String ||
+        merchantAddress is! String ||
+        customerName is! String ||
+        customerPhone is! String ||
+        deliveryAddress is! String ||
+        pickupOtp is! String ||
+        rawItems is! List) {
+      throw const FormatException('Invalid SubOrder JSON');
+    }
+
+    final statusName = json['status'];
+    final status = SubOrderStatus.values.firstWhere(
+      (s) => s.name == statusName,
+      orElse: () => throw FormatException('Unknown SubOrderStatus: $statusName'),
+    );
+
+    final parsedItems = rawItems.map((entry) {
+      if (entry is! Map) {
+        throw const FormatException('Invalid OrderItem entry in SubOrder');
+      }
+      return OrderItem.fromJson(Map<String, dynamic>.from(entry));
+    }).toList();
+
+    return SubOrder(
+      id: id,
+      sequenceNumber: sequenceNumber.toInt(),
+      merchantName: merchantName,
+      merchantAddress: merchantAddress,
+      merchantPhone: json['merchantPhone'] as String?,
+      merchantInstructions: json['merchantInstructions'] as String?,
+      merchantLatitude: (json['merchantLatitude'] as num?)?.toDouble(),
+      merchantLongitude: (json['merchantLongitude'] as num?)?.toDouble(),
+      customerName: customerName,
+      customerPhone: customerPhone,
+      deliveryAddress: deliveryAddress,
+      items: parsedItems,
+      pickupOtp: pickupOtp,
+      isPickupVerified: json['isPickupVerified'] as bool? ?? false,
+      status: status,
+      isOrderIdChecked: json['isOrderIdChecked'] as bool? ?? false,
+      isCustomerDetailsChecked:
+          json['isCustomerDetailsChecked'] as bool? ?? false,
+      isAllItemsCollected: json['isAllItemsCollected'] as bool? ?? false,
     );
   }
 
@@ -155,6 +260,9 @@ class SubOrder {
         other.pickupOtp == pickupOtp &&
         other.isPickupVerified == isPickupVerified &&
         other.status == status &&
+        other.isOrderIdChecked == isOrderIdChecked &&
+        other.isCustomerDetailsChecked == isCustomerDetailsChecked &&
+        other.isAllItemsCollected == isAllItemsCollected &&
         listEquals(other.items, items);
   }
 
@@ -169,6 +277,9 @@ class SubOrder {
         pickupOtp,
         isPickupVerified,
         status,
+        isOrderIdChecked,
+        isCustomerDetailsChecked,
+        isAllItemsCollected,
         Object.hashAll(items),
       );
 
