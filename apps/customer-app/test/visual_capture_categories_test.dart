@@ -1,0 +1,76 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+import 'package:fillcart_customer/features/home/presentation/screens/customer_home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  final outDir = Directory('C:/Users/Administrator/.gemini/antigravity/brain/3466bb4f-c225-4bea-8bab-86d8b7e8c81d/screenshots');
+
+  testWidgets('Capture Home Screen Categories Sections', (WidgetTester tester) async {
+    final binding = TestWidgetsFlutterBinding.ensureInitialized();
+    binding.platformDispatcher.textScaleFactorTestValue = 1.0;
+    await binding.setSurfaceSize(const Size(412, 1100));
+
+    final repaintKey = GlobalKey();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          fontFamily: 'Montserrat',
+          scaffoldBackgroundColor: const Color(0xFFFEFCF6),
+        ),
+        home: RepaintBoundary(
+          key: repaintKey,
+          child: const MediaQuery(
+            data: MediaQueryData(
+              size: Size(412, 1100),
+              padding: EdgeInsets.only(top: 40, bottom: 20),
+            ),
+            child: CustomerHomeScreen(),
+          ),
+        ),
+      ),
+    );
+
+    // Precache all AssetImages
+    await tester.runAsync(() async {
+      for (final element in find.byType(Image).evaluate()) {
+        final widget = element.widget as Image;
+        if (widget.image is AssetImage) {
+          try {
+            await precacheImage(widget.image, repaintKey.currentContext!);
+          } catch (_) {}
+        }
+      }
+    });
+
+    await tester.pumpAndSettle();
+
+    // Capture View 1: Top categories (Grocery, Fresh, Snacks & Beverages)
+    await tester.runAsync(() async {
+      final boundary = repaintKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final image = await boundary.toImage(pixelRatio: 2.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = byteData!.buffer.asUint8List();
+      if (!outDir.existsSync()) outDir.createSync(recursive: true);
+      File('${outDir.path}/categories_view_1.png').writeAsBytesSync(bytes);
+    });
+
+    // Scroll to middle/lower categories (Beauty & Care, Stationery, Essentials, Electronics)
+    await tester.drag(find.byType(SingleChildScrollView).first, const Offset(0, -750));
+    await tester.pumpAndSettle();
+
+    await tester.runAsync(() async {
+      final boundary = repaintKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final image = await boundary.toImage(pixelRatio: 2.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = byteData!.buffer.asUint8List();
+      File('${outDir.path}/categories_view_2.png').writeAsBytesSync(bytes);
+    });
+  });
+}
