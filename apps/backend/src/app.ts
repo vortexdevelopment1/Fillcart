@@ -9,6 +9,7 @@ import {
   errorHandler,
 } from "./middleware/index.js";
 import { validateRequest } from "./middleware/validate-request.js";
+import { cookiesMiddleware } from "./middleware/cookies.js";
 import { verifySessionRequestSchema } from "@fillcart/validations";
 import { healthRouter } from "./routes/health.routes.js";
 import { createReadyRouter } from "./routes/ready.routes.js";
@@ -44,7 +45,10 @@ export function createApp(config: AppConfig): Express {
   // 4. CORS Middleware
   app.use(createCorsMiddleware(config));
 
-  // 5. Body Parsers with limits
+  // 5. Cookie Parser Middleware
+  app.use(cookiesMiddleware);
+
+  // 6. Body Parsers with limits
   app.use(express.json({ limit: "100kb" }));
   app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
