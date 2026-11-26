@@ -22,6 +22,14 @@ import '../../features/kyc/presentation/screens/vehicle_details_screen.dart';
 import '../../features/kyc/presentation/screens/verification_success_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/splash_screen.dart';
+import '../../features/profile/presentation/screens/bank_account_screen.dart';
+import '../../features/profile/presentation/screens/documents_details_screen.dart';
+import '../../features/profile/presentation/screens/edit_profile_screen.dart';
+import '../../features/profile/presentation/screens/incentive_screen.dart';
+import '../../features/profile/presentation/screens/profile_info_screens.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/profile/presentation/screens/upload_details_screen.dart';
+import '../../features/profile/presentation/screens/vehicle_details_screen.dart';
 
 /// Centralized application router using GoRouter.
 abstract final class AppRouter {
@@ -129,6 +137,50 @@ abstract final class AppRouter {
           GoRoute(
             path: '/dashboard',
             builder: (context, state) => const DashboardScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/profile/edit',
+            builder: (context, state) => const EditProfileScreen(),
+          ),
+          GoRoute(
+            path: '/profile/incentives',
+            builder: (context, state) => const IncentiveScreen(),
+          ),
+          GoRoute(
+            path: '/profile/documents',
+            builder: (context, state) => const DocumentsDetailsScreen(),
+          ),
+          GoRoute(
+            path: '/profile/vehicle',
+            builder: (context, state) => const ProfileVehicleDetailsScreen(),
+          ),
+          GoRoute(
+            path: '/profile/vehicle-success',
+            builder: (context, state) => const UploadDetailsScreen(),
+          ),
+          GoRoute(
+            path: '/profile/bank',
+            builder: (context, state) => const BankAccountScreen(),
+          ),
+          GoRoute(
+            path: '/profile/faq',
+            builder: (context, state) => const FaqScreen(),
+          ),
+          GoRoute(
+            path: '/profile/support',
+            builder: (context, state) => const ContactSupportScreen(),
+          ),
+          GoRoute(
+            path: '/profile/about',
+            builder: (context, state) => const AboutAppScreen(),
+          ),
+          GoRoute(
+            path: '/profile/privacy-policy',
+            builder: (context, state) => const PrivacyPolicyScreen(),
           ),
         ],
       );

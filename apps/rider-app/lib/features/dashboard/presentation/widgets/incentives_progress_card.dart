@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../shared/constants/rider_colors.dart';
@@ -38,8 +39,15 @@ class IncentivesProgressCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Container(
-          key: const Key('incentive_progress_card'),
+        InkWell(
+          onTap: () {
+            try {
+              GoRouter.of(context).push('/profile/incentives');
+            } catch (_) {}
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            key: const Key('incentive_progress_card'),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: const Color(0xFFF8FAFF),
@@ -158,6 +166,7 @@ class IncentivesProgressCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
         ),
       ],
     );
