@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -6,10 +7,9 @@ import '../../features/authentication/bloc/auth_state.dart';
 import '../../features/authentication/presentation/otp_success_screen.dart';
 import '../../features/authentication/presentation/otp_verification_screen.dart';
 import '../../features/authentication/presentation/phone_number_input_screen.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/orders/presentation/screens/orders_screen.dart';
-import '../../features/earnings/presentation/screens/earnings_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/earnings/presentation/screens/earnings_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/kyc/presentation/screens/aadhaar_details_screen.dart';
 import '../../features/kyc/presentation/screens/aadhaar_otp_verification_screen.dart';
 import '../../features/kyc/presentation/screens/aadhaar_verify_success_screen.dart';
@@ -20,8 +20,12 @@ import '../../features/kyc/presentation/screens/pending_verification_screen.dart
 import '../../features/kyc/presentation/screens/permissions_screen.dart';
 import '../../features/kyc/presentation/screens/vehicle_details_screen.dart';
 import '../../features/kyc/presentation/screens/verification_success_screen.dart';
+import '../../features/navigation/presentation/widgets/rider_bottom_nav_bar.dart';
+import '../../features/notifications/presentation/screens/notification_preferences_screen.dart';
+import '../../features/notifications/presentation/screens/notification_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/splash_screen.dart';
+import '../../features/orders/presentation/screens/orders_screen.dart';
 
 /// Centralized application router using GoRouter.
 abstract final class AppRouter {
@@ -115,20 +119,73 @@ abstract final class AppRouter {
             builder: (context, state) => const PermissionsScreen(),
           ),
           GoRoute(
-            path: '/home',
-            builder: (context, state) => const HomeScreen(),
+            path: '/notifications',
+            builder: (context, state) {
+              final isEmpty = state.uri.queryParameters['empty'] == 'true';
+              return NotificationScreen(
+                initialNotifications: isEmpty ? const [] : null,
+              );
+            },
           ),
           GoRoute(
-            path: '/orders',
-            builder: (context, state) => const OrdersScreen(),
+            path: '/notifications/preferences',
+            builder: (context, state) =>
+                const NotificationPreferencesScreen(),
           ),
-          GoRoute(
-            path: '/earnings',
-            builder: (context, state) => const EarningsScreen(),
-          ),
-          GoRoute(
-            path: '/dashboard',
-            builder: (context, state) => const DashboardScreen(),
+          StatefulShellRoute.indexedStack(
+            builder: (context, state, navigationShell) {
+              return Scaffold(
+                backgroundColor: const Color(0xFFF3F4E5),
+                body: navigationShell,
+                bottomNavigationBar: RiderBottomNavBar(
+                  selectedIndex: navigationShell.currentIndex,
+                  onTabSelected: (index) {
+                    navigationShell.goBranch(
+                      index,
+                      initialLocation: index == navigationShell.currentIndex,
+                    );
+                  },
+                ),
+              );
+            },
+            branches: [
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/home',
+                    builder: (context, state) =>
+                        const HomeScreen(showBottomNavBar: false),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/orders',
+                    builder: (context, state) =>
+                        const OrdersScreen(showBottomNavBar: false),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/earnings',
+                    builder: (context, state) =>
+                        const EarningsScreen(showBottomNavBar: false),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/dashboard',
+                    builder: (context, state) =>
+                        const DashboardScreen(showBottomNavBar: false),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       );

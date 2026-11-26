@@ -26,8 +26,7 @@ void main() {
         expect(find.byKey(const Key('kyc_header_back_button')), findsNothing);
 
         // Simulate 1st system pop (e.g. Android back)
-        final dynamic widgetsAppState = tester.state(find.byType(WidgetsApp));
-        await widgetsAppState.didPopRoute();
+        await tester.binding.handlePopRoute();
         await tester.pump();
 
         // Stays on Vehicle Details
@@ -60,7 +59,15 @@ void main() {
 
         // 4. Vehicle Details is restored with single RC value intact
         expect(find.byType(VehicleDetailsScreen), findsOneWidget);
-        expect(find.text('22 BH 1234 AA'), findsOneWidget);
+        final editableFinder = find.descendant(
+          of: find.byKey(const Key('vehicle_rc_number_field')),
+          matching: find.byType(EditableText),
+        );
+        expect(editableFinder, findsOneWidget);
+        expect(
+          tester.widget<EditableText>(editableFinder).controller.text,
+          equals('22 BH 1234 AA'),
+        );
       },
     );
   });

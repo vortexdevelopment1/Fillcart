@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../shared/constants/rider_colors.dart';
 import '../../../home/presentation/widgets/rider_online_toggle_bar.dart';
 import '../../../home/presentation/widgets/today_earnings_bar.dart';
 
@@ -120,18 +120,7 @@ class DashboardHeader extends StatelessWidget {
                     InkWell(
                       key: const Key('dashboard_notification_button'),
                       onTap: () {
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'No new notifications',
-                              style: GoogleFonts.poppins(fontSize: 13),
-                            ),
-                            duration: const Duration(seconds: 1),
-                            behavior: SnackBarBehavior.floating,
-                            backgroundColor: RiderColors.onSurfaceDark,
-                          ),
-                        );
+                        context.push('/notifications');
                       },
                       borderRadius: BorderRadius.circular(12),
                       child: Padding(

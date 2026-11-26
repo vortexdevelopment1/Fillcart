@@ -9,10 +9,10 @@ import 'package:google_fonts/google_fonts.dart';
 /// - Track border: 1 px #EEEEEE
 /// - Border radius: 100 px (pill)
 /// - Track padding: 4 px
-/// - Selected pill background: #1B1C17
+/// - Selected pill background: #FFE700 (Fillcart Primary Yellow)
 /// - Selected pill height: 32 px
 /// - Selected pill radius: 100 px
-/// - Selected text color: #FFFFFF
+/// - Selected text color: #1B1C17
 /// - Unselected text color: #777980
 /// - Font: Poppins Medium (w500), 14 px, line height 20 px (1.43)
 /// - Three options: Today (0), Weekly (1), Monthly (2)
@@ -59,7 +59,7 @@ class EarningsPeriodSlider extends StatelessWidget {
               child: Container(
                 height: 32,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1B1C17),
+                  color: const Color(0xFFFFE700),
                   borderRadius: BorderRadius.circular(100),
                 ),
               ),
@@ -110,7 +110,7 @@ class EarningsPeriodSlider extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.w500,
               height: 20 / 14,
-              color: isSelected ? Colors.white : const Color(0xFF777980),
+              color: isSelected ? const Color(0xFF1B1C17) : const Color(0xFF777980),
             ),
             child: Text(
               label,

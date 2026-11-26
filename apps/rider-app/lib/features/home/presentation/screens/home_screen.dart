@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../shared/constants/rider_colors.dart';
 import '../../../navigation/presentation/widgets/rider_bottom_nav_bar.dart';
 import '../widgets/rider_online_toggle_bar.dart';
 import '../widgets/today_earnings_bar.dart';
@@ -9,7 +9,7 @@ import '../widgets/today_earnings_bar.dart';
 /// New Rider Home Screen / No Orders Empty State (Figma Node 1045:3648).
 ///
 /// Figma Specifications (360 x 800 px):
-/// - Background: #FFFFFF (RiderColors.background)
+/// - Background: #F3F4E5
 /// - Header Container: 360 x 217 px with gradient (#FFE700 -> #FFF48C -> #FFF8B0 -> #FFFFFF)
 /// - Status Bar spacer: 48 px
 /// - Profile Row (1470:54670): 328 x 42 px at x=16, y=64
@@ -27,7 +27,12 @@ import '../widgets/today_earnings_bar.dart';
 ///       (Poppins Regular 12 px, #777980, literal double space preserved)
 /// - Bottom Navigation Bar (1359:19422): 360 x 68 px fixed at bottom with Home tab active
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final bool showBottomNavBar;
+
+  const HomeScreen({
+    super.key,
+    this.showBottomNavBar = true,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -39,8 +44,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: RiderColors.background,
-      bottomNavigationBar: const RiderBottomNavBar(selectedIndex: 0),
+      backgroundColor: const Color(0xFFF3F4E5),
+      bottomNavigationBar: widget.showBottomNavBar
+          ? const RiderBottomNavBar(selectedIndex: 0)
+          : null,
       body: Column(
         children: [
           // 1. Header Section with Gradient (360 x 217 px)
@@ -121,18 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           InkWell(
                             key: const Key('home_notification_button'),
                             onTap: () {
-                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'No new notifications',
-                                    style: GoogleFonts.poppins(fontSize: 13),
-                                  ),
-                                  duration: const Duration(seconds: 1),
-                                  behavior: SnackBarBehavior.floating,
-                                  backgroundColor: RiderColors.onSurfaceDark,
-                                ),
-                              );
+                              context.push('/notifications');
                             },
                             borderRadius: BorderRadius.circular(12),
                             child: Padding(

@@ -205,6 +205,17 @@ void main() {
 
         await tester.tap(find.byKey(const Key('aadhaar_next_button')));
         await tester.pumpAndSettle();
+
+        // Complete Aadhaar OTP verification to progress to Driving License
+        for (int i = 0; i < 6; i++) {
+          await tester.enterText(find.byKey(Key('aadhaar_otp_cell_$i')), '1');
+        }
+        await tester.pump();
+        await tester.tap(find.byKey(const Key('verify_aadhaar_button')));
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 6));
+        await tester.pumpAndSettle();
+
         expect(find.byType(DrivingLicenseScreen), findsOneWidget);
 
         // 3. Driving License Details (Step 3/4)

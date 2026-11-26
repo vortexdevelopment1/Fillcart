@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/constants/rider_colors.dart';
 import '../../../navigation/presentation/widgets/rider_bottom_nav_bar.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/incentives_progress_card.dart';
@@ -13,7 +12,7 @@ import '../widgets/today_summary_section.dart';
 ///
 /// Figma Specifications:
 /// - Frame: 360 x 1206 px (scrollable within 360 x 800 mobile viewport)
-/// - Background: #FFFFFF (RiderColors.background)
+/// - Background: #F3F4E5
 /// - Fixed Bottom Navigation: 360 x 68 px at bottom with index 3 (Dashboard) selected
 /// - Layout Structure:
 ///   1. Dashboard Header (360 x 208 px gradient header, profile, notification, toggle, earnings bar)
@@ -23,7 +22,12 @@ import '../widgets/today_summary_section.dart';
 ///   5. Section 4: Incentives Progress (₹100 Bonus + progress bar + counter)
 ///   6. Section 5: Ratings Breakdown (5 to 1 score distribution + score badge)
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final bool showBottomNavBar;
+
+  const DashboardScreen({
+    super.key,
+    this.showBottomNavBar = true,
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -36,8 +40,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: const Key('dashboard_screen_scaffold'),
-      backgroundColor: RiderColors.background,
-      bottomNavigationBar: const RiderBottomNavBar(selectedIndex: 3),
+      backgroundColor: const Color(0xFFF3F4E5),
+      bottomNavigationBar: widget.showBottomNavBar
+          ? const RiderBottomNavBar(selectedIndex: 3)
+          : null,
       body: SafeArea(
         top: false,
         bottom: false,

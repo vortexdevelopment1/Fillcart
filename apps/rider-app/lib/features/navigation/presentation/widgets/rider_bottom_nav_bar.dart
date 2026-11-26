@@ -9,13 +9,13 @@ import '../../../../shared/constants/rider_colors.dart';
 /// Figma Specifications:
 /// - Dimensions: 360 x 68 px
 /// - Background: #FFFFFF
-/// - Four tabs with supplied Figma icons:
-///   0. Home (assets/icons/nav_home.png)
-///   1. Orders (assets/icons/nav_orders.png)
-///   2. Earnings (assets/icons/nav_earnings.png)
-///   3. Dashboard (assets/icons/nav_dashboard.png)
-/// - Selected Tab: #1B1C17 (Dark), Poppins SemiBold 12 px
-/// - Unselected Tab: #777980 (Grey), Poppins Regular 12 px
+/// - Four tabs with active and inactive supplied Figma icons:
+///   0. Home (active: assets/icons/nav_home_active.png, inactive: assets/icons/nav_home.png)
+///   1. Orders (active: assets/icons/nav_orders_active.png, inactive: assets/icons/nav_orders.png)
+///   2. Earnings (active: assets/icons/nav_earnings_active.png, inactive: assets/icons/nav_earnings.png)
+///   3. Dashboard (active: assets/icons/nav_dashboard_active.png, inactive: assets/icons/nav_dashboard.png)
+/// - Selected Tab: Yellow pill (#FFE700, 64 x 32 px, radius 32 px), #1B1C17 (Dark), Poppins SemiBold 12 px
+/// - Unselected Tab: Transparent background, #777980 (Grey), Poppins Regular 12 px
 class RiderBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int>? onTabSelected;
@@ -96,28 +96,32 @@ class RiderBottomNavBar extends StatelessWidget {
             context: context,
             index: 0,
             label: 'Home',
-            iconAsset: 'assets/icons/nav_home.png',
+            activeIconAsset: 'assets/icons/nav_home_active.png',
+            inactiveIconAsset: 'assets/icons/nav_home.png',
             key: const Key('nav_tab_home'),
           ),
           _buildNavItem(
             context: context,
             index: 1,
             label: 'Orders',
-            iconAsset: 'assets/icons/nav_orders.png',
+            activeIconAsset: 'assets/icons/nav_orders_active.png',
+            inactiveIconAsset: 'assets/icons/nav_orders.png',
             key: const Key('nav_tab_orders'),
           ),
           _buildNavItem(
             context: context,
             index: 2,
             label: 'Earnings',
-            iconAsset: 'assets/icons/nav_earnings.png',
+            activeIconAsset: 'assets/icons/nav_earnings_active.png',
+            inactiveIconAsset: 'assets/icons/nav_earnings.png',
             key: const Key('nav_tab_earnings'),
           ),
           _buildNavItem(
             context: context,
             index: 3,
             label: 'Dashboard',
-            iconAsset: 'assets/icons/nav_dashboard.png',
+            activeIconAsset: 'assets/icons/nav_dashboard_active.png',
+            inactiveIconAsset: 'assets/icons/nav_dashboard.png',
             key: const Key('nav_tab_dashboard'),
           ),
         ],
@@ -129,11 +133,13 @@ class RiderBottomNavBar extends StatelessWidget {
     required BuildContext context,
     required int index,
     required String label,
-    required String iconAsset,
+    required String activeIconAsset,
+    required String inactiveIconAsset,
     required Key key,
   }) {
     final isSelected = index == selectedIndex;
     final color = isSelected ? RiderColors.onSurfaceDark : RiderColors.textSecondary;
+    final iconAsset = isSelected ? activeIconAsset : inactiveIconAsset;
 
     return Expanded(
       child: InkWell(
@@ -145,11 +151,22 @@ class RiderBottomNavBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                iconAsset,
+              Container(
                 width: 64,
                 height: 32,
-                fit: BoxFit.contain,
+                decoration: isSelected
+                    ? BoxDecoration(
+                        color: RiderColors.primaryYellow,
+                        borderRadius: BorderRadius.circular(32),
+                      )
+                    : null,
+                alignment: Alignment.center,
+                child: Image.asset(
+                  iconAsset,
+                  width: 64,
+                  height: 32,
+                  fit: BoxFit.contain,
+                ),
               ),
               const SizedBox(height: 4),
               Text(

@@ -94,8 +94,7 @@ void main() {
       expect(find.byType(OtpSuccessScreen), findsOneWidget);
 
       // Attempt system pop
-      final dynamic widgetsAppState = tester.state(find.byType(WidgetsApp));
-      final didPop = await widgetsAppState.didPopRoute();
+      final didPop = await tester.binding.handlePopRoute();
       await tester.pump();
 
       // Handled and prevented

@@ -139,6 +139,12 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
     );
 
     context.read<KycBloc>().add(KycBankDetailsSubmitted(details));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        key: Key('kyc_all_steps_completed_snackbar'),
+        content: Text('All KYC steps completed successfully'),
+      ),
+    );
     context.push('/kyc/pending');
   }
 

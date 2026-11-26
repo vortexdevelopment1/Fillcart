@@ -6,8 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 /// Figma Specifications:
 /// - Dimensions: 328 x 40 px
 /// - Track background: #F9FAFB
-/// - Selected pill background: #1B1C17
-/// - Selected text color: #FFFFFF
+/// - Selected pill background: #FFE700 (Fillcart Primary Yellow)
+/// - Selected text color: #1B1C17
 /// - Unselected text color: #777980
 /// - Font: Poppins Medium (w500), 14 px, line height 20 px (1.43)
 /// - Two options: "Active Orders" and "Completed Orders"
@@ -50,7 +50,7 @@ class OrdersSliderBar extends StatelessWidget {
               width: 160,
               height: 32,
               decoration: BoxDecoration(
-                color: const Color(0xFF1B1C17),
+                color: const Color(0xFFFFE700),
                 borderRadius: BorderRadius.circular(100),
               ),
             ),
@@ -73,7 +73,7 @@ class OrdersSliderBar extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         height: 20 / 14,
                         color: selectedIndex == 0
-                            ? Colors.white
+                            ? const Color(0xFF1B1C17)
                             : const Color(0xFF777980),
                       ),
                       child: const Text(
@@ -100,7 +100,7 @@ class OrdersSliderBar extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         height: 20 / 14,
                         color: selectedIndex == 1
-                            ? Colors.white
+                            ? const Color(0xFF1B1C17)
                             : const Color(0xFF777980),
                       ),
                       child: const Text(

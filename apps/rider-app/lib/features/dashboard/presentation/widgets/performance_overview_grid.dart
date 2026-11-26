@@ -39,6 +39,10 @@ class PerformanceOverviewGrid extends StatelessWidget {
                 key: const Key('online_hours_card'),
                 valueKey: const Key('online_hours_value'),
                 iconAsset: 'assets/icons/dashboard_online_hours.png',
+                iconBackgroundColor: const Color(0x52B0C0FF),
+                iconBorderColor: const Color(0xFFB0C0FF),
+                iconWidth: 16,
+                iconHeight: 16,
                 label: 'Online Hours',
                 value: '0',
               ),
@@ -49,6 +53,10 @@ class PerformanceOverviewGrid extends StatelessWidget {
                 key: const Key('rider_rating_card'),
                 valueKey: const Key('rider_rating_value'),
                 iconAsset: 'assets/icons/dashboard_rider_rating.png',
+                iconBackgroundColor: const Color(0x33FFBE4E),
+                iconBorderColor: const Color(0xFFFFBE4E),
+                iconWidth: 14,
+                iconHeight: 14,
                 label: 'Rider Rating',
                 value: '0',
               ),
@@ -64,6 +72,10 @@ class PerformanceOverviewGrid extends StatelessWidget {
                 key: const Key('distance_covered_card'),
                 valueKey: const Key('distance_covered_value'),
                 iconAsset: 'assets/icons/dashboard_distance.png',
+                iconBackgroundColor: const Color(0xFFF5F5F5),
+                iconBorderColor: const Color(0x33555555),
+                iconWidth: 16,
+                iconHeight: 16,
                 label: 'Distance Covered',
                 value: '0',
               ),
@@ -74,6 +86,10 @@ class PerformanceOverviewGrid extends StatelessWidget {
                 key: const Key('orders_completed_card'),
                 valueKey: const Key('orders_completed_value'),
                 iconAsset: 'assets/icons/dashboard_orders_completed.png',
+                iconBackgroundColor: const Color(0x33A259FB),
+                iconBorderColor: const Color(0xFFA259FB),
+                iconWidth: 14,
+                iconHeight: 14,
                 label: 'Orders Completed',
                 value: '0',
               ),
@@ -88,6 +104,10 @@ class PerformanceOverviewGrid extends StatelessWidget {
     required Key key,
     required Key valueKey,
     required String iconAsset,
+    required Color iconBackgroundColor,
+    Color? iconBorderColor,
+    double iconWidth = 14,
+    double iconHeight = 14,
     required String label,
     required String value,
   }) {
@@ -114,11 +134,12 @@ class PerformanceOverviewGrid extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Image.asset(
-            iconAsset,
-            width: 24,
-            height: 24,
-            fit: BoxFit.contain,
+          _MetricIconCircle(
+            iconAsset: iconAsset,
+            backgroundColor: iconBackgroundColor,
+            borderColor: iconBorderColor,
+            iconWidth: iconWidth,
+            iconHeight: iconHeight,
           ),
           const SizedBox(height: 8),
           Column(
@@ -151,6 +172,51 @@ class PerformanceOverviewGrid extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Reusable metric icon circular container ensuring identical 24 x 24 px dimensions across all cards.
+class _MetricIconCircle extends StatelessWidget {
+  final String iconAsset;
+  final Color backgroundColor;
+  final Color? borderColor;
+  final double iconWidth;
+  final double iconHeight;
+
+  const _MetricIconCircle({
+    required this.iconAsset,
+    required this.backgroundColor,
+    this.borderColor,
+    this.iconWidth = 14,
+    this.iconHeight = 14,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          shape: BoxShape.circle,
+          border: borderColor != null
+              ? Border.all(
+                  color: borderColor!,
+                  width: 0.5,
+                )
+              : null,
+        ),
+        child: Center(
+          child: Image.asset(
+            iconAsset,
+            width: iconWidth,
+            height: iconHeight,
+            fit: BoxFit.contain,
+          ),
+        ),
       ),
     );
   }

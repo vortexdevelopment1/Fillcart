@@ -31,14 +31,16 @@ void main() {
         final kycBloc = KycBloc();
 
         await tester.pumpWidget(
-          _createTestWidget(
-            child: const PendingVerificationScreen(),
+          _createRouterApp(
+            initialLocation: '/kyc/pending',
             kycBloc: kycBloc,
           ),
         );
         await tester.pump();
+        await tester.pump();
 
-        // Check text elements
+        // Check screen and text elements
+        expect(find.byType(PendingVerificationScreen), findsOneWidget);
         expect(
           find.byKey(const Key('pending_verification_title')),
           findsOneWidget,
@@ -72,13 +74,24 @@ void main() {
         expect(tapTarget, findsOneWidget);
         await tester.tap(tapTarget);
         await tester.pump();
+        await tester.pump(const Duration(milliseconds: 400));
+
+        // Verify navigation reaches Document Rejected screen
+        expect(
+          find.byKey(const Key('document_rejection_title')),
+          findsOneWidget,
+        );
+        expect(find.text('Documents Rejected'), findsOneWidget);
 
         expect(
           kycBloc.state.verificationStatus,
           KycVerificationStatus.rejected,
         );
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.runAsync(() async {
+          await kycBloc.close();
+        });
       },
     );
 
@@ -93,7 +106,8 @@ void main() {
             kycBloc: kycBloc,
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 950));
 
         // Should now be on Verification Success screen
         expect(
@@ -106,7 +120,10 @@ void main() {
           KycVerificationStatus.successful,
         );
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.runAsync(() async {
+          await kycBloc.close();
+        });
       },
     );
 
@@ -121,7 +138,8 @@ void main() {
             kycBloc: kycBloc,
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 400));
 
         // Should now be on unified Document Rejected screen
         expect(
@@ -134,7 +152,10 @@ void main() {
           KycVerificationStatus.rejected,
         );
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.runAsync(() async {
+          await kycBloc.close();
+        });
       },
     );
 
@@ -179,7 +200,10 @@ void main() {
         );
         expect(find.text('Allow Permission to proceed'), findsOneWidget);
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.runAsync(() async {
+          await kycBloc.close();
+        });
       },
     );
 
@@ -229,7 +253,10 @@ void main() {
           KycVerificationStatus.successful,
         );
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.runAsync(() async {
+          await kycBloc.close();
+        });
       },
     );
 
@@ -302,7 +329,10 @@ void main() {
         expect(kycBloc.state.isBatteryUsageGranted, isTrue);
         expect(kycBloc.state.areAllPermissionsGranted, isTrue);
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.runAsync(() async {
+          await kycBloc.close();
+        });
       },
     );
 
@@ -345,9 +375,10 @@ void main() {
         await tester.pump();
 
         // Tap Next
-        final nextBtn = find.byKey(const Key('kyc_next_button'));
+        final nextBtn = find.byKey(const Key('bank_next_button'));
         await tester.tap(nextBtn);
         await tester.pump();
+        await tester.pump(const Duration(milliseconds: 400));
 
         // Should now be on Pending Verification screen
         expect(
@@ -362,7 +393,10 @@ void main() {
         expect(kycBloc.state.isBankDetailsStepValid, isTrue);
         expect(kycBloc.state.isKycComplete, isTrue);
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.runAsync(() async {
+          await kycBloc.close();
+        });
       },
     );
   });

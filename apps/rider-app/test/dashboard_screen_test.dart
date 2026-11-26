@@ -312,7 +312,7 @@ void main() {
           matching: find.byType(Image),
         ),
       );
-      expect((navDashboardImage.image as AssetImage).assetName, equals('assets/icons/nav_dashboard.png'));
+      expect((navDashboardImage.image as AssetImage).assetName, equals('assets/icons/nav_dashboard_active.png'));
 
       await tester.binding.setSurfaceSize(null);
     });
@@ -357,6 +357,71 @@ void main() {
       await tester.tap(find.byKey(const Key('nav_tab_dashboard')));
       await tester.pumpAndSettle();
       expect(find.byType(DashboardScreen), findsOneWidget);
+
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    testWidgets('Active/inactive navigation icons switch correctly across all 4 screens', (
+      WidgetTester tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(360, 800));
+
+      String getIconAssetForTab(Key tabKey) {
+        final image = tester.widget<Image>(
+          find.descendant(
+            of: find.byKey(tabKey),
+            matching: find.byType(Image),
+          ),
+        );
+        return (image.image as AssetImage).assetName;
+      }
+
+      // 1. Home Screen: Home is active, others inactive
+      await tester.pumpWidget(
+        const RiderApp(initialLocation: '/home'),
+      );
+      await tester.pumpAndSettle();
+
+      expect(getIconAssetForTab(const Key('nav_tab_home')), equals('assets/icons/nav_home_active.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_orders')), equals('assets/icons/nav_orders.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_earnings')), equals('assets/icons/nav_earnings.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_dashboard')), equals('assets/icons/nav_dashboard.png'));
+
+      // 2. Navigate to Orders Screen: Orders becomes active, Home becomes inactive
+      await tester.tap(find.byKey(const Key('nav_tab_orders')));
+      await tester.pumpAndSettle();
+
+      expect(getIconAssetForTab(const Key('nav_tab_home')), equals('assets/icons/nav_home.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_orders')), equals('assets/icons/nav_orders_active.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_earnings')), equals('assets/icons/nav_earnings.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_dashboard')), equals('assets/icons/nav_dashboard.png'));
+
+      // 3. Navigate to Earnings Screen: Earnings becomes active, Orders becomes inactive
+      await tester.tap(find.byKey(const Key('nav_tab_earnings')));
+      await tester.pumpAndSettle();
+
+      expect(getIconAssetForTab(const Key('nav_tab_home')), equals('assets/icons/nav_home.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_orders')), equals('assets/icons/nav_orders.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_earnings')), equals('assets/icons/nav_earnings_active.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_dashboard')), equals('assets/icons/nav_dashboard.png'));
+
+      // 4. Navigate to Dashboard Screen: Dashboard becomes active, Earnings becomes inactive
+      await tester.tap(find.byKey(const Key('nav_tab_dashboard')));
+      await tester.pumpAndSettle();
+
+      expect(getIconAssetForTab(const Key('nav_tab_home')), equals('assets/icons/nav_home.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_orders')), equals('assets/icons/nav_orders.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_earnings')), equals('assets/icons/nav_earnings.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_dashboard')), equals('assets/icons/nav_dashboard_active.png'));
+
+      // 5. Navigate back to Home: Home becomes active again, Dashboard becomes inactive
+      await tester.tap(find.byKey(const Key('nav_tab_home')));
+      await tester.pumpAndSettle();
+
+      expect(getIconAssetForTab(const Key('nav_tab_home')), equals('assets/icons/nav_home_active.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_orders')), equals('assets/icons/nav_orders.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_earnings')), equals('assets/icons/nav_earnings.png'));
+      expect(getIconAssetForTab(const Key('nav_tab_dashboard')), equals('assets/icons/nav_dashboard.png'));
 
       await tester.binding.setSurfaceSize(null);
     });

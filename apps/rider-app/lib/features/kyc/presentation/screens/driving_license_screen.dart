@@ -59,11 +59,7 @@ class _DrivingLicenseScreenState extends State<DrivingLicenseScreen> {
   }
 
   void _handleBackNavigation() {
-    if (context.canPop()) {
-      context.pop();
-    } else {
-      context.go('/kyc/aadhaar');
-    }
+    context.go('/kyc/aadhaar');
   }
 
   void _uploadLicenseImage() {

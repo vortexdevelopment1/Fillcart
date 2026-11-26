@@ -76,7 +76,9 @@ class _PendingVerificationScreenState extends State<PendingVerificationScreen> {
     context.read<KycBloc>().add(
       const KycVerificationStatusChanged(KycVerificationStatus.successful),
     );
-    context.replace('/kyc/success');
+    try {
+      context.replace('/kyc/success');
+    } catch (_) {}
   }
 
   void _triggerRejection() {
@@ -85,7 +87,9 @@ class _PendingVerificationScreenState extends State<PendingVerificationScreen> {
     context.read<KycBloc>().add(
       const KycVerificationStatusChanged(KycVerificationStatus.rejected),
     );
-    context.replace('/kyc/rejected');
+    try {
+      context.replace('/kyc/rejected');
+    } catch (_) {}
   }
 
   @override

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../shared/constants/rider_colors.dart';
 import '../../../navigation/presentation/widgets/rider_bottom_nav_bar.dart';
 import '../widgets/orders_slider_bar.dart';
 
@@ -9,7 +8,7 @@ import '../widgets/orders_slider_bar.dart';
 ///
 /// Figma Specifications:
 /// - Frame size: 360 x 800 px
-/// - Background: #FFFFFF
+/// - Background: #F3F4E5
 /// - Header: 328 x 82 px at (16, 48)
 ///   * Top Screen Heading: "Orders" (18 px Poppins SemiBold, 24 px line height, #1B1C17)
 ///   * Spacing: 12 px
@@ -29,10 +28,12 @@ import '../widgets/orders_slider_bar.dart';
 /// - Bottom Navigation: Component 3 (360 x 68 px at y=732), index 1 active
 class OrdersScreen extends StatefulWidget {
   final int initialTabIndex;
+  final bool showBottomNavBar;
 
   const OrdersScreen({
     super.key,
     this.initialTabIndex = 0,
+    this.showBottomNavBar = true,
   });
 
   @override
@@ -59,10 +60,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: RiderColors.background,
-      bottomNavigationBar: const RiderBottomNavBar(
-        selectedIndex: 1,
-      ),
+      backgroundColor: const Color(0xFFF3F4E5),
+      bottomNavigationBar: widget.showBottomNavBar
+          ? const RiderBottomNavBar(
+              selectedIndex: 1,
+            )
+          : null,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -114,9 +117,19 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Center(
                     child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      switchInCurve: Curves.easeInOut,
-                      switchOutCurve: Curves.easeInOut,
+                      duration: const Duration(milliseconds: 200),
+                      reverseDuration: const Duration(milliseconds: 150),
+                      switchInCurve: Curves.easeOut,
+                      switchOutCurve: Curves.easeIn,
+                      layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+                        return Stack(
+                          alignment: Alignment.topCenter,
+                          children: <Widget>[
+                            ...previousChildren,
+                            if (currentChild != null) currentChild,
+                          ],
+                        );
+                      },
                       transitionBuilder: (child, animation) {
                         return FadeTransition(
                           opacity: animation,
@@ -146,7 +159,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       children: [
         const SizedBox(height: 48),
 
-        // Illustration: 328 x 254 px
+        // Illustration: 328 x 254 px matching Figma node 1501:38052
         Image.asset(
           'assets/images/rider_scooter_empty.png',
           key: const Key('orders_active_illustration'),
@@ -155,7 +168,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           fit: BoxFit.contain,
         ),
 
-        // 12 px gap between illustration and text
+        // 12 px gap between illustration and text matching Figma node 1501:38051
         const SizedBox(height: 12),
 
         // Text Context: 328 x 53 px
@@ -202,9 +215,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(height: 64),
+        // Top spacing calibrated to align title baseline exactly with Active Orders:
+        // Active: 48 (top) + 254 (illustration) + 12 (gap) = 314 px to title
+        // Completed: 106 (top) + 192 (illustration) + 16 (gap) = 314 px to title
+        const SizedBox(height: 106),
 
-        // Illustration: 218 x 192 px, centered horizontally
+        // Illustration: 218 x 192 px, centered horizontally matching Figma node 1589:64102
         Center(
           child: Image.asset(
             'assets/images/completed_orders_empty.png',
@@ -215,7 +231,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           ),
         ),
 
-        // 16 px gap between illustration and text
+        // 16 px gap between illustration and text matching Figma node 1501:38473
         const SizedBox(height: 16),
 
         // Text Context: 328 x 53 px (subtitle in 280 px container)
