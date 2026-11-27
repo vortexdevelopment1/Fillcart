@@ -5,7 +5,6 @@ import 'package:fillcart_rider/features/kyc/bloc/kyc_state.dart';
 import 'package:fillcart_rider/features/kyc/models/aadhaar_details_model.dart';
 import 'package:fillcart_rider/features/kyc/models/driving_license_model.dart';
 import 'package:fillcart_rider/features/kyc/models/vehicle_details_model.dart';
-import 'package:fillcart_rider/features/kyc/presentation/screens/pending_verification_screen.dart';
 import 'package:fillcart_rider/features/kyc/presentation/screens/permissions_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,8 +30,8 @@ void main() {
         final kycBloc = KycBloc();
 
         await tester.pumpWidget(
-          _createTestWidget(
-            child: const PendingVerificationScreen(),
+          _createRouterApp(
+            initialLocation: '/kyc/pending',
             kycBloc: kycBloc,
           ),
         );
@@ -78,7 +77,8 @@ void main() {
           KycVerificationStatus.rejected,
         );
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        addTearDown(kycBloc.close);
       },
     );
 
@@ -106,7 +106,8 @@ void main() {
           KycVerificationStatus.successful,
         );
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        addTearDown(kycBloc.close);
       },
     );
 
@@ -134,7 +135,8 @@ void main() {
           KycVerificationStatus.rejected,
         );
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        addTearDown(kycBloc.close);
       },
     );
 
@@ -179,7 +181,8 @@ void main() {
         );
         expect(find.text('Allow Permission to proceed'), findsOneWidget);
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        addTearDown(kycBloc.close);
       },
     );
 
@@ -229,7 +232,8 @@ void main() {
           KycVerificationStatus.successful,
         );
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        addTearDown(kycBloc.close);
       },
     );
 
@@ -302,7 +306,8 @@ void main() {
         expect(kycBloc.state.isBatteryUsageGranted, isTrue);
         expect(kycBloc.state.areAllPermissionsGranted, isTrue);
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        addTearDown(kycBloc.close);
       },
     );
 
@@ -362,7 +367,8 @@ void main() {
         expect(kycBloc.state.isBankDetailsStepValid, isTrue);
         expect(kycBloc.state.isKycComplete, isTrue);
 
-        await kycBloc.close();
+        await tester.pumpWidget(const SizedBox.shrink());
+        addTearDown(kycBloc.close);
       },
     );
   });
