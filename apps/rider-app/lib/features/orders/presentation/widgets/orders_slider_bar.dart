@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Segmented slider component matching Figma `Orders Slider` (Node 1589:62838).
-///
-/// Figma Specifications:
-/// - Dimensions: 328 x 40 px
-/// - Track background: #F9FAFB
-/// - Selected pill background: #1B1C17
-/// - Selected text color: #FFFFFF
-/// - Unselected text color: #777980
-/// - Font: Poppins Medium (w500), 14 px, line height 20 px (1.43)
-/// - Two options: "Active Orders" and "Completed Orders"
-/// - Animated pill transition (matching Smart Animate)
+/// Segmented slider for Order Details: [ Available | Completed ]
+/// with olive-gold (#C4B600) active pill.
 class OrdersSliderBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTabChanged;
@@ -26,40 +17,34 @@ class OrdersSliderBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('orders_slider_bar'),
-      width: 328,
-      height: 40,
+      width: double.infinity,
+      height: 44,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(100),
-        border: Border.all(
-          color: const Color(0xFFEEEEEE),
-          width: 1,
-        ),
       ),
       child: Stack(
         children: [
-          // Animated sliding pill background
           AnimatedAlign(
-            duration: const Duration(milliseconds: 250),
+            duration: const Duration(milliseconds: 220),
             curve: Curves.easeInOut,
             alignment: selectedIndex == 0
                 ? Alignment.centerLeft
                 : Alignment.centerRight,
-            child: Container(
-              width: 160,
-              height: 32,
-              decoration: BoxDecoration(
-                color: const Color(0xFF1B1C17),
-                borderRadius: BorderRadius.circular(100),
+            child: FractionallySizedBox(
+              widthFactor: 0.5,
+              child: Container(
+                height: 36,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFCCB900),
+                  borderRadius: BorderRadius.circular(100),
+                ),
               ),
             ),
           ),
-
-          // Foreground clickable tab labels
           Row(
             children: [
-              // Active Orders Tab
               Expanded(
                 child: GestureDetector(
                   key: const Key('orders_slider_active_tab'),
@@ -67,17 +52,16 @@ class OrdersSliderBar extends StatelessWidget {
                   onTap: () => onTabChanged(0),
                   child: Center(
                     child: AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 200),
+                      duration: const Duration(milliseconds: 180),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        height: 20 / 14,
                         color: selectedIndex == 0
                             ? Colors.white
-                            : const Color(0xFF777980),
+                            : const Color(0xFF000000),
                       ),
                       child: const Text(
-                        'Active Orders',
+                        'Available',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -85,8 +69,6 @@ class OrdersSliderBar extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // Completed Orders Tab
               Expanded(
                 child: GestureDetector(
                   key: const Key('orders_slider_completed_tab'),
@@ -94,17 +76,16 @@ class OrdersSliderBar extends StatelessWidget {
                   onTap: () => onTabChanged(1),
                   child: Center(
                     child: AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 200),
+                      duration: const Duration(milliseconds: 180),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        height: 20 / 14,
                         color: selectedIndex == 1
                             ? Colors.white
-                            : const Color(0xFF777980),
+                            : const Color(0xFF000000),
                       ),
                       child: const Text(
-                        'Completed Orders',
+                        'Completed',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
