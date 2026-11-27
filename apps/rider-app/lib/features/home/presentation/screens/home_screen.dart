@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../shared/constants/rider_colors.dart';
 import '../../../navigation/presentation/widgets/rider_bottom_nav_bar.dart';
+import '../../../profile/bloc/profile_bloc.dart';
 import '../widgets/rider_online_toggle_bar.dart';
 import '../widgets/today_earnings_bar.dart';
 
@@ -14,8 +17,8 @@ import '../widgets/today_earnings_bar.dart';
 /// - Status Bar spacer: 48 px
 /// - Profile Row (1470:54670): 328 x 42 px at x=16, y=64
 ///   - Avatar: 36 x 36 px circular
-///   - Name: "Ms Dhoni" (Poppins Medium 14 px, #080808)
-///   - Location: "Vijay Nagar, Indore" (Poppins Regular 12 px, #0A0A0A)
+///   - Name: "Virat kholi (khachedu)" (Poppins Medium 14 px, #080808)
+///   - Location: "London" (Poppins Regular 12 px, #0A0A0A)
 ///   - Notification bell: 24 x 24 px
 /// - Online / Offline toggle bar (1470:54683 / 153:1171): 328 x 36 px
 /// - Today's Earnings bar (1048:14779): 328 x 40 px, #C1FE03
@@ -74,47 +77,83 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Left: Avatar + Name & Location
-                          Row(
-                            children: [
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFFF0F0F0),
-                                  border: Border.all(
-                                    color: const Color(0x22000000),
-                                    width: 1,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
+                          // Left: Avatar + Name & Location (tap opens Profile)
+                          Expanded(
+                            child: InkWell(
+                              key: const Key('home_profile_button'),
+                              onTap: () {
+                                try {
+                                  GoRouter.of(context).push('/profile');
+                                } catch (_) {}
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              child: Row(
                                 children: [
-                                  Text(
-                                    'Ms Dhoni',
-                                    key: const Key('home_rider_name'),
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color(0xFF080808),
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color(0xFFF0F0F0),
+                                      border: Border.all(
+                                        color: const Color(0x22000000),
+                                        width: 1,
+                                      ),
                                     ),
                                   ),
-                                  Text(
-                                    'Vijay Nagar, Indore',
-                                    key: const Key('home_rider_location'),
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: const Color(0xFF0A0A0A),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Builder(
+                                      builder: (context) {
+                                        String riderName =
+                                            'Virat kohli (khachedu)';
+                                        String riderAddress = 'London';
+                                        try {
+                                          final profile = context
+                                              .watch<ProfileBloc>()
+                                              .state
+                                              .profile;
+                                          riderName = profile.fullName;
+                                          riderAddress = profile.address;
+                                        } catch (_) {}
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              riderName,
+                                              key: const Key('home_rider_name'),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: const Color(0xFF080808),
+                                              ),
+                                            ),
+                                            Text(
+                                              riderAddress,
+                                              key: const Key(
+                                                'home_rider_location',
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400,
+                                                color: const Color(0xFF0A0A0A),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     ),
                                   ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
 
                           // Right: Notification Bell (24 x 24 px)

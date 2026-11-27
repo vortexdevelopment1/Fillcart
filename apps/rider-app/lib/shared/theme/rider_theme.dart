@@ -25,13 +25,13 @@ abstract final class RiderTheme {
       outline: RiderColors.inputBorder,
     );
 
-    final poppinsTextTheme = GoogleFonts.poppinsTextTheme(base.textTheme);
+    final poppinsTextTheme = _poppinsTextTheme(base.textTheme);
 
     return base.copyWith(
       colorScheme: riderColorScheme,
       scaffoldBackgroundColor: RiderColors.background,
       textTheme: poppinsTextTheme,
-      primaryTextTheme: GoogleFonts.poppinsTextTheme(base.primaryTextTheme),
+      primaryTextTheme: _poppinsTextTheme(base.primaryTextTheme),
       appBarTheme: base.appBarTheme.copyWith(
         backgroundColor: RiderColors.background,
         foregroundColor: RiderColors.onSurfaceDark,
@@ -105,8 +105,33 @@ abstract final class RiderTheme {
   static ThemeData get darkTheme {
     final base = FCTheme.darkTheme;
     return base.copyWith(
-      textTheme: GoogleFonts.poppinsTextTheme(base.textTheme),
-      primaryTextTheme: GoogleFonts.poppinsTextTheme(base.primaryTextTheme),
+      textTheme: _poppinsTextTheme(base.textTheme),
+      primaryTextTheme: _poppinsTextTheme(base.primaryTextTheme),
+    );
+  }
+
+  /// Applies Poppins font family across a Flutter Material [TextTheme].
+  ///
+  /// Uses [GoogleFonts.poppins] per style instead of [GoogleFonts.poppinsTextTheme]
+  /// because `google_fonts` 9.x targets `package:material_ui` whose `TextTheme`
+  /// type is distinct from `package:flutter/material.dart`.
+  static TextTheme _poppinsTextTheme(TextTheme base) {
+    return base.copyWith(
+      displayLarge: GoogleFonts.poppins(textStyle: base.displayLarge),
+      displayMedium: GoogleFonts.poppins(textStyle: base.displayMedium),
+      displaySmall: GoogleFonts.poppins(textStyle: base.displaySmall),
+      headlineLarge: GoogleFonts.poppins(textStyle: base.headlineLarge),
+      headlineMedium: GoogleFonts.poppins(textStyle: base.headlineMedium),
+      headlineSmall: GoogleFonts.poppins(textStyle: base.headlineSmall),
+      titleLarge: GoogleFonts.poppins(textStyle: base.titleLarge),
+      titleMedium: GoogleFonts.poppins(textStyle: base.titleMedium),
+      titleSmall: GoogleFonts.poppins(textStyle: base.titleSmall),
+      bodyLarge: GoogleFonts.poppins(textStyle: base.bodyLarge),
+      bodyMedium: GoogleFonts.poppins(textStyle: base.bodyMedium),
+      bodySmall: GoogleFonts.poppins(textStyle: base.bodySmall),
+      labelLarge: GoogleFonts.poppins(textStyle: base.labelLarge),
+      labelMedium: GoogleFonts.poppins(textStyle: base.labelMedium),
+      labelSmall: GoogleFonts.poppins(textStyle: base.labelSmall),
     );
   }
 }

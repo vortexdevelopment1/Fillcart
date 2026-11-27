@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../shared/constants/rider_colors.dart';
 import '../../../home/presentation/widgets/rider_online_toggle_bar.dart';
 import '../../../home/presentation/widgets/today_earnings_bar.dart';
+import '../../../profile/bloc/profile_bloc.dart';
 
 /// Header section for the Dashboard screen matching Figma Top Frame (Node 1076:14889).
 ///
@@ -12,8 +15,8 @@ import '../../../home/presentation/widgets/today_earnings_bar.dart';
 /// - Safe area / status bar spacing: 48 px
 /// - Profile row (1076:14893): 328 x 36 px at padding 16 px
 ///   - Avatar: 36 x 36 px blank grey circle (#D9D9D9)
-///   - Name: "Ms Dhoni" (Poppins Medium 12 px, #080808)
-///   - Location: "Vijay Nagar, Indore" (Poppins Regular 12 px, #0A0A0A)
+///   - Name: "Virat kholi (khachedu)" (Poppins Medium 12 px, #080808)
+///   - Location: "London" (Poppins Regular 12 px, #0A0A0A)
 ///   - Notification bell: 24 x 24 px
 /// - Toggle & Earnings bars container (1076:14904): 328 x 84 px with 8 px gap
 ///   - Online / Offline toggle bar (328 x 36 px)
@@ -60,57 +63,83 @@ class DashboardHeader extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Left: Avatar + Name & Location
+                    // Left: Avatar + Name & Location (tap opens Profile)
                     Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color(0xFFD9D9D9),
-                              border: Border.all(
-                                color: const Color(0x22000000),
-                                width: 1,
+                      child: InkWell(
+                        key: const Key('dashboard_profile_button'),
+                        onTap: () {
+                          try {
+                            GoRouter.of(context).push('/profile');
+                          } catch (_) {}
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: const Color(0xFFD9D9D9),
+                                border: Border.all(
+                                  color: const Color(0x22000000),
+                                  width: 1,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Ms Dhoni',
-                                  key: const Key('dashboard_rider_name'),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: const Color(0xFF080808),
-                                    height: 1.2,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Vijay Nagar, Indore',
-                                  key: const Key('dashboard_rider_location'),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    color: const Color(0xFF0A0A0A),
-                                    height: 1.2,
-                                  ),
-                                ),
-                              ],
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Builder(
+                                builder: (context) {
+                                  String riderName = 'Virat kohli (khachedu)';
+                                  String riderAddress = 'London';
+                                  try {
+                                    final profile = context
+                                        .watch<ProfileBloc>()
+                                        .state
+                                        .profile;
+                                    riderName = profile.fullName;
+                                    riderAddress = profile.address;
+                                  } catch (_) {}
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        riderName,
+                                        key: const Key('dashboard_rider_name'),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color(0xFF080808),
+                                          height: 1.2,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        riderAddress,
+                                        key: const Key(
+                                          'dashboard_rider_location',
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                          color: const Color(0xFF0A0A0A),
+                                          height: 1.2,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
 

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../features/authentication/bloc/auth_bloc.dart';
 import '../features/authentication/data/mock_auth_repository.dart';
 import '../features/kyc/bloc/kyc_bloc.dart';
+import '../features/profile/bloc/profile_bloc.dart';
 import '../shared/theme/rider_theme.dart';
 import 'router/app_router.dart';
 
@@ -12,6 +13,7 @@ import 'router/app_router.dart';
 class RiderApp extends StatefulWidget {
   final AuthRepository? authRepository;
   final KycBloc? kycBloc;
+  final ProfileBloc? profileBloc;
   final GoRouter? router;
   final String? initialLocation;
 
@@ -19,6 +21,7 @@ class RiderApp extends StatefulWidget {
     super.key,
     this.authRepository,
     this.kycBloc,
+    this.profileBloc,
     this.router,
     this.initialLocation,
   });
@@ -31,6 +34,7 @@ class _RiderAppState extends State<RiderApp> {
   late final GoRouter _router;
   late final AuthBloc _authBloc;
   late final KycBloc _kycBloc;
+  late final ProfileBloc _profileBloc;
 
   @override
   void initState() {
@@ -44,6 +48,7 @@ class _RiderAppState extends State<RiderApp> {
       repository: widget.authRepository ?? const MockAuthRepository(),
     );
     _kycBloc = widget.kycBloc ?? KycBloc();
+    _profileBloc = widget.profileBloc ?? ProfileBloc();
   }
 
   @override
@@ -51,6 +56,9 @@ class _RiderAppState extends State<RiderApp> {
     _authBloc.close();
     if (widget.kycBloc == null) {
       _kycBloc.close();
+    }
+    if (widget.profileBloc == null) {
+      _profileBloc.close();
     }
     super.dispose();
   }
@@ -61,6 +69,7 @@ class _RiderAppState extends State<RiderApp> {
       providers: [
         BlocProvider.value(value: _authBloc),
         BlocProvider.value(value: _kycBloc),
+        BlocProvider.value(value: _profileBloc),
       ],
       child: MaterialApp.router(
         title: 'Fillcart Rider',
