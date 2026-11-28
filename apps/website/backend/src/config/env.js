@@ -9,6 +9,10 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default("http://127.0.0.1:5173,http://localhost:5173"),
   DATABASE_URL: z.string().optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  CENTRAL_AUTH_URL: z.string().url().default("http://127.0.0.1:4000"),
+  CENTRAL_AUTH_ISSUER: z.string().default("https://auth.fillcart.internal"),
+  CENTRAL_AUTH_AUDIENCE: z.string().default("customer-backend"),
+  JWKS_CACHE_TTL_MS: z.coerce.number().default(3600000),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

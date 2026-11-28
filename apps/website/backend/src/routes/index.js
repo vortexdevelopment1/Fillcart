@@ -12,6 +12,10 @@ import { partnersRouter } from "./partners.routes.js";
 import { supportRouter } from "./support.routes.js";
 import { faqsRouter } from "./faqs.routes.js";
 import { newsletterRouter } from "./newsletter.routes.js";
+import { cartRouter } from "./cart.routes.js";
+import { wishlistRouter } from "./wishlist.routes.js";
+import { addressRouter } from "./addresses.routes.js";
+import { profileRouter } from "./profile.routes.js";
 
 export const v1Router = Router();
 
@@ -29,3 +33,9 @@ v1Router.use("/partners", partnersRouter);
 v1Router.use("/support", supportRouter);
 v1Router.use("/faqs", faqsRouter);
 v1Router.use("/newsletter", newsletterRouter);
+
+// Customer Authenticated State Modules (requireAuth)
+v1Router.use("/cart", cartRouter);
+v1Router.use("/wishlist", wishlistRouter);
+v1Router.use("/addresses", addressRouter);
+v1Router.use("/me/profile", profileRouter);
