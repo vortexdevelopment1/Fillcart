@@ -759,4 +759,20 @@ The standalone customer orders, tracking, and promotional coupon subsystems have
 - `ProductReview` (`product_reviews`)
 
 ---
+
+## Part I: Delivery Slots, Blogs & Restock Notifications Implementation Update (November 28, 2026)
+
+### Implemented Endpoints
+1. `GET /api/v1/delivery-slots` — Public delivery slot schedule generator (?days=1..3, default 2). Dynamically maps morning (7–9 AM), afternoon (1–3 PM), and evening (7–9 PM) slots, marking past slots on the current day as `available: false` based on IST clock time.
+2. `GET /api/v1/blogs` — Public blog articles catalog (?category, page, limit). Returns published articles newest-first, omitting heavy markdown content for quick browsing.
+3. `GET /api/v1/blogs/:slug` — Public article detail returning full markdown content. Returns 404 for unknown or unpublished drafts.
+4. `POST /api/v1/products/:slugOrId/notify-me` — Restock notification subscription for out-of-stock products. Supports optional authentication (extracts `req.user.id`) or guest submissions (requires email/phone, rate-limited). Idempotent 200 on duplicate; returns 409 if product is currently in stock.
+5. `DELETE /api/v1/products/:slugOrId/notify-me` — Allows authenticated customer (requireAuth) to cancel their restock notification.
+
+### Implemented Customer Database Models (schema `customer`)
+- `BlogPost` (`blog_posts`)
+- `StockNotification` (`stock_notifications`)
+- `Product` (`products`): Added `stockNotifications StockNotification[]` relation
+
+---
 *Report generated and validated by Antigravity Read-Only Audit Service.*

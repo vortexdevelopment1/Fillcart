@@ -405,6 +405,37 @@ curl -X PATCH http://127.0.0.1:4100/api/v1/products/fresh-royal-apples/reviews/m
 curl -X DELETE http://127.0.0.1:4100/api/v1/products/fresh-royal-apples/reviews/mine \
   -H "Authorization: Bearer <CUSTOMER_JWT>"
 ```
+
+#### 16. Delivery Slots (Public)
+```bash
+# Fetch delivery slots from today up to 3 days (default 2 days, IST timezone aware)
+curl -X GET "http://127.0.0.1:4100/api/v1/delivery-slots?days=2"
 ```
+
+#### 17. Blogs & Insights (Public)
+```bash
+# List published blog posts (content omitted for fast catalog navigation)
+curl -X GET "http://127.0.0.1:4100/api/v1/blogs?category=Hyperlocal%20Tech&page=1&limit=10"
+
+# Read full article with markdown content
+curl -X GET "http://127.0.0.1:4100/api/v1/blogs/why-local-kiranas-beat-megastores-on-freshness-in-hyperlocal-delivery"
+```
+
+#### 18. Restock Notifications ("Notify Me")
+```bash
+# Guest subscriber (Rate-limited, email or phone required)
+curl -X POST http://127.0.0.1:4100/api/v1/products/fresh-royal-apples/notify-me \
+  -H "Content-Type: application/json" \
+  -d '{ "email": "customer@example.com" }'
+
+# Authenticated customer subscriber
+curl -X POST http://127.0.0.1:4100/api/v1/products/fresh-royal-apples/notify-me \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+
+# Authenticated customer unsubscribe
+curl -X DELETE http://127.0.0.1:4100/api/v1/products/fresh-royal-apples/notify-me \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+```
+
 
 

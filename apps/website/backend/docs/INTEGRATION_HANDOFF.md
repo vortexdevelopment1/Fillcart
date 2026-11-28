@@ -122,3 +122,51 @@ As specified by the customer frontend (`CartPage.jsx` and `ProfileOrders.jsx`), 
 
 - **Explicit Decision:** As per engineering review, the Recurring Subscriptions feature has been **skipped** from backend implementation because the subscription flow is neither reachable nor exposed anywhere in the customer website navigation, footer, or profile menus.
 
+---
+
+## 8. Delivery Slots & Fleet Capacity Integration
+
+- **Current Implementation:**
+  - `GET /api/v1/delivery-slots?days=2` returns dynamic time windows (Morning: 7–9 AM, Afternoon: 1–3 PM, Evening: 7–9 PM) generated from IST configuration (`src/config/deliverySlots.js`).
+  - Automatically marks passed time slots on the current day as `available: false` based on real-time IST clock calculations.
+- **Handoff for Vendor Operating Hours & Rider Capacity:**
+  1. **Vendor Store Operating Hours:** When integrating with vendor backends, slots should cross-reference `Store.openHours` and vendor holiday schedules to disable slots outside store operational hours.
+  2. **Rider Fleet Capacity Throttling:** A real-time dispatch service should track open orders per zone per slot. When rider dispatch capacity reaches its ceiling (e.g. 50 orders per hour per dark store/hub), that slot should dynamically return `available: false` or `badge: "Surge / Filling Fast"`.
+  3. **Cut-off Buffers:** Configure a lead-time buffer (e.g. 45 minutes prior to slot start) to allow vendors sufficient pick & pack preparation time before dispatch.
+
+---
+
+## 9. Blogs CMS & Content Administration
+
+- **Current Implementation:**
+  - Table `BlogPost` (`customer.blog_posts`) stores markdown articles, cover images, author metadata, read times, and tags.
+  - Public endpoints `GET /api/v1/blogs` (listing excludes heavy content) and `GET /api/v1/blogs/:slug` (full markdown body).
+  - Draft or unpublished posts (`isPublished: false`) are strictly hidden from customers (return 404).
+- **Handoff for Marketing & CMS Team:**
+  1. **Admin Portal / Headless CMS Integration:** Staff or marketing leads can use an internal admin panel or headless CMS webhook (e.g. Strapi, Sanity) to write and update articles in `customer.blog_posts`.
+  2. **Image CDN Hosting:** Blog images in seed point to Unsplash. Production images should be uploaded via FillCart's Cloudinary / S3 pipeline.
+  3. **Markdown Rendering:** Frontend renders article markdown using standard markdown rendering components.
+
+---
+
+## 10. Restock Notifications ("Notify Me") Architecture
+
+- **Current Implementation:**
+  - Table `StockNotification` (`customer.stock_notifications`) records customer restock intent for out-of-stock items (`status: "PENDING"`).
+  - Dual support: Authenticated customers (using JWT `req.user.id`) and guest shoppers (providing `email` or `phone`, rate-limited).
+  - Idempotent: Duplicate subscription requests return `200 OK` without duplicating database rows (`@@unique([productId, userId])`, `@@unique([productId, email])`).
+  - If item is already in stock, requests reject with `409 PRODUCT_IN_STOCK`.
+  - Authenticated customers can unsubscribe via `DELETE /api/v1/products/:slugOrId/notify-me`.
+- **Handoff for Restock Notification Dispatch Worker:**
+  1. **Restock Trigger:** When a vendor updates `Product.countInStock > 0` or toggles `inStock = true`:
+     - An asynchronous worker (e.g., BullMQ / Kafka queue) should query pending notifications:
+       ```sql
+       SELECT * FROM customer.stock_notifications WHERE product_id = :id AND status = 'PENDING';
+       ```
+  2. **Multi-Channel Dispatch:**
+     - For `userId`: Dispatch in-app push notification (FCM) and customer account notification.
+     - For `email`: Send personalized transactional email ("Back in Stock: <Product Name> is now available!").
+     - For `phone`: Send SMS / WhatsApp notification via notification gateway (e.g. Twilio, Gupshup).
+  3. **Status Transition:** Once dispatched, mark rows as `status = 'NOTIFIED'`.
+
+
