@@ -9,7 +9,13 @@ import {
   updateMyReview,
   deleteMyReview,
 } from "../controllers/review.controller.js";
+import {
+  subscribeToStockNotification,
+  unsubscribeFromStockNotification,
+} from "../controllers/stockNotification.controller.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
+import { optionalAuth } from "../middlewares/optionalAuth.js";
+import { rateLimit } from "../middlewares/rateLimit.js";
 import { validate } from "../middlewares/validate.js";
 import {
   getProductsSchema,
@@ -21,6 +27,10 @@ import {
   updateReviewSchema,
   reviewSlugParamSchema,
 } from "../validators/review.validator.js";
+import {
+  subscribeStockNotificationSchema,
+  unsubscribeStockNotificationSchema,
+} from "../validators/stockNotification.validator.js";
 
 export const productRouter = Router();
 
@@ -33,6 +43,24 @@ productRouter.post("/:slugOrId/reviews", requireAuth, validate(createReviewSchem
 productRouter.patch("/:slugOrId/reviews/mine", requireAuth, validate(updateReviewSchema), updateMyReview);
 productRouter.delete("/:slugOrId/reviews/mine", requireAuth, validate(reviewSlugParamSchema), deleteMyReview);
 
+// Stock Notification ("Notify Me") Endpoints
+productRouter.post(
+  "/:slugOrId/notify-me",
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 15,
+    message: "Too many restock notification requests. Please try again later.",
+  }),
+  optionalAuth,
+  validate(subscribeStockNotificationSchema),
+  subscribeToStockNotification
+);
+productRouter.delete(
+  "/:slugOrId/notify-me",
+  requireAuth,
+  validate(unsubscribeStockNotificationSchema),
+  unsubscribeFromStockNotification
+);
+
 // Single Product Detail
 productRouter.get("/:slug", validate(getProductParamsSchema), getProductBySlug);
-
