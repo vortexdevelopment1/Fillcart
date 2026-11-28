@@ -89,6 +89,8 @@ model Product {
   storeId          String?        @map("store_id")
   store            Store?         @relation(fields: [storeId], references: [id], onDelete: SetNull)
   storeProducts    StoreProduct[]
+  cartItems        CartItem[]
+  wishlistItems    WishlistItem[]
 
   @@index([categoryId])
   @@index([storeId])
@@ -235,5 +237,84 @@ model NewsletterSubscriber {
 
   @@index([email])
   @@map("newsletter_subscribers")
+  @@schema("customer")
+}
+
+model Cart {
+  id        String     @id @default(uuid()) @map("id")
+  userId    String     @unique @map("user_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  items     CartItem[]
+
+  @@map("carts")
+  @@schema("customer")
+}
+
+model CartItem {
+  id        String   @id @default(uuid()) @map("id")
+  cartId    String   @map("cart_id")
+  productId String   @map("product_id")
+  quantity  Int      @default(1) @map("quantity")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productId])
+  @@index([cartId])
+  @@index([productId])
+  @@map("cart_items")
+  @@schema("customer")
+}
+
+model WishlistItem {
+  id        String   @id @default(uuid()) @map("id")
+  userId    String   @map("user_id")
+  productId String   @map("product_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+  @@map("wishlist_items")
+  @@schema("customer")
+}
+
+model Address {
+  id        String   @id @default(uuid()) @map("id")
+  userId    String   @map("user_id")
+  label     String   @default("Home") @map("label")
+  fullName  String   @map("full_name")
+  phone     String   @map("phone")
+  line1     String   @map("line1")
+  line2     String?  @map("line2")
+  landmark  String?  @map("landmark")
+  city      String   @map("city")
+  state     String   @map("state")
+  pincode   String   @map("pincode")
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([userId, isDefault])
+  @@map("addresses")
+  @@schema("customer")
+}
+
+model CustomerProfile {
+  id        String   @id @default(uuid()) @map("id")
+  userId    String   @unique @map("user_id")
+  fullName  String?  @map("full_name")
+  phone     String?  @map("phone")
+  avatarUrl String?  @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("customer_profiles")
   @@schema("customer")
 }
