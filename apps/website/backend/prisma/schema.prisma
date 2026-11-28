@@ -93,6 +93,7 @@ model Product {
   cartItems        CartItem[]
   wishlistItems    WishlistItem[]
   orderItems       OrderItem[]
+  reviews          ProductReview[]
 
   @@index([categoryId])
   @@index([storeId])
@@ -428,5 +429,44 @@ model CouponRedemption {
   @@index([couponId, userId])
   @@index([userId])
   @@map("coupon_redemptions")
+  @@schema("customer")
+}
+
+model Prescription {
+  id              String   @id @default(uuid()) @map("id")
+  userId          String   @map("user_id")
+  fileName        String   @map("file_name")
+  fileUrl         String   @map("file_url")
+  fileType        String   @map("file_type") // jpg, jpeg, png, pdf
+  patientName     String?  @map("patient_name")
+  doctorName      String?  @map("doctor_name")
+  notes           String?  @map("notes")
+  status          String   @default("PENDING") @map("status") // PENDING | VERIFIED | REJECTED
+  rejectionReason String?  @map("rejection_reason")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, createdAt])
+  @@map("prescriptions")
+  @@schema("customer")
+}
+
+model ProductReview {
+  id                 String   @id @default(uuid()) @map("id")
+  productId          String   @map("product_id")
+  userId             String   @map("user_id")
+  displayName        String   @map("display_name")
+  rating             Int      @map("rating")
+  title              String?  @map("title")
+  comment            String   @map("comment")
+  isVerifiedPurchase Boolean  @default(false) @map("is_verified_purchase")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
+  @@index([productId])
+  @@map("product_reviews")
   @@schema("customer")
 }
