@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, Plus, Minus, X } from "lucide-react";
 
@@ -312,7 +312,25 @@ export default function ImageViewer({
     }
   };
 
-  const activeImage = images[currentIndex] || "";
+  const rawImage = images[currentIndex] || "";
+  // Ensure maximum resolution and replace low-res SVG placeholders with crisp HD photos
+  const activeImage = useMemo(() => {
+    if (!rawImage) return "";
+    if (rawImage.includes("fresh-red-onion.svg")) {
+      return "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=1200&auto=format&fit=crop&q=85";
+    }
+    if (rawImage.includes("fresh-tomato.svg")) {
+      return "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=1200&auto=format&fit=crop&q=85";
+    }
+    if (rawImage.includes("fresh-banana-robusta.svg")) {
+      return "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=1200&auto=format&fit=crop&q=85";
+    }
+    if (rawImage.includes("images.unsplash.com")) {
+      return rawImage.replace(/w=\d+/, "w=1200").replace(/q=\d+/, "q=85");
+    }
+    return rawImage;
+  }, [rawImage]);
+
   const zoomPercentText = `${Math.round(zoom * 100)}%`;
 
   return createPortal(
@@ -465,7 +483,7 @@ export default function ImageViewer({
           </button>
         )}
 
-        {/* Stage Card: 960px x 560px, background #F8FAFC, radius 20px (under 768px: fills width, no radius) */}
+        {/* Stage Area: Transparent background (NO white card), image large and prominent */}
         <div
           ref={stageCardRef}
           onWheel={handleWheel}
@@ -478,10 +496,10 @@ export default function ImageViewer({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           style={{
-            backgroundColor: "#F8FAFC",
+            backgroundColor: "transparent",
             cursor: zoom > 1 ? (isDragging ? "grabbing" : "grab") : "zoom-in",
           }}
-          className="relative w-full max-w-[960px] h-[340px] sm:h-[440px] md:h-[560px] max-h-[calc(100vh-240px)] rounded-none md:rounded-[20px] overflow-hidden flex items-center justify-center shadow-2xl"
+          className="relative w-full max-w-[1080px] h-[55vh] sm:h-[65vh] md:h-[72vh] max-h-[calc(100vh-200px)] flex items-center justify-center select-none"
         >
           <img
             src={activeImage}
@@ -490,7 +508,7 @@ export default function ImageViewer({
               transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
               transition: isDragging ? "none" : "transform 150ms ease-out",
             }}
-            className="max-w-full max-h-full object-contain pointer-events-none select-none"
+            className="w-auto h-auto max-w-[92vw] md:max-w-[850px] max-h-[55vh] sm:max-h-[65vh] md:max-h-[72vh] min-w-[280px] sm:min-w-[440px] md:min-w-[560px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.7)] pointer-events-none select-none rounded-2xl"
             draggable={false}
           />
         </div>

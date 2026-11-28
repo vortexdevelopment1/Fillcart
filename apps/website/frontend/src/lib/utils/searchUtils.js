@@ -67,19 +67,16 @@ export function calculateWordSimilarity(target, query) {
   if (stemT === stemQ) return 0.95;
   if (stemT.includes(stemQ) || stemQ.includes(stemT)) return 0.85;
 
+  const minLen = Math.min(t.length, q.length);
   const maxLen = Math.max(t.length, q.length);
-  const distance = levenshteinDistance(t, q);
-  const maxAllowedDistance = q.length <= 3 ? 1 : q.length <= 6 ? 2 : 3;
-
-  if (distance <= maxAllowedDistance) {
-    const rawScore = 1 - distance / maxLen;
-    return Math.max(0.45, rawScore);
-  }
+  if (Math.abs(t.length - q.length) > 2) return 0;
 
   const stemDistance = levenshteinDistance(stemT, stemQ);
-  if (stemDistance <= maxAllowedDistance) {
-    const rawScore = 1 - stemDistance / Math.max(stemT.length, stemQ.length);
-    return Math.max(0.4, rawScore);
+  const maxAllowedDistance = minLen <= 4 ? 1 : 2;
+
+  if (stemDistance <= maxAllowedDistance && (stemT[0] === stemQ[0] || stemDistance <= 1)) {
+    const rawScore = 1 - stemDistance / maxLen;
+    return rawScore >= 0.6 ? rawScore : 0;
   }
 
   return 0;
@@ -168,15 +165,23 @@ export function searchCatalog(queryStr, productsList = []) {
     .filter((c) => c.score > 25)
     .sort((a, b) => b.score - a.score);
 
+  const topCategoryMatch = scoredCategories.length > 0 ? scoredCategories[0] : null;
+
   // 2. Score Products
   const scoredProducts = products.map((prod) => {
     let score = 0;
     const pName = (prod.name || "").toLowerCase();
     const tags = prod.tags || [];
     const keywords = prod.keywords || [];
+    const pCat = (prod.categoryKey || prod.category || "").toLowerCase();
 
     if (pName === query) score += 250;
     else if (pName.includes(query)) score += 160;
+
+    // Category boost if top category matched strongly
+    if (topCategoryMatch && topCategoryMatch.score >= 50 && pCat.includes(topCategoryMatch.key.toLowerCase())) {
+      score += 75;
+    }
 
     for (const kw of keywords) {
       const kwLower = String(kw).toLowerCase();
@@ -221,7 +226,6 @@ export function searchCatalog(queryStr, productsList = []) {
     .filter((s) => s.score > 20)
     .sort((a, b) => b.score - a.score);
 
-  const topCategoryMatch = scoredCategories.length > 0 ? scoredCategories[0] : null;
   const topProductMatch = scoredProducts.length > 0 ? scoredProducts[0] : null;
 
   let didYouMean = null;

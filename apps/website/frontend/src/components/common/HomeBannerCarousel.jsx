@@ -14,9 +14,9 @@ export const CAROUSEL_HEIGHT = 410;
 
 /**
  * Configuration flag for slider indicator dots.
- * Enabled so dots stay visible and usable across all viewports.
+ * Disabled so indicator button pill is removed.
  */
-const SHOW_DOTS = true;
+const SHOW_DOTS = false;
 
 /**
  * HomeBannerCarousel Component
@@ -148,9 +148,9 @@ export default function HomeBannerCarousel({ banners = homeBanners }) {
     }
   };
 
-  // Auto-advance every 4 seconds (pauses on hover, focus, tab hidden, and reduced motion)
+  // Auto-advance automatically every 3.5 seconds in an infinite loop
   useEffect(() => {
-    if (!isMulti || isHovered || isFocused || prefersReducedMotion) return;
+    if (!isMulti || prefersReducedMotion) return;
 
     let intervalId = null;
 
@@ -158,7 +158,7 @@ export default function HomeBannerCarousel({ banners = homeBanners }) {
       if (document.visibilityState === "hidden") return;
       intervalId = setInterval(() => {
         handleNext();
-      }, 4000);
+      }, 3500);
     };
 
     const handleVisibilityChange = () => {
@@ -176,7 +176,7 @@ export default function HomeBannerCarousel({ banners = homeBanners }) {
       clearInterval(intervalId);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [isMulti, isHovered, isFocused, prefersReducedMotion, handleNext, autoplayKey]);
+  }, [isMulti, prefersReducedMotion, handleNext, autoplayKey]);
 
   // Touch swipe support (threshold 50px)
   const handleTouchStart = (e) => {
@@ -341,34 +341,6 @@ export default function HomeBannerCarousel({ banners = homeBanners }) {
             );
           })}
         </div>
-
-        {/* Indicator dots: visible and usable across viewports */}
-        {SHOW_DOTS && isMulti && (
-          <div
-            className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-20 pointer-events-auto bg-black/20 backdrop-blur-xs px-2.5 py-1 rounded-full"
-          >
-            {banners.map((_, i) => {
-              const isDotActive = i === activeRealIndex;
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleGoToReal(i);
-                  }}
-                  aria-label={`Go to slide ${i + 1}`}
-                  aria-current={isDotActive ? "true" : undefined}
-                  className={`transition-all duration-200 cursor-pointer rounded-full focus:outline-none focus-visible:ring-1 focus-visible:ring-white ${
-                    isDotActive
-                      ? "w-4 sm:w-6 h-1.5 sm:h-2 bg-[#FBBF24]"
-                      : "w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/70 hover:bg-white"
-                  }`}
-                />
-              );
-            })}
-          </div>
-        )}
       </div>
     </section>
   );

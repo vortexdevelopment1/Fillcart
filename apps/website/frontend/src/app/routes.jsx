@@ -33,7 +33,11 @@ const StyleguidePage = lazy(() => import("../features/misc/StyleguidePage.jsx"))
 
 function CategoriesRedirect() {
   const [searchParams] = useSearchParams();
+  const q = searchParams.get("q");
   const cat = searchParams.get("cat");
+  if (q) {
+    return <Navigate to={`/search?${searchParams.toString()}`} replace />;
+  }
   if (cat) {
     return <Navigate to={`/category/${cat}`} replace />;
   }

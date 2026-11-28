@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Link, NavLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   MapPin, Search, User, ShoppingCart, ChevronDown, X, Navigation,
   Loader2, Check, Store, Bike, Menu, ExternalLink, ArrowRight,
-  LayoutGrid, Sparkles, Plus, AlertCircle
+  LayoutGrid, Sparkles, Plus, AlertCircle, Heart
 } from "lucide-react";
 import { useCart } from "../../lib/context/CartContext.jsx";
+import { useWishlist } from "../../lib/context/WishlistContext.jsx";
 import api from "../../services/api.js";
 import SearchDropdown from "../navigation/SearchDropdown.jsx";
 import Logo from "../common/Logo.jsx";
@@ -23,8 +24,11 @@ const RIDER_URL =
     ? "https://fillcarts-rider.vercel.app"
     : "http://localhost:5175");
 
-export default function Navbar({ onSearchChange }) {
+export default function Navbar({ onSearchChange, hideCategoryNav = false }) {
+  const [searchParams] = useSearchParams();
   const { cartCount, user, userLocation, changeLocation } = useCart();
+  const wishlistContext = useWishlist ? useWishlist() : null;
+  const wishlistCount = wishlistContext?.wishlistCount ?? 0;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [addressDropdownOpen, setAddressDropdownOpen] = useState(false);
@@ -52,7 +56,40 @@ export default function Navbar({ onSearchChange }) {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const currentSearchQuery = location.pathname === "/search" ? searchParams.get("q") || "" : "";
   const addressDropdownRef = useRef(null);
+
+  const isNoCategoryNavRoute = [
+    "/about",
+    "/contact",
+    "/careers",
+    "/become-vendor",
+    "/partner/vendor",
+    "/become-rider",
+    "/partner/rider",
+    "/how-it-works",
+    "/support",
+    "/faq",
+    "/help",
+    "/terms",
+    "/privacy",
+  ].some(
+    (route) => location.pathname === route || location.pathname.startsWith(`${route}/`)
+  );
+  const shouldHideCategoryNav = hideCategoryNav || isNoCategoryNavRoute;
+
+  const displayLocation = useMemo(() => {
+    if (!userLocation) return "Indore, 452001";
+    if (userLocation.city && userLocation.pincode && userLocation.city !== "Nearby Location") {
+      return `${userLocation.city}, ${userLocation.pincode}`;
+    }
+    if (userLocation.area && !userLocation.area.startsWith("GPS")) {
+      return userLocation.pincode
+        ? `${userLocation.area}, ${userLocation.pincode}`
+        : userLocation.area;
+    }
+    return "Indore, 452001";
+  }, [userLocation]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -139,12 +176,12 @@ export default function Navbar({ onSearchChange }) {
         const lat = Number(pos.coords.latitude.toFixed(6));
         const lng = Number(pos.coords.longitude.toFixed(6));
         const gpsLoc = {
-          city: "Nearby Location",
-          area: `GPS (${lat}, ${lng})`,
+          city: "Indore",
+          area: "Indore",
           lat,
           lng,
           pincode: "452001",
-          formatted: `Lat: ${lat}, Lng: ${lng}`,
+          formatted: "Indore, 452001",
           isGps: true,
           isUserSelected: true,
         };
@@ -200,7 +237,7 @@ export default function Navbar({ onSearchChange }) {
 
   // Row 2 Navigation links according to Figma specification
   const row2Links = [
-    { label: "All", to: "/" },
+    { label: "All categories", to: "/", hasIcon: true },
     { label: "Grocery", to: "/category/grocery" },
     { label: "Dairy", to: "/category/dairy" },
     { label: "Electronics", to: "/category/electronics" },
@@ -327,27 +364,32 @@ export default function Navbar({ onSearchChange }) {
             <button
               type="button"
               onClick={() => setAddressDropdownOpen(!addressDropdownOpen)}
-              className="flex items-center gap-1 sm:gap-2 px-1.5 min-[360px]:px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full hover:bg-[#F4F5F8] transition-colors cursor-pointer text-left group max-w-full"
+              className="flex items-center gap-2 sm:gap-2.5 px-1.5 sm:px-2 py-1 rounded-xl hover:bg-[#F4F5F8] transition-colors cursor-pointer text-left group select-none max-w-full"
               aria-expanded={addressDropdownOpen}
               aria-label="Select delivery address"
             >
-              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#F4F5F8] text-[#111925] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <MapPin size={14} className="sm:w-[15px] sm:h-[15px]" />
-              </div>
-              <div className="flex flex-col leading-tight pr-0.5 sm:pr-1 min-w-0">
-                <span className="text-[11px] lg:text-[10px] font-bold uppercase tracking-wider text-[#6B7280]">
+              <MapPin
+                size={22}
+                strokeWidth={2.4}
+                className="text-[#D49400] shrink-0"
+              />
+              <div className="flex flex-col leading-tight min-w-0">
+                <span className="text-[12px] sm:text-[13px] font-medium text-[#667085] leading-none mb-1">
                   Deliver to
                 </span>
-                <span className="text-xs sm:text-sm font-bold text-[#111925] truncate max-w-[45px] min-[360px]:max-w-[65px] min-[400px]:max-w-[90px] sm:max-w-[140px] lg:max-w-[180px]">
-                  {userLocation?.area || userLocation?.city || "Indore, 452001"}
-                </span>
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-[13px] sm:text-[15px] font-extrabold text-[#101828] tracking-tight truncate max-w-[110px] min-[360px]:max-w-[130px] sm:max-w-[170px] lg:max-w-[210px]">
+                    {displayLocation}
+                  </span>
+                  <ChevronDown
+                    size={16}
+                    strokeWidth={2.4}
+                    className={`text-[#101828] transition-transform shrink-0 ${
+                      addressDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
               </div>
-              <ChevronDown
-                size={13}
-                className={`text-[#111925] transition-transform shrink-0 ${
-                  addressDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
             </button>
 
             {/* Address Selection Dropdown */}
@@ -397,7 +439,22 @@ export default function Navbar({ onSearchChange }) {
                     )}
                   </div>
 
-                  {user ? (
+                  <Link
+                  to="/wishlist"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-[#111925] hover:bg-[#F4F5F8] transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Heart size={16} className={wishlistCount > 0 ? "text-[#DC2626] fill-[#DC2626]" : "text-[#111925]"} />
+                    <span>My Wishlist</span>
+                  </div>
+                  {wishlistCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#FEE2E2] text-[#DC2626]">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+                {user ? (
                     loadingAddresses ? (
                       <div className="p-3 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
                         <Loader2 size={14} className="animate-spin text-[#FEC201]" />
@@ -486,7 +543,7 @@ export default function Navbar({ onSearchChange }) {
           {/* Desktop Wide Pill Search Bar (Inside Row 1 at >= 1024px) */}
           <div className="hidden lg:flex flex-1 min-w-[200px] max-w-2xl mx-1 lg:mx-4">
             <SearchDropdown
-              defaultValue=""
+              defaultValue={currentSearchQuery}
               onSearchSubmit={(val) => {
                 if (onSearchChange) onSearchChange(val);
                 navigate(`/search?q=${encodeURIComponent(val)}`);
@@ -530,6 +587,24 @@ export default function Navbar({ onSearchChange }) {
               </Link>
             )}
 
+            {/* Wishlist Button: Left side of cart icon */}
+            <Link
+              to="/wishlist"
+              className="w-10 h-10 sm:w-[40px] sm:h-[41px] rounded-[10px] sm:rounded-[12px] bg-[#F4F5F8] hover:bg-[#EAECEF] text-[#111925] flex items-center justify-center relative transition-all shadow-2xs cursor-pointer shrink-0 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-[#111925] focus-visible:ring-offset-2"
+              title="Wishlist"
+              aria-label={`Wishlist, ${wishlistCount} items`}
+            >
+              <Heart
+                size={20}
+                className={wishlistCount > 0 ? "text-[#DC2626] fill-[#DC2626]" : "text-[#111925]"}
+              />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[17px] h-[17px] px-1 rounded-full bg-[#DC2626] text-white text-[10px] font-black flex items-center justify-center shadow-xs border border-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
             {/* Cart Button: Exact Figma Yellow Rounded-Square (40px x 41px, 12px radius) with count badge */}
             <Link
               to="/cart"
@@ -550,7 +625,7 @@ export default function Navbar({ onSearchChange }) {
         {/* Mobile / Tablet Full-Width Search Bar (< 1024px) */}
         <div className="lg:hidden mt-2 pt-1 border-t border-[#ECEEF2]/70 pb-1">
           <SearchDropdown
-            defaultValue=""
+            defaultValue={currentSearchQuery}
             onSearchSubmit={(val) => {
               if (onSearchChange) onSearchChange(val);
               navigate(`/search?q=${encodeURIComponent(val)}`);
@@ -561,30 +636,38 @@ export default function Navbar({ onSearchChange }) {
       </div>
 
       {/* ROW 2: Text Links (All, Grocery, Dairy, Electronics, Stationery, Beauty, + More) */}
-      <nav className="border-t border-[#ECEEF2] bg-white relative z-40">
+      {!shouldHideCategoryNav && (
+        <nav className="border-t border-[#ECEEF2] bg-white relative z-40 py-1.5">
         <div className="max-w-[1216px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between overflow-x-auto no-scrollbar lg:overflow-visible">
-          <div className="flex items-center gap-5 sm:gap-7 lg:gap-8 overflow-x-auto no-scrollbar whitespace-nowrap lg:overflow-visible flex-nowrap">
+          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-2.5 overflow-x-auto no-scrollbar whitespace-nowrap lg:overflow-visible flex-nowrap">
             {row2Links.map((link) => (
               <NavLink
                 key={link.label}
                 to={link.to}
                 end={link.to === "/"}
                 className={({ isActive }) =>
-                  `py-2.5 whitespace-nowrap transition-colors relative cursor-pointer text-xs sm:text-sm font-medium border-b-2 ${
+                  `px-3.5 sm:px-4 py-1.5 rounded-full whitespace-nowrap transition-all relative cursor-pointer text-xs sm:text-sm select-none inline-flex items-center gap-2 ${
                     isActive
-                      ? "text-[#101828] font-bold border-[#FBBF24]"
-                      : "text-[#6B7280] hover:text-[#101828] border-transparent"
+                      ? "bg-[#FFF5D9] text-[#101828] font-bold"
+                      : "text-[#6B7280] hover:text-[#101828] hover:bg-[#F4F5F8] font-medium"
                   }`
                 }
               >
-                {link.label}
+                {link.hasIcon && (
+                  <LayoutGrid
+                    size={17}
+                    strokeWidth={2.2}
+                    className="shrink-0 text-current"
+                  />
+                )}
+                <span>{link.label}</span>
               </NavLink>
             ))}
 
             {/* "More" dropdown trigger with Chevron */}
             <div
               ref={moreMenuRef}
-              className="relative py-1 shrink-0"
+              className="relative shrink-0"
               onMouseEnter={handleMoreMouseEnter}
               onMouseLeave={handleMoreMouseLeave}
             >
@@ -598,10 +681,10 @@ export default function Navbar({ onSearchChange }) {
                 aria-haspopup="menu"
                 aria-expanded={moreMenuOpen}
                 aria-label="More categories menu"
-                className={`py-1.5 flex items-center gap-1 whitespace-nowrap transition-colors relative cursor-pointer text-xs sm:text-sm font-medium border-b-2 focus:outline-none ${
+                className={`px-3 sm:px-3.5 py-1.5 rounded-full flex items-center gap-1 whitespace-nowrap transition-all relative cursor-pointer text-xs sm:text-sm focus:outline-none select-none ${
                   isMoreActive
-                    ? "text-[#101828] font-bold border-[#FBBF24]"
-                    : "text-[#6B7280] hover:text-[#101828] border-transparent"
+                    ? "bg-[#FFF6D8] text-[#101828] font-bold"
+                    : "text-[#6B7280] hover:text-[#101828] hover:bg-[#F4F5F8] font-medium"
                 }`}
               >
                 <span>More</span>
@@ -677,6 +760,7 @@ export default function Navbar({ onSearchChange }) {
           </div>
         </div>
       </nav>
+      )}
 
       {/* Manual Location Modal */}
       {showLocationModal && (
@@ -814,6 +898,21 @@ export default function Navbar({ onSearchChange }) {
                     <span>{cat.label}</span>
                   </NavLink>
                 ))}
+                <Link
+                  to="/wishlist"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-[#111925] hover:bg-[#F4F5F8] transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Heart size={16} className={wishlistCount > 0 ? "text-[#DC2626] fill-[#DC2626]" : "text-[#111925]"} />
+                    <span>My Wishlist</span>
+                  </div>
+                  {wishlistCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#FEE2E2] text-[#DC2626]">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
                 {user ? (
                   <Link
                     to="/profile"

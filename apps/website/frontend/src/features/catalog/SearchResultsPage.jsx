@@ -12,6 +12,7 @@ export default function SearchResultsPage() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const categoryFilter = searchParams.get("cat") || "all";
+  const storeFilter = searchParams.get("store") || "";
 
   const { cart } = useCart();
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export default function SearchResultsPage() {
   const [matchingProducts, setMatchingProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch search products from backend MongoDB API
+  // Fetch search products from backend/local catalog
   useEffect(() => {
     let isMounted = true;
     const fetchSearchData = async () => {
@@ -30,15 +31,30 @@ export default function SearchResultsPage() {
           productService.getProducts({
             search: query,
             category: categoryFilter,
-            limit: 100
+            store: storeFilter,
+            limit: 100,
           }),
-          productService.getProducts({ limit: 50 })
+          productService.getProducts({ limit: 250 }),
         ]);
 
         if (isMounted) {
-          const matched = searchRes.data || [];
+          let matched = searchRes.data || [];
+          const all = generalRes.data || [];
+
+          // If strict search had 0 items, use searchCatalog fuzzy matching on all products
+          if (matched.length === 0 && query) {
+            const catalog = searchCatalog(query, all);
+            matched = catalog.products || [];
+            if (categoryFilter && categoryFilter !== "all") {
+              matched = matched.filter((p) => p.categoryKey === categoryFilter);
+            }
+            if (storeFilter && storeFilter !== "all") {
+              matched = matched.filter((p) => p.store?.toLowerCase().includes(storeFilter.toLowerCase()));
+            }
+          }
+
           setMatchingProducts(matched);
-          setAllProducts(generalRes.data || []);
+          setAllProducts(all);
         }
       } catch (err) {
         console.error("Error fetching search results:", err);
@@ -49,7 +65,7 @@ export default function SearchResultsPage() {
 
     fetchSearchData();
     return () => { isMounted = false; };
-  }, [query, categoryFilter]);
+  }, [query, categoryFilter, storeFilter]);
 
   // Perform instant fuzzy catalog search for category suggestions
   const searchResults = useMemo(() => {
@@ -73,7 +89,7 @@ export default function SearchResultsPage() {
   return (
     <div className="bg-white min-h-screen text-[#111925] flex flex-col font-sans" style={{ fontFamily: "'Manrope', sans-serif" }}>
       {/* Universal Sticky Top Header Navbar */}
-      <Navbar searchPlaceholder="Search for items (e.g. Tomato, Milk, Paneer, Atta)..." />
+      <Navbar />
 
       {/* SEARCH HEADER */}
       <section className="bg-white border-b border-[#ECEEF2] py-4 sm:py-5">
@@ -81,7 +97,13 @@ export default function SearchResultsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-xl sm:text-2xl font-black text-[#111925] tracking-tight">
-                {query ? `Search Results for "${query}"` : "Explore Catalog"}
+                {query
+                  ? `Search Results for "${query}"`
+                  : storeFilter
+                  ? `Products from "${storeFilter}"`
+                  : categoryFilter !== "all"
+                  ? `Category: ${categoryFilter}`
+                  : "Explore Catalog"}
               </h1>
               <p className="text-xs text-[#6B7280] font-semibold mt-0.5">
                 {matchingProducts.length} product{matchingProducts.length === 1 ? "" : "s"} ready for instant 15-30 min delivery
@@ -135,7 +157,7 @@ export default function SearchResultsPage() {
                 Try searching for "Tomatoes", "Milk", "Atta", "Paneer", "Rice", or "Burger".
               </p>
               <Link
-                to="/categories"
+                to="/category/grocery"
                 className="inline-block bg-[#FEC201] hover:bg-[#F5B800] text-[#111925] font-extrabold px-6 py-2.5 rounded-full text-xs transition-colors cursor-pointer shadow-xs"
               >
                 Browse All Categories
@@ -158,7 +180,7 @@ export default function SearchResultsPage() {
                 <Layers size={18} className="text-[#111925]" />
                 Similar Categories You Might Like
               </h3>
-              <Link to="/categories" className="text-xs font-extrabold text-[#111925] hover:text-[#F5B800] flex items-center gap-1">
+              <Link to="/category/grocery" className="text-xs font-extrabold text-[#111925] hover:text-[#F5B800] flex items-center gap-1">
                 View All Categories <ArrowRight size={12} />
               </Link>
             </div>

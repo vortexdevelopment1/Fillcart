@@ -74,9 +74,13 @@ export default function SearchDropdown({
       if (q.length >= 1) {
         setLoading(true);
         try {
-          const res = await productService.getProducts({ search: q, limit: 12 });
+          const res = await productService.getProducts({ search: q, limit: 30 });
           if (isMounted) {
-            const apiProducts = res.data || [];
+            let apiProducts = res.data || [];
+            if (apiProducts.length === 0) {
+              const allRes = await productService.getProducts({ limit: 200 });
+              apiProducts = allRes.data || [];
+            }
             const searchRes = searchCatalog(q, apiProducts);
             setSearchResult(searchRes);
             setIsOpen(true);
@@ -120,7 +124,10 @@ export default function SearchDropdown({
   };
 
   const handleSubmit = (e) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      if (typeof e.stopPropagation === "function") e.stopPropagation();
+    }
     if (!query.trim()) return;
 
     setIsOpen(false);
@@ -133,7 +140,9 @@ export default function SearchDropdown({
 
   const handleCategoryClick = (catKey) => {
     setIsOpen(false);
-    navigate(`/categories?cat=${catKey}&q=${encodeURIComponent(query.trim())}`);
+    if (catKey) {
+      navigate(`/search?cat=${encodeURIComponent(catKey)}&q=${encodeURIComponent(query.trim())}`);
+    }
   };
 
   const handleStoreClick = (storeName) => {
@@ -141,15 +150,17 @@ export default function SearchDropdown({
     navigate(`/search?store=${encodeURIComponent(storeName)}`);
   };
 
-  const handleProductClick = (prodId) => {
+  const handleProductClick = (prod) => {
     setIsOpen(false);
-    navigate(`/product/${prodId}`);
+    const target = typeof prod === "object" ? prod.slug || prod.id || prod.productId : prod;
+    navigate(`/product/${target}`);
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Escape") {
       setIsOpen(false);
     } else if (e.key === "Enter") {
+      e.preventDefault();
       handleSubmit(e);
     }
   };
@@ -235,7 +246,14 @@ export default function SearchDropdown({
                   Showing results for{" "}
                   <strong
                     className="underline cursor-pointer"
-                    onClick={() => handleCategoryClick(searchResult.topCategoryMatch?.key)}
+                    onClick={() => {
+                      if (searchResult.topCategoryMatch?.key) {
+                        handleCategoryClick(searchResult.topCategoryMatch.key);
+                      } else {
+                        setQuery(searchResult.didYouMean);
+                        navigate(`/search?q=${encodeURIComponent(searchResult.didYouMean)}`);
+                      }
+                    }}
                   >
                     {searchResult.didYouMean}
                   </strong>
@@ -263,16 +281,17 @@ export default function SearchDropdown({
                   </div>
                   <div className="space-y-1.5">
                     {searchResult.products.slice(0, 6).map((prod) => {
-                      const inCart = cart.find((item) => item.id === prod.id);
+                      const inCart = (cart || []).find((item) => item && (item.id === prod.id || item.productId === prod.id));
+                      const imgSrc = prod.img || prod.image || "https://res.cloudinary.com/l44x18ko/image/upload/v1795688066/fillcart/products/placeholder.png";
                       return (
                         <div
-                          key={prod.id}
-                          onClick={() => handleProductClick(prod.id)}
+                          key={prod.id || prod.slug}
+                          onClick={() => handleProductClick(prod)}
                           className="flex items-center justify-between p-2 rounded-xl hover:bg-[#F4F5F8] transition-colors cursor-pointer group border border-transparent hover:border-[#ECEEF2]"
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="w-11 h-11 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-200/60">
-                              <img src={prod.img} alt={prod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                              <img src={imgSrc} alt={prod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                             </div>
                             <div className="min-w-0">
                               <h4 className="text-xs font-extrabold text-[#111925] group-hover:text-[#F5B800] truncate">
@@ -339,23 +358,36 @@ export default function SearchDropdown({
                     Categories ({searchResult.categories.length})
                   </div>
                   <div className="grid grid-cols-2 gap-1.5">
-                    {searchResult.categories.slice(0, 4).map((cat) => (
-                      <button
-                        type="button"
-                        key={cat.key}
-                        onClick={() => handleCategoryClick(cat.key)}
-                        className="flex items-center gap-2 p-2 rounded-xl bg-white hover:bg-[#F4F5F8] border border-[#ECEEF2] text-left transition-colors cursor-pointer group"
-                      >
-                        <span className="text-base">{cat.icon}</span>
-                        <div className="min-w-0">
-                          <div className="text-xs font-extrabold text-[#111925] group-hover:text-[#F5B800] truncate">
-                            {cat.name}
+                    {searchResult.categories.slice(0, 4).map((cat) => {
+                      const IconComp = cat.icon;
+                      return (
+                        <button
+                          type="button"
+                          key={cat.key || cat.id}
+                          onClick={() => handleCategoryClick(cat.key)}
+                          className="flex items-center gap-2 p-2 rounded-xl bg-white hover:bg-[#F4F5F8] border border-[#ECEEF2] text-left transition-colors cursor-pointer group"
+                        >
+                          <span className="w-6 h-6 rounded-lg bg-[#F4F5F8] text-[#166534] flex items-center justify-center shrink-0">
+                            {IconComp ? (
+                              typeof IconComp === "string" ? (
+                                IconComp
+                              ) : (
+                                <IconComp size={14} />
+                              )
+                            ) : (
+                              "🛒"
+                            )}
+                          </span>
+                          <div className="min-w-0">
+                            <div className="text-xs font-extrabold text-[#111925] group-hover:text-[#F5B800] truncate">
+                              {cat.name}
+                            </div>
+                            <div className="text-[10px] text-slate-400">Department</div>
                           </div>
-                          <div className="text-[10px] text-slate-400">Department</div>
-                        </div>
-                        <ChevronRight size={12} className="ml-auto text-slate-300 group-hover:text-[#111925] shrink-0" />
-                      </button>
-                    ))}
+                          <ChevronRight size={12} className="ml-auto text-slate-300 group-hover:text-[#111925] shrink-0" />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
