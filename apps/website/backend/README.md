@@ -138,11 +138,15 @@ npm run db:studio
 
 ## Customer Storefront Endpoints (`/api/v1`)
 
-> **Total Storefront APIs Implemented:** **18 Endpoints** (17 Public Storefront + 1 Health Probe)  
-> All endpoints are public, require no token/login, and return standardized JSON responses.
+> **Total Storefront APIs Implemented:** **34 Endpoints**  
+> - **18 Public Storefront Endpoints** (Home, Categories, Stores, Products, Search, Offers, Leads, FAQs, Health)  
+> - **16 Customer Authenticated Endpoints** (Cart, Wishlist, Addresses, Customer Profile protected by `requireAuth`)
 
+All endpoints return standardized JSON responses:
 - Success: `{ "success": true, "data": ... }`
 - Error: `{ "success": false, "error": { "code": "...", "message": "..." } }`
+
+### Public Endpoints (No Token Required)
 
 | Method | Endpoint | Query / Body Parameters | Description |
 | :--- | :--- | :--- | :--- |
@@ -164,6 +168,27 @@ npm run db:studio
 | `POST` | `/api/v1/support/messages` | Body: `{ subject, category, orderId?, description, fullName?, email?, phone? }` | Support desk ticket creation (rate limited: 5 req / 10 min) |
 | `GET` | `/api/v1/faqs` | `category` (optional), `q` (optional query search) | FAQ Help Centre questions and answers |
 | `POST` | `/api/v1/newsletter/subscribe` | Body: `{ email }` | Newsletter / daily deals email subscription (rate limited: 5 req / 10 min) |
+
+### Authenticated Endpoints (`Authorization: Bearer <CentralAuthJWT>`)
+
+| Method | Endpoint | Query / Body Parameters | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/cart` | None | Fetch user's persistent cart, items, product specs & subtotal |
+| `POST` | `/api/v1/cart/items` | Body: `{ productId \| slug, quantity? }` | Add item or increment quantity in user's cart (max 20 per item) |
+| `PATCH` | `/api/v1/cart/items/:itemId` | Body: `{ quantity }` | Update item quantity in cart (`0` removes item) |
+| `DELETE` | `/api/v1/cart/items/:itemId` | Path parameter `:itemId` | Remove specific item from cart |
+| `DELETE` | `/api/v1/cart` | None | Clear entire cart |
+| `POST` | `/api/v1/cart/merge` | Body: `{ items: [{ productId \| slug, quantity }] }` | Merge guest/local cart items on customer login |
+| `GET` | `/api/v1/wishlist` | None | Fetch user's wishlisted products |
+| `POST` | `/api/v1/wishlist/items` | Body: `{ productId \| slug }` | Add product to user's wishlist |
+| `DELETE` | `/api/v1/wishlist/items/:productId` | Path parameter `:productId` (UUID or slug) | Remove product from user's wishlist |
+| `GET` | `/api/v1/addresses` | None | List saved delivery addresses for user |
+| `POST` | `/api/v1/addresses` | Body: `{ label, fullName, phone, line1, line2?, landmark?, city, state, pincode, isDefault? }` | Create new delivery address |
+| `PATCH` | `/api/v1/addresses/:id` | Body: Address fields to update | Update existing delivery address |
+| `DELETE` | `/api/v1/addresses/:id` | Path parameter `:id` | Delete delivery address |
+| `PATCH` | `/api/v1/addresses/:id/default` | Path parameter `:id` | Set address as default in atomic transaction |
+| `GET` | `/api/v1/me/profile` | None | Fetch customer profile (fullName, phone, avatarUrl) |
+| `PATCH` | `/api/v1/me/profile` | Body: `{ fullName?, phone?, avatarUrl? }` | Update customer profile |
 
 ### Example cURL Invocations
 

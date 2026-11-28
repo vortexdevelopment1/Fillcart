@@ -664,23 +664,24 @@ To ensure seamless integration with the existing frontend, backend development s
 
 ---
 
-### Phase 2: Customer Authenticated State APIs (15 Endpoints)
-*Connects logged-in user profile, synchronized multi-item cart, wishlist, and delivery addresses.*
-12. `GET /api/v1/cart` (Fetch persistent cart)
-13. `POST /api/v1/cart/items` (Add product to cart)
-14. `PATCH /api/v1/cart/items/:id` (Update item quantity)
-15. `DELETE /api/v1/cart/items/:id` (Remove item from cart)
+### Phase 2: Customer Authenticated State APIs (16 Endpoints) — [IMPLEMENTED]
+*Connects logged-in user profile, synchronized multi-item cart, wishlist, and delivery addresses via `requireAuth`.*
+12. `GET /api/v1/cart` (Fetch persistent cart, items, product details & subtotal)
+13. `POST /api/v1/cart/items` (Add product to cart / increment quantity)
+14. `PATCH /api/v1/cart/items/:itemId` (Update item quantity; 0 removes)
+15. `DELETE /api/v1/cart/items/:itemId` (Remove item from cart)
 16. `DELETE /api/v1/cart` (Clear cart)
-17. `GET /api/v1/wishlist` (List wishlisted products)
-18. `POST /api/v1/wishlist/:productId` (Save product)
-19. `DELETE /api/v1/wishlist/:productId` (Unsave product)
-20. `GET /api/v1/customer/profile` (Get profile)
-21. `PUT /api/v1/customer/profile` (Update full name & phone)
-22. `GET /api/v1/customer/addresses` (List saved addresses)
-23. `POST /api/v1/customer/addresses` (Create address)
-24. `PUT /api/v1/customer/addresses/:id` (Update address)
-25. `DELETE /api/v1/customer/addresses/:id` (Delete address)
-26. `PATCH /api/v1/customer/addresses/:id/default` (Set default delivery address)
+17. `POST /api/v1/cart/merge` (Merge guest cart items on login)
+18. `GET /api/v1/wishlist` (List wishlisted products)
+19. `POST /api/v1/wishlist/items` (Save product to wishlist)
+20. `DELETE /api/v1/wishlist/items/:productId` (Unsave product from wishlist)
+21. `GET /api/v1/me/profile` (Get profile)
+22. `PATCH /api/v1/me/profile` (Update full name, phone, avatar)
+23. `GET /api/v1/addresses` (List saved delivery addresses)
+24. `POST /api/v1/addresses` (Create address; first address auto-default)
+25. `PATCH /api/v1/addresses/:id` (Update address)
+26. `DELETE /api/v1/addresses/:id` (Delete address; promotes next address if default)
+27. `PATCH /api/v1/addresses/:id/default` (Set default delivery address in transaction)
 
 ---
 
