@@ -29,7 +29,7 @@ export default function BecomeRiderPage() {
 
   return (
     <div className="bg-white min-h-screen text-[#101828] font-sans flex flex-col" style={{ fontFamily: "var(--font-sans, 'Manrope', sans-serif)" }}>
-      <Navbar />
+      <Navbar hideCategoryNav={true} />
 
       <main className="flex-1 max-w-[1216px] w-full mx-auto px-4 sm:px-6 xl:px-0 py-8 sm:py-12 space-y-12">
         {/* Header */}

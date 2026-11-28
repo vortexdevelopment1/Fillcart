@@ -156,7 +156,7 @@ export default function CareersPage() {
   return (
     <div className="bg-[#FFFFFF] min-h-screen text-[#111925] flex flex-col font-sans" style={{ fontFamily: "'Manrope', sans-serif" }}>
       {/* Shared Common Navbar */}
-      <Navbar searchPlaceholder="Search career opportunities at FillCarts..." />
+      <Navbar hideCategoryNav={true} searchPlaceholder="Search career opportunities at FillCarts..." />
 
 
       {/* 1. HERO SECTION */}

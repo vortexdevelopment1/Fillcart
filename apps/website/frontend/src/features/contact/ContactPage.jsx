@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Mail,
   Phone,
@@ -6,6 +6,7 @@ import {
   MessageCircle,
   ChevronDown,
   CheckCircle2,
+  Check,
   Send,
   Loader2,
 } from "lucide-react";
@@ -25,6 +26,24 @@ export default function ContactPage() {
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [subjectDropdownOpen, setSubjectDropdownOpen] = useState(false);
+  const subjectDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (subjectDropdownRef.current && !subjectDropdownRef.current.contains(e.target)) {
+        setSubjectDropdownOpen(false);
+      }
+    };
+    if (subjectDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside, { passive: true });
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [subjectDropdownOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -146,7 +165,7 @@ export default function ContactPage() {
       `}</style>
 
       {/* Global Navbar */}
-      <Navbar />
+      <Navbar hideCategoryNav={true} />
 
       <main className="flex-1 w-full">
         {/* 1. HERO BANNER */}
@@ -441,43 +460,87 @@ export default function ContactPage() {
                       )}
                     </div>
 
-                    {/* Subject */}
-                    <div className="flex flex-col">
+                    {/* Subject Custom Dropdown */}
+                    <div className="flex flex-col" ref={subjectDropdownRef}>
                       <label
-                        htmlFor="subject"
-                        className="block font-semibold text-[14px] leading-[20px] text-[#1F2937] mb-[6px]"
+                        id="subject-label"
+                        className="block font-semibold text-[14px] leading-[20px] text-[#1F2937] mb-[6px] select-none"
                       >
                         Subject <span className="text-[#EF4444] ml-[3px]">*</span>
                       </label>
                       <div className="relative">
-                        <select
-                          id="subject"
-                          name="subject"
-                          value={formData.subject}
-                          onChange={handleChange}
-                          aria-invalid={!!formErrors.subject}
-                          aria-describedby={formErrors.subject ? "subject-error" : undefined}
-                          className={`w-full h-[46px] rounded-[12px] bg-white pl-[16px] pr-[40px] text-[14px] appearance-none transition-colors cursor-pointer border ${
-                            !formData.subject ? "text-[#4B5563]" : "text-[#111827]"
+                        <button
+                          type="button"
+                          id="subject-button"
+                          aria-haspopup="listbox"
+                          aria-expanded={subjectDropdownOpen}
+                          aria-labelledby="subject-label subject-button"
+                          onClick={() => setSubjectDropdownOpen((prev) => !prev)}
+                          className={`w-full h-[46px] rounded-[12px] bg-white pl-[16px] pr-[14px] text-[14px] flex items-center justify-between transition-all cursor-pointer border select-none ${
+                            !formData.subject ? "text-[#9CA3AF]" : "text-[#111827] font-medium"
                           } ${
                             formErrors.subject
-                              ? "border-[#DC2626] contact-input-error"
-                              : "border-[#E5E7EB] contact-input"
+                              ? "border-[#DC2626] ring-2 ring-[#DC2626]/20"
+                              : subjectDropdownOpen
+                              ? "border-[#F5B800] ring-2 ring-[#F5B800]/25 shadow-xs"
+                              : "border-[#E5E7EB] hover:border-[#D1D5DB]"
                           }`}
                         >
-                          <option value="" disabled>
-                            Select a topic
-                          </option>
-                          {contactData.subjectOptions.map((opt) => (
-                            <option key={opt} value={opt} className="text-[#111827]">
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown
-                          className="absolute right-[16px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[#374151] pointer-events-none"
-                          aria-hidden="true"
-                        />
+                          <span className="truncate">
+                            {formData.subject || "Select a topic"}
+                          </span>
+                          <ChevronDown
+                            size={18}
+                            strokeWidth={2.2}
+                            className={`text-[#6B7280] transition-transform duration-200 shrink-0 ${
+                              subjectDropdownOpen ? "rotate-180 text-[#111827]" : ""
+                            }`}
+                            aria-hidden="true"
+                          />
+                        </button>
+
+                        {/* Floating Themed Menu */}
+                        {subjectDropdownOpen && (
+                          <div
+                            role="listbox"
+                            aria-labelledby="subject-label"
+                            className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-white border border-[#E5E7EB] rounded-[16px] p-1.5 shadow-[0_12px_30px_rgba(16,24,40,0.12)] max-h-60 overflow-y-auto animate-scale-up"
+                            style={{ fontFamily: "'Manrope', sans-serif" }}
+                          >
+                            {contactData.subjectOptions.map((opt) => {
+                              const isSelected = formData.subject === opt;
+                              return (
+                                <button
+                                  key={opt}
+                                  type="button"
+                                  role="option"
+                                  aria-selected={isSelected}
+                                  onClick={() => {
+                                    setFormData((prev) => ({ ...prev, subject: opt }));
+                                    if (formErrors.subject) {
+                                      setFormErrors((prev) => ({ ...prev, subject: "" }));
+                                    }
+                                    setSubjectDropdownOpen(false);
+                                  }}
+                                  className={`w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-[10px] text-left transition-colors cursor-pointer select-none ${
+                                    isSelected
+                                      ? "bg-[#FFF4DA] text-[#101828] font-bold"
+                                      : "text-[#111827] hover:bg-[#F4F5F8] font-medium"
+                                  }`}
+                                >
+                                  <span>{opt}</span>
+                                  {isSelected && (
+                                    <Check
+                                      size={16}
+                                      strokeWidth={2.5}
+                                      className="text-[#D49400] shrink-0 ml-2"
+                                    />
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                       {formErrors.subject && (
                         <p

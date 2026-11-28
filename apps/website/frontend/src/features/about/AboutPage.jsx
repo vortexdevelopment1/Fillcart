@@ -112,7 +112,7 @@ export default function AboutPage() {
       `}</style>
 
       {/* 1. Global Navbar */}
-      <Navbar />
+      <Navbar hideCategoryNav={true} />
 
       <main className="flex-1 w-full pb-16 lg:pb-[60px]">
         {/* Main 1216px Container */}

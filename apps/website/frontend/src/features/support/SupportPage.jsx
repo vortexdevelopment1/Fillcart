@@ -13,6 +13,7 @@ import {
   Phone,
   Mail,
   CheckCircle2,
+  Check,
   LifeBuoy,
   Send,
   HelpCircle,
@@ -106,6 +107,32 @@ export default function SupportPage() {
     description: "",
   });
   const [ticketSubmitted, setTicketSubmitted] = useState(false);
+  const [ticketCatOpen, setTicketCatOpen] = useState(false);
+  const ticketCatRef = useRef(null);
+
+  const TICKET_CATEGORIES = [
+    "Orders & Delivery",
+    "Payments & Refunds",
+    "Return & Replacement",
+    "Account & Settings",
+    "Other Query",
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ticketCatRef.current && !ticketCatRef.current.contains(e.target)) {
+        setTicketCatOpen(false);
+      }
+    };
+    if (ticketCatOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside, { passive: true });
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [ticketCatOpen]);
 
   // Live Chat simulation state
   const [chatMessages, setChatMessages] = useState([
@@ -260,7 +287,7 @@ export default function SupportPage() {
       className="min-h-screen flex flex-col bg-white text-[#101828] selection:bg-[#FFE9A8] selection:text-[#101828]"
       style={{ fontFamily: "var(--font-sans, 'Manrope', sans-serif)" }}
     >
-      <Navbar />
+      <Navbar hideCategoryNav={true} />
 
       <main className="flex-1 w-full">
         {/* 1. HERO SECTION (Full width, gradient) */}
@@ -944,23 +971,60 @@ export default function SupportPage() {
               </div>
             ) : (
               <form onSubmit={handleTicketSubmit} className="space-y-4 text-xs">
-                <div>
-                  <label className="block font-extrabold text-[#101828] mb-1">
+                <div className="relative" ref={ticketCatRef}>
+                  <label className="block font-extrabold text-[#101828] mb-1 select-none">
                     Issue Category *
                   </label>
-                  <select
-                    value={ticketForm.category}
-                    onChange={(e) =>
-                      setTicketForm({ ...ticketForm, category: e.target.value })
-                    }
-                    className="w-full bg-[#FFFFFF] border border-slate-200 rounded-xl px-3 py-2 font-bold text-xs focus:outline-none focus:border-[#F5B800] cursor-pointer"
+                  <button
+                    type="button"
+                    onClick={() => setTicketCatOpen((prev) => !prev)}
+                    className={`w-full bg-[#FFFFFF] border rounded-xl px-3.5 py-2.5 font-bold text-xs flex items-center justify-between cursor-pointer transition-all select-none ${
+                      ticketCatOpen
+                        ? "border-[#F5B800] ring-2 ring-[#F5B800]/25"
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
                   >
-                    <option>Orders &amp; Delivery</option>
-                    <option>Payments &amp; Refunds</option>
-                    <option>Return &amp; Replacement</option>
-                    <option>Account &amp; Settings</option>
-                    <option>Other Query</option>
-                  </select>
+                    <span className="text-[#101828]">{ticketForm.category}</span>
+                    <ChevronDown
+                      size={14}
+                      strokeWidth={2.2}
+                      className={`text-[#667085] transition-transform duration-200 shrink-0 ${
+                        ticketCatOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {ticketCatOpen && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-white border border-slate-200 rounded-xl p-1 shadow-lg max-h-48 overflow-y-auto animate-scale-up">
+                      {TICKET_CATEGORIES.map((cat) => {
+                        const isSelected = ticketForm.category === cat;
+                        return (
+                          <button
+                            key={cat}
+                            type="button"
+                            onClick={() => {
+                              setTicketForm((prev) => ({ ...prev, category: cat }));
+                              setTicketCatOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg text-left transition-colors cursor-pointer select-none ${
+                              isSelected
+                                ? "bg-[#FFF4DA] text-[#101828] font-bold"
+                                : "text-slate-700 hover:bg-slate-50 font-semibold"
+                            }`}
+                          >
+                            <span>{cat}</span>
+                            {isSelected && (
+                              <Check
+                                size={14}
+                                strokeWidth={2.4}
+                                className="text-[#D49400] shrink-0 ml-1.5"
+                              />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

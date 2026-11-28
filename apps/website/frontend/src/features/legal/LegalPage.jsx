@@ -37,6 +37,29 @@ const iconMap = {
   Lock,
 };
 
+function LegalGavelIcon({ size = 28, className = "", style = {} }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      style={style}
+    >
+      <path d="M2 21h12" />
+      <path d="M10 13l8 8" />
+      <path d="M12 4l3 3-8 8-3-3 8-8z" />
+      <path d="M9 7l3 3" />
+      <path d="M6 10l3 3" />
+    </svg>
+  );
+}
+
 export default function LegalPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -196,7 +219,7 @@ export default function LegalPage() {
       style={{ fontFamily: "Inter, sans-serif" }}
     >
       {/* 1. NAVBAR */}
-      <Navbar />
+      <Navbar hideCategoryNav={true} />
 
       <main className="flex-1 w-full overflow-visible">
         {/* 2. HERO (Figma: 1440 x 316, background #111925, directly under Navbar) */}
@@ -254,10 +277,10 @@ export default function LegalPage() {
             aria-label="Legal pages"
             style={{
               backgroundColor: "#FFF6E6",
-              borderRadius: "12px",
+              borderRadius: "16px",
               padding: "24px 16px",
             }}
-            className="w-full lg:w-[256px] shrink-0 flex flex-col lg:sticky lg:top-[126px] lg:max-h-[calc(100vh-150px)] lg:overflow-y-auto"
+            className="w-full lg:w-[276px] shrink-0 flex flex-col lg:sticky lg:top-[126px] lg:max-h-[calc(100vh-150px)] lg:overflow-y-auto"
           >
             {legal.menu.map((group, groupIndex) => (
               <div key={group.group} className="flex flex-col">
@@ -273,12 +296,13 @@ export default function LegalPage() {
                 )}
 
                 {/* Group Header */}
-                <div className="mb-4">
+                <div className="mb-3 px-2">
                   <h2
                     style={{
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      fontWeight: 600,
+                      fontSize: "13px",
+                      lineHeight: "18px",
+                      fontWeight: 700,
+                      letterSpacing: "0.5px",
                       color: "#1E1E1E",
                       textTransform: "uppercase",
                     }}
@@ -291,7 +315,7 @@ export default function LegalPage() {
                       fontSize: "12px",
                       lineHeight: "16px",
                       fontWeight: 400,
-                      color: "#5F5F5F",
+                      color: "#667085",
                     }}
                   >
                     {group.sub}
@@ -310,17 +334,18 @@ export default function LegalPage() {
                           key={item.label}
                           to={item.target}
                           style={{
-                            height: "44px",
+                            height: "40px",
                             borderRadius: "10px",
+                            fontWeight: 600,
                           }}
-                          className="px-3 flex items-center gap-3 text-[15px] font-medium text-[#1E1E1E] transition-colors hover:bg-[#FFEFD0] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#F8AB18] focus-visible:ring-offset-2"
+                          className="px-3 flex items-center gap-3 text-[14px] text-[#1E1E1E] transition-colors hover:bg-[#FFEFD0] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#F8AB18] focus-visible:ring-offset-2 select-none"
                         >
                           <IconComponent
-                            size={20}
-                            strokeWidth={1.75}
+                            size={18}
+                            strokeWidth={2}
                             className="text-[#1E1E1E] shrink-0"
                           />
-                          <span className="truncate">{item.label}</span>
+                          <span className="whitespace-nowrap">{item.label}</span>
                         </Link>
                       );
                     }
@@ -332,19 +357,19 @@ export default function LegalPage() {
                         onClick={(e) => handleItemClick(e, item)}
                         aria-current={active ? "true" : undefined}
                         style={{
-                          height: "44px",
+                          height: "40px",
                           borderRadius: "10px",
                           backgroundColor: active ? "#FFE7BA" : "transparent",
-                          fontWeight: active ? 600 : 500,
+                          fontWeight: 600,
                         }}
-                        className={`px-3 flex items-center gap-3 text-[15px] text-[#1E1E1E] transition-colors hover:bg-[#FFEFD0] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#F8AB18] focus-visible:ring-offset-2 cursor-pointer`}
+                        className={`px-3 flex items-center gap-3 text-[14px] text-[#1E1E1E] transition-colors hover:bg-[#FFEFD0] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#F8AB18] focus-visible:ring-offset-2 cursor-pointer select-none`}
                       >
                         <IconComponent
-                          size={20}
-                          strokeWidth={1.75}
+                          size={18}
+                          strokeWidth={2}
                           className="text-[#1E1E1E] shrink-0"
                         />
-                        <span className="truncate">{item.label}</span>
+                        <span className="whitespace-nowrap">{item.label}</span>
                       </a>
                     );
                   })}
@@ -374,12 +399,12 @@ export default function LegalPage() {
                 }}
                 className="flex items-center gap-3 pb-3 mb-8"
               >
-                <Gavel size={28} style={{ color: "#F8AB18" }} className="shrink-0" />
+                <LegalGavelIcon size={28} style={{ color: "#F8AB18" }} className="shrink-0" />
                 <h2
                   style={{
                     fontFamily: "Outfit, sans-serif",
                     color: "#F8AB18",
-                    fontWeight: 500,
+                    fontWeight: 700,
                   }}
                   className="text-[24px] md:text-[28px] leading-[32px] md:leading-[36px] m-0"
                 >
@@ -447,7 +472,7 @@ export default function LegalPage() {
                   style={{
                     fontFamily: "Outfit, sans-serif",
                     color: "#F8AB18",
-                    fontWeight: 500,
+                    fontWeight: 700,
                   }}
                   className="text-[24px] md:text-[28px] leading-[32px] md:leading-[36px] m-0"
                 >
