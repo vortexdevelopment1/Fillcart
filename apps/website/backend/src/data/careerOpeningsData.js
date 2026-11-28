@@ -1,0 +1,80 @@
+/**
+ * Single source of truth for Fillcart Hyperlocal Career Job Openings.
+ */
+export const careerOpenings = [
+  {
+    id: "geo-eng",
+    title: "Senior Geospatial & Dispatch Engineer",
+    department: "Engineering",
+    location: "Bengaluru, IN / Remote",
+    type: "Full-Time",
+    experience: "4-7 Years",
+    tag: "Core Tech",
+    description: "Build H3 grid spatial indexes, rider-vendor matching engines, and sub-100ms order dispatch pipelines using Node.js & Go.",
+    requirements: [
+      "Deep experience with PostGIS, H3, or Uber H3 spatial indexing",
+      "High-concurrency microservices architecture",
+      "WebSocket & Redis real-time state management",
+    ],
+  },
+  {
+    id: "merch-lead",
+    title: "Merchant POS & Kirana Onboarding Lead",
+    department: "Merchant Success",
+    location: "Delhi NCR, IN (On-Site)",
+    type: "Full-Time",
+    experience: "3-5 Years",
+    tag: "Field Operations",
+    description: "Lead field teams digitizing local kiranas, pharmacy stores, and fresh fruit vendors with our lightweight POS & inventory app.",
+    requirements: [
+      "Proven experience in retail merchant acquisition or SMB sales",
+      "Deep understanding of kirana supply chain dynamics",
+      "Fluency in local market expansion",
+    ],
+  },
+  {
+    id: "fleet-ops",
+    title: "Delivery Fleet Safety & Operations Manager",
+    department: "Fleet Operations",
+    location: "Mumbai, IN (Hybrid)",
+    type: "Full-Time",
+    experience: "3-6 Years",
+    tag: "Fleet Welfare",
+    description: "Manage rider onboarding, safety compliance, daily payout infrastructure, and localized rider hub management.",
+    requirements: [
+      "Experience managing 1000+ rider fleet operations",
+      "Strong data analytics & rider retention strategies",
+      "Passion for driver safety and fair payout standards",
+    ],
+  },
+  {
+    id: "micro-hub",
+    title: "Hyperlocal Micro-Fulfillment Manager",
+    department: "City Logistics",
+    location: "Pune, IN (On-Site)",
+    type: "Full-Time",
+    experience: "2-5 Years",
+    tag: "City Ops",
+    description: "Oversee pincode-level dark hubs, inventory accuracy, and express packing turnarounds under 3 minutes.",
+    requirements: [
+      "Experience in quick-commerce or e-commerce dark store management",
+      "Six Sigma or LEAN fulfillment process optimization",
+      "Team leadership over 30+ warehouse associates",
+    ],
+  },
+  {
+    id: "mob-android",
+    title: "Lead Mobile Engineer (Merchant & Rider Apps)",
+    department: "Engineering",
+    location: "Remote / Hybrid",
+    type: "Full-Time",
+    experience: "4-6 Years",
+    tag: "Mobile",
+    description: "Architect offline-first, low-bandwidth resilient Android apps used by thousands of shopkeepers and delivery partners daily.",
+    requirements: [
+      "React Native / Android Kotlin experience",
+      "Offline synchronization & SQLite local caching",
+      "Push notification & background location tracking reliability",
+    ],
+  },
+];

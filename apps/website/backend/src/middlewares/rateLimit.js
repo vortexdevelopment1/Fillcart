@@ -6,7 +6,11 @@
  * @param {number} options.windowMs - Time window in milliseconds (default: 10 minutes)
  * @param {number} options.max - Maximum requests allowed within window (default: 5)
  */
-export function rateLimit({ windowMs = 10 * 60 * 1000, max = 5 } = {}) {
+export function rateLimit({
+  windowMs = 10 * 60 * 1000,
+  max = 5,
+  message = "Too many requests. Please try again later.",
+} = {}) {
   const ipRequests = new Map();
 
   // Periodic cleanup of expired entries
@@ -42,7 +46,7 @@ export function rateLimit({ windowMs = 10 * 60 * 1000, max = 5 } = {}) {
         success: false,
         error: {
           code: "RATE_LIMITED",
-          message: "Too many contact requests. Please try again later.",
+          message,
         },
       });
     }
