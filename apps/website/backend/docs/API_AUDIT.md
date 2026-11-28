@@ -717,4 +717,28 @@ The following questions require decisions or clarifications from the Project Lea
 | **Q6** | **Document & Prescription Uploads Storage** | Prescription files and job resumes cannot be stored as base64 in the database. Should they use the existing Cloudinary account (`l44x18ko`) or an S3/Google Cloud Storage bucket? | Use Cloudinary's `raw` or `image` private upload under `fillcart/prescriptions/` and `fillcart/resumes/` to maintain a single cloud media provider. |
 
 ---
+
+## Part G: Orders, Tracking & Coupons Implementation Update (November 28, 2026)
+
+The standalone customer orders, tracking, and promotional coupon subsystems have been fully implemented in `apps/website/backend`:
+
+### Implemented Endpoints
+1. `POST /api/v1/coupons/apply` — Apply promo code to active cart (calculates discount, deliveryFee, tax, and grand total).
+2. `DELETE /api/v1/coupons/remove` — Remove active coupon from cart.
+3. `POST /api/v1/orders` — Atomically validate stock, snapshot address & items, create order + status event (PLACED) + redemption, decrement stock, and clear cart (COD only).
+4. `GET /api/v1/orders` — List user's orders with pagination and status filters.
+5. `GET /api/v1/orders/:orderId` — Fetch single order details (strictly isolated to owning user).
+6. `POST /api/v1/orders/:orderId/cancel` — Cancel order in PLACED or CONFIRMED state, restore inventory stock, and revert coupon redemption.
+7. `POST /api/v1/orders/:orderId/reorder` — Re-add available order items back into user's active cart.
+8. `GET /api/v1/orders/:orderId/track` — Retrieve order tracking timeline events and estimated delivery without exposing live rider/GPS.
+
+### Implemented Customer Database Models (schema `customer`)
+- `Order` (`orders`)
+- `OrderItem` (`order_items`)
+- `OrderStatusEvent` (`order_status_events`)
+- `Coupon` (`coupons`)
+- `CouponRedemption` (`coupon_redemptions`)
+- `Cart` (`carts`): Added `appliedCouponCode` field
+
+---
 *Report generated and validated by Antigravity Read-Only Audit Service.*

@@ -303,6 +303,54 @@ curl -X POST http://127.0.0.1:4100/api/v1/newsletter/subscribe \
     "email": "subscriber@example.com"
   }'
 ```
+
+#### 12. Promotional Coupons (requireAuth)
+```bash
+# Apply coupon code to cart (calculates discount, deliveryFee, tax, and grand total)
+curl -X POST http://127.0.0.1:4100/api/v1/coupons/apply \
+  -H "Authorization: Bearer <CUSTOMER_JWT>" \
+  -H "Content-Type: application/json" \
+  -d '{ "code": "WELCOME10" }'
+
+# Remove applied coupon from cart
+curl -X DELETE http://127.0.0.1:4100/api/v1/coupons/remove \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+```
+
+#### 13. Orders & Tracking (requireAuth)
+```bash
+# Place new order (COD only, validates stock, snapshots address & items, clears cart)
+curl -X POST http://127.0.0.1:4100/api/v1/orders \
+  -H "Authorization: Bearer <CUSTOMER_JWT>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "addressId": "your-address-uuid",
+    "paymentMethod": "COD",
+    "notes": "Ring bell on arrival"
+  }'
+
+# List customer orders (with pagination and optional status filter)
+curl -X GET "http://127.0.0.1:4100/api/v1/orders?page=1&limit=10" \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+
+# Get single order details by id or orderNumber (e.g. FC-123456)
+curl -X GET http://127.0.0.1:4100/api/v1/orders/FC-123456 \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+
+# Track order lifecycle & status timeline
+curl -X GET http://127.0.0.1:4100/api/v1/orders/FC-123456/track \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+
+# Cancel order (permitted only in PLACED or CONFIRMED state; restores stock)
+curl -X POST http://127.0.0.1:4100/api/v1/orders/FC-123456/cancel \
+  -H "Authorization: Bearer <CUSTOMER_JWT>" \
+  -H "Content-Type: application/json" \
+  -d '{ "reason": "Placed by mistake" }'
+
+# Reorder previous order (adds available items back into user cart)
+curl -X POST http://127.0.0.1:4100/api/v1/orders/FC-123456/reorder \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+```
 ```
 
 
