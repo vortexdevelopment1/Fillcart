@@ -18,6 +18,7 @@ import { addressRouter } from "./addresses.routes.js";
 import { profileRouter } from "./profile.routes.js";
 import { couponRouter } from "./coupons.routes.js";
 import { orderRouter } from "./orders.routes.js";
+import { prescriptionRouter } from "./prescriptions.routes.js";
 
 export const v1Router = Router();
 
@@ -43,3 +44,4 @@ v1Router.use("/addresses", addressRouter);
 v1Router.use("/me/profile", profileRouter);
 v1Router.use("/coupons", couponRouter);
 v1Router.use("/orders", orderRouter);
+v1Router.use("/prescriptions", prescriptionRouter);
