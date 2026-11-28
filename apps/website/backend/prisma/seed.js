@@ -18,6 +18,7 @@ import { CHILL_FROZEN_PRODUCTS } from "../src/data/chillFrozenProducts.js";
 import { DAILY_CARE_PRODUCTS } from "../src/data/dailyCareProducts.js";
 import { HOME_ESSENTIALS_PRODUCTS } from "../src/data/homeEssentialsProducts.js";
 import { toSlug } from "../src/data/productLookup.js";
+import { BLOG_POSTS } from "../src/data/blogData.js";
 
 async function main() {
   console.log("🌱 Starting customer database seeding...");
@@ -544,6 +545,48 @@ async function main() {
       couponCount++;
     }
     console.log(`✓ Seeded ${couponCount} promotional coupons.`);
+  }
+
+  // 7. Seed Blog Posts
+  if (prisma.blogPost) {
+    console.log("Seeding blog posts...");
+    let blogCount = 0;
+    for (const post of BLOG_POSTS) {
+      await prisma.blogPost.upsert({
+        where: { slug: post.slug },
+        update: {
+          title: post.title,
+          excerpt: post.excerpt,
+          content: post.content,
+          coverImageUrl: post.coverImageUrl,
+          category: post.category,
+          authorName: post.authorName,
+          authorRole: post.authorRole,
+          readTimeMinutes: post.readTimeMinutes,
+          tags: post.tags,
+          isFeatured: post.isFeatured,
+          isPublished: post.isPublished,
+          publishedAt: new Date(post.publishedAt),
+        },
+        create: {
+          slug: post.slug,
+          title: post.title,
+          excerpt: post.excerpt,
+          content: post.content,
+          coverImageUrl: post.coverImageUrl,
+          category: post.category,
+          authorName: post.authorName,
+          authorRole: post.authorRole,
+          readTimeMinutes: post.readTimeMinutes,
+          tags: post.tags,
+          isFeatured: post.isFeatured,
+          isPublished: post.isPublished,
+          publishedAt: new Date(post.publishedAt),
+        },
+      });
+      blogCount++;
+    }
+    console.log(`✓ Seeded ${blogCount} blog posts.`);
   }
 
   // Summary calculation
