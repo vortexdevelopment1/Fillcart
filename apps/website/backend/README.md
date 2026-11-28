@@ -138,21 +138,32 @@ npm run db:studio
 
 ## Customer Storefront Endpoints (`/api/v1`)
 
-All customer storefront APIs are public and return standardized JSON responses:
+> **Total Storefront APIs Implemented:** **18 Endpoints** (17 Public Storefront + 1 Health Probe)  
+> All endpoints are public, require no token/login, and return standardized JSON responses.
+
 - Success: `{ "success": true, "data": ... }`
 - Error: `{ "success": false, "error": { "code": "...", "message": "..." } }`
 
 | Method | Endpoint | Query / Body Parameters | Description |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/v1/health` | None | Service liveness health check |
-| `GET` | `/api/v1/home` | None | Home hero banners, featured categories, and 4 sections (popular, chill-frozen, daily-care, home-essentials) |
+| `GET` | `/api/v1/home` | None | Home hero banners, featured categories, and 4 sections |
 | `GET` | `/api/v1/categories` | `featured=true` (optional) | Active categories ordered by position |
 | `GET` | `/api/v1/stores` | `q` (optional name search) | Active neighbourhood stores |
 | `GET` | `/api/v1/stores/:slug` | Path parameter `:slug` | Store detail and catalog products (max 24) |
-| `GET` | `/api/v1/products` | `category`, `store`, `q`, `sort` (`popular` \| `price_asc` \| `price_desc`), `page` (default 1), `limit` (default 20, max 50) | Paginated catalog search and filtering |
+| `GET` | `/api/v1/products` | `category`, `store`, `q`, `sort`, `page`, `limit` | Paginated catalog search and filtering |
 | `GET` | `/api/v1/products/:slug` | Path parameter `:slug` | Product detail with gallery, nutrition, brand, and 8 related items |
 | `GET` | `/api/v1/offers` | `type` (`BANK` \| `WALLET` \| `UPI`, optional) | Active payment and bank discount offers |
-| `POST` | `/api/v1/contact` | Body: `{ fullName, email, phone?, subject?, message }` | Contact inquiry submission (rate limited: 5 req / 10 min per IP) |
+| `POST` | `/api/v1/contact` | Body: `{ fullName, email, phone?, subject?, message }` | Contact inquiry submission (rate limited: 5 req / 10 min) |
+| `GET` | `/api/v1/search` | `q` (min 2 chars), `limit` (default 8, max 20) | Unified search across products, stores, and categories |
+| `GET` | `/api/v1/search/suggestions` | `q` (min 1 char) | Quick dropdown suggestions (name, type, slug; max 8) |
+| `GET` | `/api/v1/careers/openings` | `department` (optional), `q` (optional) | Hyperlocal job openings list |
+| `POST` | `/api/v1/careers/applications` | Body: `{ fullName, email, phone, jobTitle?, department?, experience?, resumeName?, coverNote? }` | Career job application submission (rate limited: 5 req / 10 min) |
+| `POST` | `/api/v1/partners/vendor-applications` | Body: `{ storeName, ownerName, phone, email, category?, city, address }` | Merchant / store onboarding lead capture (rate limited: 5 req / 10 min) |
+| `POST` | `/api/v1/partners/rider-applications` | Body: `{ fullName, phone, email, city, vehicleType, hasLicense }` | Delivery partner rider application (rate limited: 5 req / 10 min) |
+| `POST` | `/api/v1/support/messages` | Body: `{ subject, category, orderId?, description, fullName?, email?, phone? }` | Support desk ticket creation (rate limited: 5 req / 10 min) |
+| `GET` | `/api/v1/faqs` | `category` (optional), `q` (optional query search) | FAQ Help Centre questions and answers |
+| `POST` | `/api/v1/newsletter/subscribe` | Body: `{ email }` | Newsletter / daily deals email subscription (rate limited: 5 req / 10 min) |
 
 ### Example cURL Invocations
 
@@ -194,6 +205,79 @@ curl -X POST http://127.0.0.1:4100/api/v1/contact \
     "subject": "Store Partnership",
     "message": "Hello, I am interested in partnering as a verified vendor."
   }'
+```
+
+#### 7. Unified Search & Suggestions
+```bash
+curl -X GET "http://127.0.0.1:4100/api/v1/search?q=milk&limit=8"
+curl -X GET "http://127.0.0.1:4100/api/v1/search/suggestions?q=fresh"
+```
+
+#### 8. Careers Openings & Job Application
+```bash
+curl -X GET "http://127.0.0.1:4100/api/v1/careers/openings?department=Engineering"
+curl -X POST http://127.0.0.1:4100/api/v1/careers/applications \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullName": "Rohan Verma",
+    "email": "rohan.verma@example.com",
+    "phone": "+91 98765 12345",
+    "jobTitle": "Senior Geospatial & Dispatch Engineer",
+    "department": "Engineering",
+    "experience": "4-7 Years",
+    "resumeName": "rohan_resume.pdf",
+    "coverNote": "Passionate about hyperlocal logistics."
+  }'
+```
+
+#### 9. Vendor & Rider Partner Applications
+```bash
+curl -X POST http://127.0.0.1:4100/api/v1/partners/vendor-applications \
+  -H "Content-Type: application/json" \
+  -d '{
+    "storeName": "Sharma Super Store",
+    "ownerName": "Mukesh Sharma",
+    "phone": "+91 98111 22233",
+    "email": "mukesh@example.com",
+    "category": "grocery",
+    "city": "Indore",
+    "address": "Shop 14, Scheme 78, Vijay Nagar, Indore"
+  }'
+
+curl -X POST http://127.0.0.1:4100/api/v1/partners/rider-applications \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullName": "Deepak Choudhary",
+    "phone": "+91 98222 33445",
+    "email": "deepak@example.com",
+    "city": "Indore",
+    "vehicleType": "bike",
+    "hasLicense": "yes"
+  }'
+```
+
+#### 10. Support Ticket Desk & Help Centre FAQs
+```bash
+curl -X POST http://127.0.0.1:4100/api/v1/support/messages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "category": "Orders & Delivery",
+    "subject": "Delayed refund for order FC-10492",
+    "orderId": "FC-10492",
+    "description": "Item was cancelled but refund has not reflected yet."
+  }'
+
+curl -X GET "http://127.0.0.1:4100/api/v1/faqs?category=orders"
+```
+
+#### 11. Newsletter Subscription
+```bash
+curl -X POST http://127.0.0.1:4100/api/v1/newsletter/subscribe \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "subscriber@example.com"
+  }'
+```
 ```
 
 
