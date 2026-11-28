@@ -451,6 +451,101 @@ async function main() {
   }
   console.log(`✓ Seeded ${offerCount} payment offers.`);
 
+  // 6. Seed Test & Promotional Coupons
+  if (prisma.coupon) {
+    console.log("Seeding coupons...");
+    const sampleCoupons = [
+      {
+        code: "WELCOME10",
+        description: "10% off on your order up to ₹100",
+        discountType: "PERCENT",
+        discountValue: 10,
+        minOrderValue: 0,
+        maxDiscount: 100,
+        perUserLimit: 1,
+        isActive: true,
+      },
+      {
+        code: "FLAT50",
+        description: "Flat ₹50 off on orders above ₹499",
+        discountType: "FLAT",
+        discountValue: 50,
+        minOrderValue: 499,
+        maxDiscount: null,
+        perUserLimit: 2,
+        isActive: true,
+      },
+      {
+        code: "EXPIRED20",
+        description: "Expired 20% discount voucher",
+        discountType: "PERCENT",
+        discountValue: 20,
+        minOrderValue: 100,
+        maxDiscount: 200,
+        expiresAt: new Date("2024-01-01T00:00:00.000Z"),
+        perUserLimit: 1,
+        isActive: true,
+      },
+      {
+        code: "INACTIVE100",
+        description: "Inactive promotional discount voucher",
+        discountType: "FLAT",
+        discountValue: 100,
+        minOrderValue: 200,
+        perUserLimit: 1,
+        isActive: false,
+      },
+      {
+        code: "FREEDEL",
+        description: "Free delivery discount (waives standard delivery charge)",
+        discountType: "FLAT",
+        discountValue: 39,
+        minOrderValue: 199,
+        perUserLimit: 5,
+        isActive: true,
+      },
+      {
+        code: "ONCEONLY",
+        description: "One-time customer reward coupon",
+        discountType: "FLAT",
+        discountValue: 25,
+        minOrderValue: 50,
+        perUserLimit: 1,
+        isActive: true,
+      },
+    ];
+
+    let couponCount = 0;
+    for (const c of sampleCoupons) {
+      await prisma.coupon.upsert({
+        where: { code: c.code },
+        update: {
+          description: c.description,
+          discountType: c.discountType,
+          discountValue: c.discountValue,
+          minOrderValue: c.minOrderValue,
+          maxDiscount: c.maxDiscount,
+          expiresAt: c.expiresAt || null,
+          perUserLimit: c.perUserLimit,
+          isActive: c.isActive,
+        },
+        create: {
+          code: c.code,
+          description: c.description,
+          discountType: c.discountType,
+          discountValue: c.discountValue,
+          minOrderValue: c.minOrderValue,
+          maxDiscount: c.maxDiscount,
+          expiresAt: c.expiresAt || null,
+          perUserLimit: c.perUserLimit,
+          isActive: c.isActive,
+        },
+      });
+      couponCount++;
+    }
+    console.log(`✓ Seeded ${couponCount} promotional coupons.`);
+  }
+
   // Summary calculation
   let popularCount = 0;
   let homeEssentialCount = 0;
