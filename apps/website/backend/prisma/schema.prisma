@@ -164,3 +164,76 @@ model StoreProduct {
   @@map("store_products")
   @@schema("customer")
 }
+
+model CareerApplication {
+  id          String   @id @default(uuid()) @map("id")
+  jobTitle    String?  @map("job_title")
+  department  String?  @map("department")
+  fullName    String   @map("full_name")
+  email       String   @map("email")
+  phone       String   @map("phone")
+  experience  String?  @map("experience")
+  resumeName  String?  @map("resume_name")
+  resumeUrl   String?  @map("resume_url")
+  coverNote   String?  @map("cover_note")
+  status      String   @default("NEW") @map("status")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("career_applications")
+  @@schema("customer")
+}
+
+model PartnerApplication {
+  id           String   @id @default(uuid()) @map("id")
+  partnerType  String   @map("partner_type") // VENDOR | RIDER
+  fullName     String   @map("full_name")
+  phone        String   @map("phone")
+  email        String?  @map("email")
+  city         String   @map("city")
+  storeName    String?  @map("store_name") // Vendor only
+  category     String?  @map("category")   // Vendor only
+  address      String?  @map("address")    // Vendor only
+  vehicleType  String?  @map("vehicle_type") // Rider only
+  hasLicense   String?  @map("has_license")  // Rider only
+  extraDetails Json?    @map("extra_details")
+  status       String   @default("NEW") @map("status")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([partnerType, status])
+  @@map("partner_applications")
+  @@schema("customer")
+}
+
+model SupportMessage {
+  id           String   @id @default(uuid()) @map("id")
+  ticketNumber String?  @map("ticket_number")
+  category     String   @map("category")
+  subject      String   @map("subject")
+  orderId      String?  @map("order_id")
+  description  String   @map("description")
+  fullName     String?  @map("full_name")
+  email        String?  @map("email")
+  phone        String?  @map("phone")
+  status       String   @default("NEW") @map("status")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("support_messages")
+  @@schema("customer")
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(uuid()) @map("id")
+  email     String   @unique @map("email")
+  status    String   @default("SUBSCRIBED") @map("status")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@map("newsletter_subscribers")
+  @@schema("customer")
+}
