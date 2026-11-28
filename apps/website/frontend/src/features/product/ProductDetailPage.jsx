@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   Star,
@@ -32,6 +32,17 @@ import {
   MAX_THUMBS,
 } from "../../lib/data/productDetailData.js";
 
+const DELIVERY_SLOT_OPTIONS = [
+  { id: "slot-today-eve", label: "Today · 7–9 PM", badge: "Fastest" },
+  { id: "slot-tomorrow-morn", label: "Tomorrow · 7–9 AM", badge: "Morning" },
+  { id: "slot-tomorrow-aft", label: "Tomorrow · 1–3 PM", badge: "Afternoon" },
+  { id: "slot-tomorrow-eve", label: "Tomorrow · 7–9 PM", badge: "Evening" },
+  { id: "slot-23-nov", label: "23 Nov 2026 · 7–9 PM", badge: "Standard" },
+  { id: "slot-24-nov-morn", label: "24 Nov 2026 · 7–9 AM", badge: null },
+  { id: "slot-24-nov-eve", label: "24 Nov 2026 · 7–9 PM", badge: null },
+  { id: "slot-25-nov-eve", label: "25 Nov 2026 · 7–9 PM", badge: null },
+];
+
 export default function ProductDetailPage() {
   const { slug: rawSlug, id: rawId } = useParams();
   const slugOrId = rawSlug || rawId;
@@ -58,6 +69,33 @@ export default function ProductDetailPage() {
   const [repeatDelivery, setRepeatDelivery] = useState(true);
   const [selectedFreq, setSelectedFreq] = useState("Weekly");
   const [scheduleDate, setScheduleDate] = useState("23 Nov 2026 · 7–9 PM");
+  const [isScheduleDropdownOpen, setIsScheduleDropdownOpen] = useState(false);
+  const scheduleDropdownRef = useRef(null);
+
+  // Close schedule dropdown on outside click or escape
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        scheduleDropdownRef.current &&
+        !scheduleDropdownRef.current.contains(event.target)
+      ) {
+        setIsScheduleDropdownOpen(false);
+      }
+    }
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setIsScheduleDropdownOpen(false);
+      }
+    }
+    if (isScheduleDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isScheduleDropdownOpen]);
 
   // Local Wishlist state
   const [localWishlisted, setLocalWishlisted] = useState(false);
@@ -74,6 +112,7 @@ export default function ProductDetailPage() {
     setSelectedPackIdx(0);
     setSelectedFreq("Weekly");
     setRepeatDelivery(true);
+    setIsScheduleDropdownOpen(false);
     window.scrollTo(0, 0);
   }, [slugOrId]);
 
@@ -193,18 +232,20 @@ export default function ProductDetailPage() {
 
   // Frequency text mapping
   const frequencyText = useMemo(() => {
+    const timeMatch = scheduleDate.match(/·\s*(.+)$/);
+    const timeSlot = timeMatch ? timeMatch[1] : "7–9 PM";
     switch (selectedFreq) {
       case "Daily":
-        return "Every day · 7–9 PM";
+        return `Every day · ${timeSlot}`;
       case "Weekly":
-        return "Every Monday · 7–9 PM";
+        return `Every Monday · ${timeSlot}`;
       case "Monthly":
-        return "Every month · 7–9 PM";
+        return `Every month · ${timeSlot}`;
       case "Custom":
       default:
         return "Custom schedule";
     }
-  }, [selectedFreq]);
+  }, [selectedFreq, scheduleDate]);
 
   return (
     <div
@@ -310,6 +351,9 @@ export default function ProductDetailPage() {
                             src={img}
                             alt={`${product.name} thumb ${idx + 1}`}
                             className="w-full h-full object-cover rounded-[9px]"
+                            onError={(e) => {
+                              e.currentTarget.src = "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=500&auto=format&fit=crop&q=80";
+                            }}
                           />
                           {/* +N Overlay */}
                           <div
@@ -359,6 +403,9 @@ export default function ProductDetailPage() {
                           src={img}
                           alt={`${product.name} thumb ${idx + 1}`}
                           className="w-full h-full object-cover rounded-[9px]"
+                          onError={(e) => {
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=500&auto=format&fit=crop&q=80";
+                          }}
                         />
                       </button>
                     );
@@ -403,6 +450,9 @@ export default function ProductDetailPage() {
                   <img
                     src={activeImage}
                     alt={product.name}
+                    onError={(e) => {
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=1000&auto=format&fit=crop&q=85";
+                    }}
                     style={{
                       filter:
                         "drop-shadow(0px 20px 26px rgba(0, 0, 0, 0.03)) drop-shadow(0px 8px 10px rgba(0, 0, 0, 0.08))",
@@ -910,26 +960,85 @@ export default function ProductDetailPage() {
                     Schedule delivery
                   </span>
 
-                  {/* Child 2: Date field (height 32px, font 12px, line-height 16px, padding 0 12px) */}
-                  <button
-                    type="button"
-                    style={{
-                      height: "32px",
-                      borderRadius: "8px",
-                      backgroundColor: "#F1F5F9",
-                      padding: "0 12px",
-                      fontWeight: 500,
-                      fontSize: "12px",
-                      lineHeight: "16px",
-                      color: "#334155",
-                      boxSizing: "border-box",
-                      margin: 0,
-                    }}
-                    className="w-full flex items-center justify-between cursor-pointer hover:bg-[#E2E8F0] transition-colors"
-                  >
-                    <span>{scheduleDate}</span>
-                    <ChevronDown size={14} className="text-[#64748B]" />
-                  </button>
+                  {/* Child 2: Date field dropdown (height 32px, font 12px, line-height 16px, padding 0 12px) */}
+                  <div className="relative w-full" ref={scheduleDropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsScheduleDropdownOpen((prev) => !prev)}
+                      aria-haspopup="listbox"
+                      aria-expanded={isScheduleDropdownOpen}
+                      style={{
+                        height: "32px",
+                        borderRadius: "8px",
+                        padding: "0 12px",
+                        fontWeight: 500,
+                        fontSize: "12px",
+                        lineHeight: "16px",
+                        color: "#334155",
+                        boxSizing: "border-box",
+                        margin: 0,
+                      }}
+                      className={`w-full flex items-center justify-between cursor-pointer transition-all border ${
+                        isScheduleDropdownOpen
+                          ? "bg-white border-[#F5B800] ring-2 ring-[#F5B800]/25 shadow-xs"
+                          : "bg-[#F1F5F9] border-transparent hover:bg-[#E2E8F0]"
+                      }`}
+                    >
+                      <span className="truncate pr-2 font-medium">{scheduleDate}</span>
+                      <ChevronDown
+                        size={14}
+                        className={`text-[#64748B] transition-transform duration-200 shrink-0 ${
+                          isScheduleDropdownOpen ? "rotate-180 text-[#D49400]" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {/* Popover dropdown list */}
+                    {isScheduleDropdownOpen && (
+                      <div
+                        role="listbox"
+                        aria-label="Delivery time slots"
+                        className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-white border border-[#E2E8F0] rounded-xl p-1.5 shadow-[0_12px_28px_rgba(15,23,42,0.15)] animate-scale-up max-h-[220px] overflow-y-auto"
+                        style={{ boxSizing: "border-box" }}
+                      >
+                        <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]">
+                          Select Delivery Slot
+                        </div>
+                        {DELIVERY_SLOT_OPTIONS.map((slot) => {
+                          const isSelected = scheduleDate === slot.label;
+                          return (
+                            <button
+                              key={slot.id}
+                              type="button"
+                              role="option"
+                              aria-selected={isSelected}
+                              onClick={() => {
+                                setScheduleDate(slot.label);
+                                setIsScheduleDropdownOpen(false);
+                              }}
+                              className={`w-full flex items-center justify-between px-2.5 py-1.5 text-[12px] rounded-lg text-left transition-colors cursor-pointer select-none my-0.5 ${
+                                isSelected
+                                  ? "bg-[#FFF4DA] text-[#101828] font-bold"
+                                  : "text-[#334155] hover:bg-[#F8FAFC] font-medium"
+                              }`}
+                            >
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <span className="truncate">{slot.label}</span>
+                                {slot.badge && !isSelected && (
+                                  <span className="px-1.5 py-0.5 text-[9px] font-bold rounded-full bg-[#F1F5F9] text-[#64748B] shrink-0">
+                                    {slot.badge}
+                                  </span>
+                                )}
+                              </div>
+                              {isSelected && (
+                                <Check size={14} className="text-[#D49400] shrink-0 ml-1.5 stroke-[2.5]" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
 
                   {/* Child 3: Repeat row wrapper: border-top 1px, pt 8px, row height 22px, total height 31px */}
                   <div

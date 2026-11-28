@@ -1,14 +1,39 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar.jsx";
 import Footer from "../../components/layout/Footer.jsx";
 import StoreCard from "../../components/common/StoreCard.jsx";
 import { stores } from "../../lib/data/storesData.js";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 
 export default function StoresListingPage() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recommended");
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const sortDropdownRef = useRef(null);
+
+  const STORE_SORT_OPTIONS = [
+    { value: "recommended", label: "Sort by: Recommended" },
+    { value: "rating", label: "Sort by: Rating" },
+    { value: "delivery", label: "Sort by: Delivery time" },
+    { value: "distance", label: "Sort by: Distance" },
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(e.target)) {
+        setSortDropdownOpen(false);
+      }
+    };
+    if (sortDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside, { passive: true });
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [sortDropdownOpen]);
 
   // Helper to parse delivery time in minutes
   const parseDeliveryTime = (timeStr) => {
@@ -177,32 +202,68 @@ export default function StoresListingPage() {
                 {filteredAndSortedStores.length} {filteredAndSortedStores.length === 1 ? "store" : "stores"}
               </span>
 
-              {/* Sort By Select */}
-              <div className="relative inline-flex items-center">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  aria-label="Sort stores"
-                  style={{
-                    border: "0.8px solid #E7E8E5",
-                    borderRadius: "999px",
-                    padding: "8px 32px 8px 16px",
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    color: "#101828",
-                    backgroundColor: "#FFFFFF",
-                  }}
-                  className="appearance-none cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#F5B800] focus-visible:ring-offset-2"
+              {/* Sort By Custom Themed Dropdown */}
+              <div className="relative inline-flex items-center" ref={sortDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setSortDropdownOpen((prev) => !prev)}
+                  aria-haspopup="listbox"
+                  aria-expanded={sortDropdownOpen}
+                  className={`inline-flex items-center justify-between gap-2.5 border rounded-full px-4 py-1.5 text-[13px] font-[600] text-[#101828] bg-white cursor-pointer transition-all shadow-2xs hover:bg-[#F9FAFB] focus:outline-none select-none ${
+                    sortDropdownOpen
+                      ? "border-[#F5B800] ring-2 ring-[#F5B800]/20"
+                      : "border-[#E7E8E5]"
+                  }`}
                 >
-                  <option value="recommended">Sort by: Recommended</option>
-                  <option value="rating">Sort by: Rating</option>
-                  <option value="delivery">Sort by: Delivery time</option>
-                  <option value="distance">Sort by: Distance</option>
-                </select>
-                <ChevronDown
-                  size={14}
-                  className="absolute right-3 text-[#667085] pointer-events-none"
-                />
+                  <span>
+                    {STORE_SORT_OPTIONS.find((o) => o.value === sortBy)?.label || sortBy}
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    strokeWidth={2.2}
+                    className={`text-[#101828] transition-transform duration-200 shrink-0 ${
+                      sortDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {sortDropdownOpen && (
+                  <div
+                    role="listbox"
+                    className="absolute right-0 top-full mt-2 z-50 min-w-[210px] bg-white border border-[#E7E8E5] rounded-2xl p-1.5 shadow-[0_12px_30px_rgba(16,24,40,0.12)] animate-scale-up"
+                    style={{ fontFamily: "'Manrope', sans-serif" }}
+                  >
+                    {STORE_SORT_OPTIONS.map((opt) => {
+                      const isSelected = opt.value === sortBy;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          role="option"
+                          aria-selected={isSelected}
+                          onClick={() => {
+                            setSortBy(opt.value);
+                            setSortDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3.5 py-2 text-[13px] rounded-xl text-left transition-colors cursor-pointer select-none ${
+                            isSelected
+                              ? "bg-[#FFF4DA] text-[#101828] font-bold"
+                              : "text-[#101828] hover:bg-[#F4F5F8] font-semibold"
+                          }`}
+                        >
+                          <span>{opt.label}</span>
+                          {isSelected && (
+                            <Check
+                              size={15}
+                              strokeWidth={2.4}
+                              className="text-[#D49400] shrink-0 ml-2"
+                            />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           </div>

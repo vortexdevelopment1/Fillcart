@@ -216,6 +216,40 @@ export function normalizeProduct(p) {
 }
 
 /**
+ * Helper to strip common English plurals/suffixes for search matching
+ */
+function stemWord(w) {
+  let s = String(w || "").toLowerCase().trim();
+  if (s.endsWith("ies")) return s.slice(0, -3) + "y";
+  if (s.endsWith("es")) return s.slice(0, -2);
+  if (s.endsWith("s") && !s.endsWith("ss")) return s.slice(0, -1);
+  return s;
+}
+
+const SEARCH_SYNONYMS = {
+  tomatoes: ["tomato"],
+  tomato: ["tomatoes"],
+  potato: ["potatoes", "aloo", "aalu"],
+  potatoes: ["potato", "aloo", "aalu"],
+  apples: ["apple"],
+  apple: ["apples"],
+  milk: ["doodh", "dairy"],
+  doodh: ["milk", "dairy"],
+  paneer: ["panir", "cottage cheese"],
+  panir: ["paneer"],
+  sabji: ["vegetable", "vegetables", "veggies", "grocery"],
+  veggies: ["vegetable", "vegetables", "sabji"],
+  vegetable: ["vegetables", "veggies", "sabji"],
+  vegetables: ["vegetable", "veggies", "sabji"],
+  chawal: ["rice"],
+  atta: ["flour", "wheat", "aata"],
+  aata: ["atta", "wheat"],
+  nashta: ["snacks", "snack", "breakfast"],
+  snacks: ["snack", "nashta"],
+  dawa: ["medicine", "medicines", "pharmacy"],
+};
+
+/**
  * Product Service API integration
  */
 export const productService = {
@@ -244,13 +278,65 @@ export const productService = {
       }
       if (params.search || params.q) {
         const query = (params.search || params.q).toLowerCase().trim();
-        all = all.filter(
-          (p) =>
-            p.name?.toLowerCase().includes(query) ||
-            p.category?.toLowerCase().includes(query) ||
-            p.description?.toLowerCase().includes(query) ||
-            (Array.isArray(p.tags) && p.tags.some((t) => t.toLowerCase().includes(query)))
-        );
+        const queryStem = stemWord(query);
+        const queryTokens = query.split(/\s+/).filter(Boolean);
+        const querySynonyms = SEARCH_SYNONYMS[query] || SEARCH_SYNONYMS[queryStem] || [];
+
+        const scored = all.map((p) => {
+          let score = 0;
+          const pName = (p.name || "").toLowerCase();
+          const pNameStem = stemWord(pName);
+          const pDesc = (p.description || "").toLowerCase();
+          const pCat = (p.categoryKey || p.categoryName || p.category || "").toLowerCase();
+          const pBrand = (p.brand || p.store || "").toLowerCase();
+          const tags = (Array.isArray(p.tags) ? p.tags : []).map((t) => String(t).toLowerCase());
+          const keywords = (Array.isArray(p.keywords) ? p.keywords : []).map((k) => String(k).toLowerCase());
+
+          // 1. Exact match on full name
+          if (pName === query || pNameStem === queryStem) score += 300;
+          else if (pName.startsWith(query) || pNameStem.startsWith(queryStem)) score += 200;
+          else if (pName.includes(query) || pNameStem.includes(queryStem)) score += 150;
+
+          // 2. Token match on name
+          const nameTokens = pName.split(/\s+/).map(stemWord);
+          for (const qt of queryTokens) {
+            const qtStem = stemWord(qt);
+            for (const nt of nameTokens) {
+              if (nt === qt || nt === qtStem) score += 120;
+              else if (nt.startsWith(qt) || nt.startsWith(qtStem)) score += 80;
+              else if (qt.length >= 4 && nt.includes(qt)) score += 60;
+            }
+          }
+
+          // 3. Category match
+          if (pCat === query || pCat === queryStem || pCat.includes(query)) score += 90;
+
+          // 4. Brand / Store match
+          if (pBrand === query || pBrand.includes(query)) score += 80;
+
+          // 5. Tags & keywords match
+          for (const t of [...tags, ...keywords]) {
+            if (t === query || stemWord(t) === queryStem) score += 90;
+            else if (t.includes(query)) score += 60;
+          }
+
+          // 6. Description match
+          if (pDesc.includes(query)) score += 30;
+
+          // 7. Synonyms match
+          for (const syn of querySynonyms) {
+            if (pName.includes(syn) || pCat.includes(syn) || tags.some((t) => t.includes(syn))) {
+              score += 100;
+            }
+          }
+
+          return { product: p, score };
+        });
+
+        all = scored
+          .filter((item) => item.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map((item) => item.product);
       }
       if (params.store && params.store !== "all") {
         const storeName = params.store.toLowerCase();

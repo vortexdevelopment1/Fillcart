@@ -226,7 +226,7 @@ export const productOverrides = {
   // ---- Tomato Reference (Existing) ----
   tomato: {
     id: "tomato",
-    name: "Tomato - Local",
+    name: "Tomato",
     slug: "tomato",
     unit: "500 g",
     tagline: "Farm Fresh · Direct Sourced",
@@ -243,15 +243,15 @@ export const productOverrides = {
       { label: "2 kg", price: 125, oldPrice: 150 },
     ],
     gallery: [
-      "/product-tomato.svg",
-      "/product-tomato.svg",
-      "/product-tomato.svg",
-      "/product-tomato.svg",
-      "/product-tomato.svg",
-      "/product-tomato.svg",
-      "/product-tomato.svg",
-      "/product-tomato.svg",
-      "/product-tomato.svg",
+      "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=1000&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1546470427-e26264be0b11?w=1000&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1561136594-7f68413baa99?w=1000&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=1000&auto=format&fit=crop&q=85",
+      "https://res.cloudinary.com/l44x18ko/image/upload/v1795688057/fillcart/products/fresh-tomato.svg",
+      "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?w=1000&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1607305387299-a3d9611cd469?w=1000&auto=format&fit=crop&q=85",
+      "https://res.cloudinary.com/l44x18ko/image/upload/v1795688072/fillcart/products/tomatoes-on-vine.svg",
+      "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=1200&auto=format&fit=crop&q=85",
     ],
     about: "Locally grown, hand-picked firm red tomatoes. Fresh harvest delivered straight from farm gates to your kitchen within hours.",
     highlights: [

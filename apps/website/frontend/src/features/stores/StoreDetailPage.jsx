@@ -567,6 +567,30 @@ function StoreHero({ store }) {
   );
 }
 
+/** Exact Figma 8-pointed starburst discount badge icon */
+function DiscountBadgeIcon({ size = 32, className = "", strokeWidth = 1.75, ...props }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M12 2.5 L15.2 5.8 L19.5 4.5 L18.2 8.8 L21.5 12 L18.2 15.2 L19.5 19.5 L15.2 18.2 L12 21.5 L8.8 18.2 L4.5 19.5 L5.8 15.2 L2.5 12 L5.8 8.8 L4.5 4.5 L8.8 5.8 Z" />
+      <line x1="15" y1="9" x2="9" y2="15" />
+      <circle cx="9.5" cy="9.5" r="1.2" />
+      <circle cx="14.5" cy="14.5" r="1.2" />
+    </svg>
+  );
+}
+
 /** FEATURE STRIP (1216 x 66px, border-radius 18px, bg #F7F6F3, 4 equal items) */
 function FeatureStrip({ store }) {
   // Format delivery time for sub text
@@ -583,7 +607,7 @@ function FeatureStrip({ store }) {
       sub: deliverySub,
     },
     {
-      icon: <Percent size={32} className="text-[#087B1C] shrink-0" strokeWidth={1.75} />,
+      icon: <DiscountBadgeIcon size={32} className="text-[#087B1C] shrink-0" strokeWidth={1.75} />,
       title: "Great Prices",
       sub: "Everyday low prices",
     },

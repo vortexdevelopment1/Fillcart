@@ -136,7 +136,7 @@ export const imageMap = {
     // Fruits & Vegetables
     tomato: "https://res.cloudinary.com/l44x18ko/image/upload/v1795688057/fillcart/products/fresh-tomato.svg",
     tomatoesOnVine: "https://res.cloudinary.com/l44x18ko/image/upload/v1795688072/fillcart/products/tomatoes-on-vine.svg",
-    redOnion: "https://res.cloudinary.com/l44x18ko/image/upload/v1795688056/fillcart/products/fresh-red-onion.svg",
+    redOnion: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=1200&auto=format&fit=crop&q=85",
     potato: "https://res.cloudinary.com/l44x18ko/image/upload/v1795688067/fillcart/products/potato.png",
     carrot: "https://res.cloudinary.com/l44x18ko/image/upload/v1795688056/fillcart/products/fresh-carrots.svg",
     banana: "https://res.cloudinary.com/l44x18ko/image/upload/v1795688054/fillcart/products/fresh-banana-robusta.svg",
