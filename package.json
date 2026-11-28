@@ -5,7 +5,7 @@
   "packageManager": "npm@11.20.0",
   "workspaces": [
     "apps/backend",
-    "apps/website",
+    "apps/website/*",
     "apps/admin-dashboard",
     "packages/config",
     "packages/design-tokens",
