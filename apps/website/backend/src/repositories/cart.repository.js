@@ -181,4 +181,22 @@ export class CartRepository {
     }
     return { count: 1 };
   }
+
+  async updateAppliedCoupon(cartId, appliedCouponCode, tx = null) {
+    const client = tx || prisma;
+    if (client.cart) {
+      return client.cart.update({
+        where: { id: cartId },
+        data: { appliedCouponCode },
+      });
+    }
+
+    for (const cart of fallbackCarts.values()) {
+      if (cart.id === cartId) {
+        cart.appliedCouponCode = appliedCouponCode;
+        return cart;
+      }
+    }
+    return null;
+  }
 }

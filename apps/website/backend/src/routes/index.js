@@ -16,6 +16,8 @@ import { cartRouter } from "./cart.routes.js";
 import { wishlistRouter } from "./wishlist.routes.js";
 import { addressRouter } from "./addresses.routes.js";
 import { profileRouter } from "./profile.routes.js";
+import { couponRouter } from "./coupons.routes.js";
+import { orderRouter } from "./orders.routes.js";
 
 export const v1Router = Router();
 
@@ -39,3 +41,5 @@ v1Router.use("/cart", cartRouter);
 v1Router.use("/wishlist", wishlistRouter);
 v1Router.use("/addresses", addressRouter);
 v1Router.use("/me/profile", profileRouter);
+v1Router.use("/coupons", couponRouter);
+v1Router.use("/orders", orderRouter);
