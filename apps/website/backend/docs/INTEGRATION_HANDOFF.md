@@ -90,3 +90,35 @@ As specified by the customer frontend (`CartPage.jsx` and `ProfileOrders.jsx`), 
 - `ORDER_CONFIG.ESTIMATED_DELIVERY_MINUTES`: 15 minutes (hyperlocal 15-minute express delivery promise)
 - Order Number Format: `FC-` prefix followed by 6 unique digits (e.g. `FC-491028`).
 - Rider Tracking: Explicitly returns `rider: null` on `GET /orders/:orderId/track` until rider dispatch backend and WebSocket GPS tracking are provisioned.
+
+---
+
+## 5. Prescriptions Verification & File Storage Architecture
+
+- **Current Implementation:**
+  - `Prescription` records are registered via `POST /api/v1/prescriptions` with a secure HTTPS `fileUrl`, status `"PENDING"`, and optional patient/doctor metadata.
+  - Strict privacy: `fileUrl` is treated as sensitive health data and is never logged in console outputs or error stacks. Endpoints are strictly owner-isolated (foreign requests return 404).
+  - Maximum 20 prescriptions per user limit enforced.
+- **Handoff for Pharmacy / Admin Verification:**
+  - **Who Verifies:** A licensed pharmacy partner or internal admin portal must review the prescription image/document before dispensing prescription-only medicines.
+  - **Status Transitions:** Admin/Pharmacy service will transition status from `PENDING` ➔ `VERIFIED` or `PENDING` ➔ `REJECTED` (with `rejectionReason`).
+  - **File Storage Recommendation:** Production uploads should use a private cloud bucket (e.g. Cloudinary authenticated upload or private S3/GCS bucket with short-lived presigned GET URLs) rather than publicly accessible CDN assets to maintain healthcare data compliance.
+
+---
+
+## 6. Product Reviews & Moderation
+
+- **Current Implementation:**
+  - Public endpoint `GET /api/v1/products/:slugOrId/reviews` returns reviews with dynamic mathematical summary: `average` rating, `count`, and `distribution` (1 to 5 stars) computed strictly from real reviews in `customer.product_reviews`.
+  - Database seed columns `Product.rating` and `Product.reviewCount` are intentionally preserved untouched to protect catalog presentation consistency.
+  - One review per user per product enforced via unique constraint.
+  - Automatic `isVerifiedPurchase` badge: When a customer submits a review, the service checks whether the user has a `DELIVERED` order containing that product item.
+- **Handoff for Moderation:**
+  - An admin/vendor dashboard or automated profanity filter can be connected to flag or hide offensive reviews without breaking the mathematical summary.
+
+---
+
+## 7. Status of Subscriptions Module
+
+- **Explicit Decision:** As per engineering review, the Recurring Subscriptions feature has been **skipped** from backend implementation because the subscription flow is neither reachable nor exposed anywhere in the customer website navigation, footer, or profile menus.
+

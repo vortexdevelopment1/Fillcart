@@ -741,4 +741,22 @@ The standalone customer orders, tracking, and promotional coupon subsystems have
 - `Cart` (`carts`): Added `appliedCouponCode` field
 
 ---
+
+## Part H: Prescriptions & Product Reviews Implementation Update (November 28, 2026)
+
+### Implemented Endpoints
+1. `GET /api/v1/prescriptions` — List customer's uploaded prescriptions (requireAuth, user-isolated).
+2. `POST /api/v1/prescriptions` — Register new prescription record (requireAuth, https URL, allowed jpg/jpeg/png/pdf, max 20 per customer).
+3. `GET /api/v1/prescriptions/:id` — Get single prescription detail (requireAuth, user-isolated).
+4. `DELETE /api/v1/prescriptions/:id` — Delete customer's own prescription (requireAuth).
+5. `GET /api/v1/products/:slugOrId/reviews` — Public reviews list with real summary math (average rating, total count, distribution 1-5).
+6. `POST /api/v1/products/:slugOrId/reviews` — Submit product review (requireAuth, 1 review per user, verified purchase badge auto-assigned if customer has DELIVERED order).
+7. `PATCH /api/v1/products/:slugOrId/reviews/mine` — Update own submitted review (requireAuth).
+8. `DELETE /api/v1/products/:slugOrId/reviews/mine` — Delete own review (requireAuth).
+
+### Implemented Customer Database Models (schema `customer`)
+- `Prescription` (`prescriptions`)
+- `ProductReview` (`product_reviews`)
+
+---
 *Report generated and validated by Antigravity Read-Only Audit Service.*

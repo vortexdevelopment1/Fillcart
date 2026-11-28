@@ -351,6 +351,60 @@ curl -X POST http://127.0.0.1:4100/api/v1/orders/FC-123456/cancel \
 curl -X POST http://127.0.0.1:4100/api/v1/orders/FC-123456/reorder \
   -H "Authorization: Bearer <CUSTOMER_JWT>"
 ```
+
+#### 14. Prescriptions Management (requireAuth)
+```bash
+# Upload / register new prescription document (https URL, max 20 per customer)
+curl -X POST http://127.0.0.1:4100/api/v1/prescriptions \
+  -H "Authorization: Bearer <CUSTOMER_JWT>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fileName": "dr_mehta_prescription.pdf",
+    "fileUrl": "https://res.cloudinary.com/fillcart/rx/dr_mehta_prescription.pdf",
+    "fileType": "pdf",
+    "doctorName": "Dr. Arvind Mehta",
+    "patientName": "Aarav Sharma"
+  }'
+
+# List user prescriptions
+curl -X GET http://127.0.0.1:4100/api/v1/prescriptions \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+
+# Get single prescription detail
+curl -X GET http://127.0.0.1:4100/api/v1/prescriptions/<prescription-id> \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+
+# Delete own prescription
+curl -X DELETE http://127.0.0.1:4100/api/v1/prescriptions/<prescription-id> \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+```
+
+#### 15. Product Ratings & Reviews
+```bash
+# Fetch product reviews & summary rating math (Public)
+curl -X GET "http://127.0.0.1:4100/api/v1/products/fresh-royal-apples/reviews?page=1&limit=10&sort=recent"
+
+# Submit a product review (requireAuth, 1 review per user per product, verified badge automatic)
+curl -X POST http://127.0.0.1:4100/api/v1/products/fresh-royal-apples/reviews \
+  -H "Authorization: Bearer <CUSTOMER_JWT>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "rating": 5,
+    "title": "Outstanding Freshness",
+    "comment": "Crisp and juicy apples, delivered in 15 minutes!",
+    "displayName": "Aarav S."
+  }'
+
+# Update own review (requireAuth)
+curl -X PATCH http://127.0.0.1:4100/api/v1/products/fresh-royal-apples/reviews/mine \
+  -H "Authorization: Bearer <CUSTOMER_JWT>" \
+  -H "Content-Type: application/json" \
+  -d '{ "rating": 5, "comment": "Updated comment after second order." }'
+
+# Delete own review (requireAuth)
+curl -X DELETE http://127.0.0.1:4100/api/v1/products/fresh-royal-apples/reviews/mine \
+  -H "Authorization: Bearer <CUSTOMER_JWT>"
+```
 ```
 
 
